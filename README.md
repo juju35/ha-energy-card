@@ -45,6 +45,7 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 - Grid outage (backup): the grid is crossed out, nothing flows from or to it, the status says so
 - Battery: level with the backup reserve marked on its bar, charging or discharging power, time to full or to the reserve, mode, reserve and capacity
 - Today: produced, consumed, imported, exported, charged and discharged energy, self-consumption and self-sufficiency (worked out from the others), self-sufficiency in the header
+- Last 7 days: production and consumption bars per day, with the week's totals, from the recorder's statistics of the daily energy sensors
 - Options: the integration's switches (charge from the grid, off-grid operation…) as toggles that ask for a confirmation, and its selects (storage or work mode) with their value
 - Status chip: producing, not producing, battery charging or discharging, grid outage, inverter error
 - Header icon of a solar panel with the brand logo as a badge, opening the brand's site, in the brand's color, readable in the light and dark themes
@@ -172,9 +173,10 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | `show_flow` | full | `true` | Power flow diagram |
 | `show_battery` | full | `true` | Battery section |
 | `show_today` | full | `true` | Today's energy |
+| `show_week` | full | `true` | Production and consumption of each of the last 7 days (bars, the day's figures on hover) and their totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour) |
 | `show_options` | full | `true` | Options: the integration's switches and selects |
 | `show_controls` | full | `true` | Toggles of the switches; `false` shows their state only |
-| `collapsed` | full | `[options]` | Sections folded by default, among `battery`, `today` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
+| `collapsed` | full | `[options]` | Sections folded by default, among `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
 | `entities` | both | — | Entities set by hand, by role: `solar`, `home`, `grid` (+ import, − export), `grid_import`, `grid_export`, `battery` (+ discharge, − charge), `battery_charge`, `battery_discharge`, `soc`, `solar_today`, `home_today`, `import_today`, `export_today`, `charge_today`, `discharge_today`, `battery_energy`, `battery_capacity`, `reserve`, `mode`, `status`, `error`, `grid_status` |
 | `invert_grid` | both | `false` | The grid sensor is positive when exporting |
 | `invert_battery` | both | `false` | The battery sensor is positive when charging |
