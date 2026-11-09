@@ -80,8 +80,24 @@ async function openCard(browser, { file, type, config, theme, width, overrides }
       for (const [id, o] of Object.entries(overrides || {})) states[id] = { ...states[id], ...o };
       const el = document.createElement(type);
       el.setConfig({ type: `custom:${type}`, ...config });
+      // Recorder mock for the last 7 days section: a week of daily production and consumption (kWh).
+      const WEEK = { produced: [14.2, 9.8, 16.9, 21.0, 6.3, 15.7, 0], consumed: [11.5, 12.8, 10.9, 13.6, 14.9, 11.2, 0] };
+      const callWS = async (msg) => {
+        if (msg.type !== "recorder/statistics_during_period") return {};
+        const start = Date.parse(msg.start_time);
+        return Object.fromEntries(
+          msg.statistic_ids.map((id, k) => [
+            id,
+            // Today: the card's own today sensor, so the last bar and the Today tiles agree.
+            (k === 0 ? WEEK.produced : WEEK.consumed).map((change, i) => ({
+              start: start + i * 86400000,
+              change: i === 6 && Number.isFinite(Number(states[id]?.state)) ? Number(states[id].state) : change,
+            })),
+          ])
+        );
+      };
       el.hass = {
-        states, entities, devices, language: "en", locale: { language: "en" }, themes: { darkMode: theme === "dark" }, callService: () => {},
+        states, entities, devices, language: "en", locale: { language: "en" }, themes: { darkMode: theme === "dark" }, callService: () => {}, callWS,
       };
       document.getElementById("root").appendChild(el);
     },
