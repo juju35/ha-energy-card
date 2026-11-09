@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 - 2026-11-09
+
+### Improvements
+- Last 7 days: short day names (*Tue*, *Wed*…) instead of the letters that repeat (*T W T F S S M*), and a tapped day shows its own production and consumption in place of the week's totals (tap it again for the totals) — the hover tooltip didn't work on a phone.
+
 ## 1.2.1 - 2026-11-09
 
 ### Maintenance

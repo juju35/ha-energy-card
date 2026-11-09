@@ -1,6 +1,6 @@
 {
   "name": "ha-energy-card",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lovelace cards for Home Assistant to monitor solar inverters and home batteries (Enphase, SolarEdge, Fronius, Huawei Solar, SMA, Tesla Powerwall, Growatt, APsystems, SolaX, GoodWe and any integration with power sensors): live power flow, battery, today's energy.",
   "private": true,
   "type": "module",
