@@ -298,6 +298,8 @@ const STRINGS = {
     show_flow: "Power flow",
     show_battery: "Battery",
     show_today: "Today's energy",
+    show_week: "Last 7 days (production and consumption per day)",
+    week: "Last 7 days",
     show_options: "Options",
     show_controls: "Controls",
     invert_grid: "Grid power is positive when exporting",
@@ -355,6 +357,8 @@ const STRINGS = {
     show_flow: "Flux d'énergie",
     show_battery: "Batterie",
     show_today: "Énergie du jour",
+    show_week: "7 derniers jours (production et consommation par jour)",
+    week: "7 derniers jours",
     show_options: "Options",
     show_controls: "Commandes",
     invert_grid: "Puissance réseau positive en export",
@@ -412,6 +416,8 @@ const STRINGS = {
     show_flow: "Energiefluss",
     show_battery: "Batterie",
     show_today: "Energie heute",
+    show_week: "Letzte 7 Tage (Erzeugung und Verbrauch pro Tag)",
+    week: "Letzte 7 Tage",
     show_options: "Optionen",
     show_controls: "Steuerung",
     invert_grid: "Netzleistung ist bei Einspeisung positiv",
@@ -469,6 +475,8 @@ const STRINGS = {
     show_flow: "Flujo de energía",
     show_battery: "Batería",
     show_today: "Energía de hoy",
+    show_week: "Últimos 7 días (producción y consumo por día)",
+    week: "Últimos 7 días",
     show_options: "Opciones",
     show_controls: "Controles",
     invert_grid: "La potencia de red es positiva al exportar",
@@ -526,6 +534,8 @@ const STRINGS = {
     show_flow: "Ток енергије",
     show_battery: "Батерија",
     show_today: "Данашња енергија",
+    show_week: "Последњих 7 дана (производња и потрошња по дану)",
+    week: "Последњих 7 дана",
     show_options: "Опције",
     show_controls: "Команде",
     invert_grid: "Снага мреже је позитивна при извозу",
@@ -583,6 +593,8 @@ const STRINGS = {
     show_flow: "Tok energije",
     show_battery: "Baterija",
     show_today: "Današnja energija",
+    show_week: "Poslednjih 7 dana (proizvodnja i potrošnja po danu)",
+    week: "Poslednjih 7 dana",
     show_options: "Opcije",
     show_controls: "Komande",
     invert_grid: "Snaga mreže je pozitivna pri izvozu",
@@ -640,6 +652,8 @@ const STRINGS = {
     show_flow: "Flusso di energia",
     show_battery: "Batteria",
     show_today: "Energia di oggi",
+    show_week: "Ultimi 7 giorni (produzione e consumo al giorno)",
+    week: "Ultimi 7 giorni",
     show_options: "Opzioni",
     show_controls: "Comandi",
     invert_grid: "La potenza di rete è positiva in immissione",
@@ -697,6 +711,8 @@ const STRINGS = {
     show_flow: "Energiestroom",
     show_battery: "Batterij",
     show_today: "Energie vandaag",
+    show_week: "Laatste 7 dagen (opwek en verbruik per dag)",
+    week: "Laatste 7 dagen",
     show_options: "Opties",
     show_controls: "Bediening",
     invert_grid: "Netvermogen is positief bij teruglevering",
@@ -754,6 +770,8 @@ const STRINGS = {
     show_flow: "Fluxo de energia",
     show_battery: "Bateria",
     show_today: "Energia de hoje",
+    show_week: "Últimos 7 dias (produção e consumo por dia)",
+    week: "Últimos 7 dias",
     show_options: "Opções",
     show_controls: "Controlos",
     invert_grid: "A potência da rede é positiva ao exportar",
@@ -811,6 +829,8 @@ const STRINGS = {
     show_flow: "Przepływ energii",
     show_battery: "Bateria",
     show_today: "Energia dzisiaj",
+    show_week: "Ostatnie 7 dni (produkcja i zużycie dziennie)",
+    week: "Ostatnie 7 dni",
     show_options: "Opcje",
     show_controls: "Sterowanie",
     invert_grid: "Moc sieci jest dodatnia przy oddawaniu",
@@ -868,6 +888,8 @@ const STRINGS = {
     show_flow: "Flux de energie",
     show_battery: "Baterie",
     show_today: "Energia de azi",
+    show_week: "Ultimele 7 zile (producție și consum pe zi)",
+    week: "Ultimele 7 zile",
     show_options: "Opțiuni",
     show_controls: "Comenzi",
     invert_grid: "Puterea rețelei este pozitivă la export",
@@ -925,6 +947,8 @@ const STRINGS = {
     show_flow: "Energiflow",
     show_battery: "Batteri",
     show_today: "Energi i dag",
+    show_week: "Seneste 7 dage (produktion og forbrug pr. dag)",
+    week: "Seneste 7 dage",
     show_options: "Indstillinger",
     show_controls: "Betjening",
     invert_grid: "Neteffekten er positiv ved salg",
@@ -982,6 +1006,8 @@ const STRINGS = {
     show_flow: "Energiflöde",
     show_battery: "Batteri",
     show_today: "Energi i dag",
+    show_week: "Senaste 7 dagarna (produktion och förbrukning per dag)",
+    week: "Senaste 7 dagarna",
     show_options: "Alternativ",
     show_controls: "Reglage",
     invert_grid: "Nätets effekt är positiv vid försäljning",
@@ -1039,6 +1065,8 @@ const STRINGS = {
     show_flow: "Енергиен поток",
     show_battery: "Батерия",
     show_today: "Енергия днес",
+    show_week: "Последните 7 дни (производство и потребление на ден)",
+    week: "Последните 7 дни",
     show_options: "Опции",
     show_controls: "Управление",
     invert_grid: "Мощността на мрежата е положителна при износ",
@@ -1096,6 +1124,8 @@ const STRINGS = {
     show_flow: "Поток энергии",
     show_battery: "Батарея",
     show_today: "Энергия за сегодня",
+    show_week: "Последние 7 дней (выработка и потребление за день)",
+    week: "Последние 7 дней",
     show_options: "Параметры",
     show_controls: "Управление",
     invert_grid: "Мощность сети положительна при отдаче",
@@ -1153,6 +1183,8 @@ const STRINGS = {
     show_flow: "Потік енергії",
     show_battery: "Батарея",
     show_today: "Енергія за сьогодні",
+    show_week: "Останні 7 днів (вироблення та споживання за день)",
+    week: "Останні 7 днів",
     show_options: "Параметри",
     show_controls: "Керування",
     invert_grid: "Потужність мережі додатна при віддачі",
@@ -1210,6 +1242,8 @@ const STRINGS = {
     show_flow: "Energiaáramlás",
     show_battery: "Akkumulátor",
     show_today: "Mai energia",
+    show_week: "Utolsó 7 nap (napi termelés és fogyasztás)",
+    week: "Utolsó 7 nap",
     show_options: "Beállítások",
     show_controls: "Vezérlők",
     invert_grid: "A hálózati teljesítmény betápláláskor pozitív",
@@ -1267,6 +1301,8 @@ const STRINGS = {
     show_flow: "Tok energie",
     show_battery: "Batéria",
     show_today: "Dnešná energia",
+    show_week: "Posledných 7 dní (výroba a spotreba za deň)",
+    week: "Posledných 7 dní",
     show_options: "Možnosti",
     show_controls: "Ovládanie",
     invert_grid: "Výkon siete je kladný pri dodávke",
@@ -1324,6 +1360,8 @@ const STRINGS = {
     show_flow: "Tok energie",
     show_battery: "Baterie",
     show_today: "Dnešní energie",
+    show_week: "Posledních 7 dní (výroba a spotřeba za den)",
+    week: "Posledních 7 dní",
     show_options: "Možnosti",
     show_controls: "Ovládání",
     invert_grid: "Výkon sítě je kladný při přetoku",
@@ -1381,6 +1419,8 @@ const STRINGS = {
     show_flow: "Tok energije",
     show_battery: "Baterija",
     show_today: "Današnja energija",
+    show_week: "Zadnjih 7 dni (proizvodnja in poraba na dan)",
+    week: "Zadnjih 7 dni",
     show_options: "Možnosti",
     show_controls: "Upravljanje",
     invert_grid: "Moč omrežja je pozitivna pri oddaji",
@@ -1438,6 +1478,8 @@ const STRINGS = {
     show_flow: "Enerģijas plūsma",
     show_battery: "Akumulators",
     show_today: "Šodienas enerģija",
+    show_week: "Pēdējās 7 dienas (ražošana un patēriņš dienā)",
+    week: "Pēdējās 7 dienas",
     show_options: "Opcijas",
     show_controls: "Vadība",
     invert_grid: "Tīkla jauda ir pozitīva nodošanas laikā",
@@ -1495,6 +1537,8 @@ const STRINGS = {
     show_flow: "Ροή ενέργειας",
     show_battery: "Μπαταρία",
     show_today: "Ενέργεια σήμερα",
+    show_week: "Τελευταίες 7 ημέρες (παραγωγή και κατανάλωση ανά ημέρα)",
+    week: "Τελευταίες 7 ημέρες",
     show_options: "Επιλογές",
     show_controls: "Χειριστήρια",
     invert_grid: "Η ισχύς δικτύου είναι θετική κατά την έγχυση",
@@ -2327,6 +2371,18 @@ const FULL_STYLE = `
   .tag span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .tag .icon { width: 14px; height: 14px; color: var(--secondary-text-color); }
   .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; height: 72px; align-items: end; }
+  .wday { display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; }
+  .wbars { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 2px; }
+  .wbar { width: 40%; max-width: 10px; border-radius: 3px 3px 0 0; }
+  .wbar.prod { background: var(--ec-solar); }
+  .wbar.cons { background: var(--ec-home); }
+  .wlbl { font-size: 10px; color: var(--secondary-text-color); }
+  .wtotals { display: flex; gap: 12px; font-size: 12px; margin-top: 4px; }
+  .wtotals > span { display: inline-flex; align-items: center; gap: 4px; }
+  .wtotals .icon { width: 14px; height: 14px; }
+  .wtotals .prod .icon { color: var(--ec-solar); }
+  .wtotals .cons .icon { color: var(--ec-home); }
   .tile { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border-radius: 10px; min-width: 0;
           background: var(--secondary-background-color, rgba(127,127,127,.08)); }
   .tile .k { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; }
@@ -2387,6 +2443,7 @@ class EnergyCard extends EnergyBase {
     if (c.show_flow !== false) parts.push(this._flow(p));
     if (c.show_battery !== false) parts.push(this._battery(p));
     if (c.show_today !== false) parts.push(this._todaySection());
+    if (c.show_week !== false) parts.push(this._weekSection());
     if (c.show_options !== false) parts.push(this._options());
     return `<style>${BASE_STYLE}${FULL_STYLE}${this._accent()}</style>
       <ha-card>
@@ -2550,6 +2607,80 @@ class EnergyCard extends EnergyBase {
     return `<div>
       ${this._sectionTitle("today", ICONS.calendar, this._t("today"))}
       ${this._isCollapsed("today") ? "" : `<div class="tiles">${tiles.join("")}</div>`}
+    </div>`;
+  }
+
+  // Production and consumption of each of the last 7 days (today included), from the daily change of the "today"
+  // energy sensors in the recorder's statistics: one query, again every hour; rendered again when it comes.
+  _fetchWeek() {
+    const ids = ["solar_today", "home_today"].map((role) => this._sys.roles[role]).filter(Boolean);
+    const key = ids.join(",");
+    if (!key || !this._hass.callWS || this._weekBusy) return;
+    if (this._weekKey === key && Date.now() - (this._weekAt || 0) < 3600000) return;
+    this._weekBusy = true;
+    this._weekKey = key;
+    this._weekAt = Date.now();
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - 6);
+    this._hass
+      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "day", types: ["change"], start_time: start.toISOString(), units: { energy: "kWh" } })
+      .then((x) => {
+        this._week = { start: start.getTime(), rows: x || {} };
+      })
+      .catch(() => {})
+      .finally(() => {
+        this._weekBusy = false;
+        this._html = null;
+        this._update();
+      });
+  }
+
+  // The 7 days, oldest first: { day (ms), produced, consumed } (null where unknown).
+  _weekDays() {
+    if (!this._week) return [];
+    const byDay = (role) => {
+      const out = new Map();
+      for (const r of this._week.rows[this._sys.roles[role]] || []) {
+        const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
+        const d = new Date(t);
+        d.setHours(0, 0, 0, 0);
+        if (Number.isFinite(Number(r.change))) out.set(d.getTime(), Math.max(0, Number(r.change)));
+      }
+      return out;
+    };
+    const prod = byDay("solar_today");
+    const cons = byDay("home_today");
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(this._week.start);
+      d.setDate(d.getDate() + i);
+      const t = d.getTime();
+      return { day: t, produced: prod.get(t) ?? null, consumed: cons.get(t) ?? null };
+    });
+  }
+
+  _weekSection() {
+    this._fetchWeek();
+    const days = this._weekDays();
+    if (!days.some((d) => d.produced !== null || d.consumed !== null)) return "";
+    const L = this._locale();
+    const max = Math.max(...days.flatMap((d) => [d.produced || 0, d.consumed || 0]), 0.001);
+    const weekday = new Intl.DateTimeFormat(L, { weekday: "narrow" });
+    const total = (k) => days.reduce((sum, d) => sum + (d[k] || 0), 0);
+    const bars = days
+      .map((d) => {
+        const h = (v) => `${v === null ? 0 : Math.max(2, Math.round((v / max) * 100))}%`;
+        const title = `${new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short" }).format(d.day)} · ${this._t("produced")} ${fmtEnergy(d.produced, L)} · ${this._t("consumed")} ${fmtEnergy(d.consumed, L)}`;
+        return `<div class="wday" title="${esc(title)}"><div class="wbars"><span class="wbar prod" style="height:${h(d.produced)}"></span><span class="wbar cons" style="height:${h(d.consumed)}"></span></div><span class="wlbl">${esc(weekday.format(d.day))}</span></div>`;
+      })
+      .join("");
+    return `<div>
+      ${this._sectionTitle("week", ICONS.calendar, this._t("week"))}
+      ${
+        this._isCollapsed("week")
+          ? ""
+          : `<div class="week">${bars}</div><div class="wtotals"><span class="prod">${svgIcon(ICONS.solar)}${esc(fmtEnergy(total("produced"), L))}</span><span class="cons">${svgIcon(ICONS.home)}${esc(fmtEnergy(total("consumed"), L))}</span></div>`
+      }
     </div>`;
   }
 
@@ -2807,6 +2938,7 @@ class EnergyCardEditor extends EnergyEditorBase {
       ["show_flow", true],
       ["show_battery", true],
       ["show_today", true],
+      ["show_week", true],
       ["show_options", true],
       ["show_controls", true],
       ["invert_grid", false],

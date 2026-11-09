@@ -259,3 +259,34 @@ test("both cards are registered for the card picker", () => {
   for (const p of Object.keys(ec.PLATFORMS)) assert.ok(ec.BRANDS[ec.PLATFORMS[p]], p);
   for (const p of Object.keys(ec.KEYS)) assert.ok(ec.PLATFORMS[p], p);
 });
+
+test("last 7 days: production and consumption per day from one daily statistics query", async () => {
+  const hass = makeHass();
+  const calls = [];
+  hass.callWS = (msg) => {
+    calls.push(msg);
+    const start = Date.parse(msg.start_time);
+    const out = {};
+    msg.statistic_ids.forEach((id, k) => {
+      out[id] = Array.from({ length: 7 }, (_, i) => ({ start: start + i * 86400000 + 3600000, change: k === 0 ? 10 + i : 8 }));
+    });
+    return Promise.resolve(out);
+  };
+  const card = newCard(hass);
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].period, "day");
+  assert.deepEqual(plain(calls[0].types), ["change"]);
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /data-section="week"/);
+  assert.equal((html.match(/class="wday"/g) || []).length, 7);
+  // 10 + 11 + … + 16 kWh produced, 7 × 8 consumed.
+  assert.match(html, /91\.0 kWh/);
+  assert.match(html, /56\.0 kWh/);
+  // Not queried again within the hour; hidden with show_week: false.
+  card.hass = makeHass();
+  card.hass.callWS = hass.callWS;
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(calls.length, 1);
+  assert.doesNotMatch(newCard(makeHass(), { show_week: false }).shadowRoot.innerHTML, /data-section="week"/);
+});

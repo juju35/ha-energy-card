@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 - 2026-11-09
+
+### Features
+- **Last 7 days**: a section with the production and consumption of each of the last 7 days as bars (the day's figures on hover) and the week's totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour). `show_week: false` hides it; `week` can be folded like the other sections.
+
 ## 1.1.1 - 2026-11-09
 
 ### Fixes
