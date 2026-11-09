@@ -3,6 +3,7 @@
 // Usage: node scripts/build.mjs  (dist/ is not committed: CI and the release workflow build it)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { splitDist } from "./i18n-split.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(`${root}package.json`, "utf8"));
@@ -15,3 +16,7 @@ for (const brand of LOGOS) out = out.replace(`__IMG_LOGO_${brand.toUpperCase()}_
 mkdirSync(`${root}dist`, { recursive: true });
 writeFileSync(`${root}dist/energy-card.js`, out);
 console.log(`Built dist/energy-card.js (${(out.length / 1024).toFixed(1)} KB)`);
+
+// Translations: English stays in the bundle, each other language goes to dist/energy-card.i18n.<lang>.js,
+// fetched when a card needs it (scripts/i18n-split.mjs).
+if (process.argv[1] === fileURLToPath(import.meta.url)) splitDist(`${root}dist`, "energy-card.js", { version: pkg.version });
