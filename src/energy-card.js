@@ -2124,6 +2124,12 @@ class EnergyBase extends HTMLElement {
     ev.stopPropagation();
     const { action, entity, label } = el.dataset;
     if (action === "zoom") return this._toggleZoom(ev);
+    if (action === "week_day") {
+      const day = Number(el.dataset.day);
+      this._weekSel = this._weekSel === day ? null : day;
+      this._html = null;
+      return this._update();
+    }
     if (action === "toggle_section") {
       const key = el.dataset.section;
       this._toggled = new Map(this._toggled).set(key, !this._isCollapsed(key));
@@ -2372,13 +2378,16 @@ const FULL_STYLE = `
   .tag .icon { width: 14px; height: 14px; color: var(--secondary-text-color); }
   .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; height: 72px; align-items: end; }
-  .wday { display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; }
+  .wday { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; cursor: pointer; border-radius: 6px; }
+  .wday.sel { background: color-mix(in srgb, var(--primary-text-color) 8%, transparent); }
+  .wday:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 1px; }
   .wbars { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 2px; }
   .wbar { width: 40%; max-width: 10px; border-radius: 3px 3px 0 0; }
   .wbar.prod { background: var(--ec-solar); }
   .wbar.cons { background: var(--ec-home); }
   .wlbl { font-size: 10px; color: var(--secondary-text-color); }
-  .wtotals { display: flex; gap: 12px; font-size: 12px; margin-top: 4px; }
+  .wtotals { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; margin-top: 4px; }
+  .wwhen { color: var(--secondary-text-color); }
   .wtotals > span { display: inline-flex; align-items: center; gap: 4px; }
   .wtotals .icon { width: 14px; height: 14px; }
   .wtotals .prod .icon { color: var(--ec-solar); }
@@ -2665,21 +2674,26 @@ class EnergyCard extends EnergyBase {
     if (!days.some((d) => d.produced !== null || d.consumed !== null)) return "";
     const L = this._locale();
     const max = Math.max(...days.flatMap((d) => [d.produced || 0, d.consumed || 0]), 0.001);
-    const weekday = new Intl.DateTimeFormat(L, { weekday: "narrow" });
+    // Short names: the narrow letters repeat (T W T F S S M).
+    const weekday = new Intl.DateTimeFormat(L, { weekday: "short" });
+    const longDay = new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short" });
+    // A day tapped (or clicked): its values replace the week's totals until it is tapped again.
+    const sel = Number.isInteger(this._weekSel) && days[this._weekSel] ? this._weekSel : null;
     const total = (k) => days.reduce((sum, d) => sum + (d[k] || 0), 0);
     const bars = days
-      .map((d) => {
+      .map((d, i) => {
         const h = (v) => `${v === null ? 0 : Math.max(2, Math.round((v / max) * 100))}%`;
-        const title = `${new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short" }).format(d.day)} · ${this._t("produced")} ${fmtEnergy(d.produced, L)} · ${this._t("consumed")} ${fmtEnergy(d.consumed, L)}`;
-        return `<div class="wday" title="${esc(title)}"><div class="wbars"><span class="wbar prod" style="height:${h(d.produced)}"></span><span class="wbar cons" style="height:${h(d.consumed)}"></span></div><span class="wlbl">${esc(weekday.format(d.day))}</span></div>`;
+        const title = `${longDay.format(d.day)} · ${this._t("produced")} ${fmtEnergy(d.produced, L)} · ${this._t("consumed")} ${fmtEnergy(d.consumed, L)}`;
+        return `<button class="wday${i === sel ? " sel" : ""}" data-action="week_day" data-day="${i}" aria-pressed="${i === sel}" title="${esc(title)}"><span class="wbars"><span class="wbar prod" style="height:${h(d.produced)}"></span><span class="wbar cons" style="height:${h(d.consumed)}"></span></span><span class="wlbl">${esc(weekday.format(d.day))}</span></button>`;
       })
       .join("");
+    const pick = sel === null ? null : days[sel];
     return `<div>
       ${this._sectionTitle("week", ICONS.calendar, this._t("week"))}
       ${
         this._isCollapsed("week")
           ? ""
-          : `<div class="week">${bars}</div><div class="wtotals"><span class="prod">${svgIcon(ICONS.solar)}${esc(fmtEnergy(total("produced"), L))}</span><span class="cons">${svgIcon(ICONS.home)}${esc(fmtEnergy(total("consumed"), L))}</span></div>`
+          : `<div class="week">${bars}</div><div class="wtotals" aria-live="polite">${pick ? `<span class="wwhen">${esc(longDay.format(pick.day))}</span>` : ""}<span class="prod">${svgIcon(ICONS.solar)}${esc(fmtEnergy(pick ? pick.produced : total("produced"), L))}</span><span class="cons">${svgIcon(ICONS.home)}${esc(fmtEnergy(pick ? pick.consumed : total("consumed"), L))}</span></div>`
       }
     </div>`;
   }

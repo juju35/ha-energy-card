@@ -283,6 +283,23 @@ test("last 7 days: production and consumption per day from one daily statistics 
   // 10 + 11 + … + 16 kWh produced, 7 × 8 consumed.
   assert.match(html, /91\.0 kWh/);
   assert.match(html, /56\.0 kWh/);
+  // Short day names, not the narrow letters that repeat (T W T F S S M).
+  const names = [...html.matchAll(/<span class="wlbl">([^<]*)<\/span>/g)].map((m) => m[1]);
+  assert.equal(names.length, 7);
+  assert.equal(new Set(names).size, 7);
+  assert.ok(names.every((n) => n.length >= 2), names.join(" "));
+  // A tapped day shows its own values instead of the totals; tapped again, the totals are back.
+  const tap = (day) => card._onClick({ composedPath: () => [{ dataset: { action: "week_day", day: String(day) } }], stopPropagation() {} });
+  tap(2);
+  let after = card.shadowRoot.innerHTML;
+  assert.match(after, /class="wday sel" data-action="week_day" data-day="2" aria-pressed="true"/);
+  assert.match(after, /class="wwhen"/);
+  assert.match(after, /12\.0 kWh/);
+  assert.doesNotMatch(after, /91\.0 kWh<\/span>/);
+  tap(2);
+  after = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(after, /class="wwhen"/);
+  assert.match(after, /91\.0 kWh/);
   // Not queried again within the hour; hidden with show_week: false.
   card.hass = makeHass();
   card.hass.callWS = hass.callWS;
