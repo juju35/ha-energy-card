@@ -169,6 +169,8 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 |---|---|---|---|
 | `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `solax`, `goodwe`, or any other domain with power sensors) |
 | `title` | both | Brand name | Card title |
+| `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
+| `show_subtitle` | both | `true` | Show the subtitle under the title |
 | `zoom` | mini | `true` | Detail button at the top right of the mini card: it shows the full card's content (with the same options, so `show_today`, `collapsed`… can be set on the mini card too) and switches back to the compact view; a click outside the card also brings the compact view back. `false` removes the button |
 | `show_flow` | full | `true` | Power flow diagram |
 | `show_battery` | full | `true` | Battery section |
