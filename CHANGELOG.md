@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2 - 2026-11-14
+
+### Fixes
+- Mini card visual editor: it now offers the full card's options that its detail view uses (title and subtitle, sections, controls, folded sections, signs and entities), not only the detail button.
+- Visual editor: the folded sections can include *Last 7 days* (`week`), as in YAML.
+
 ## 1.3.1 - 2026-11-13
 
 ### Fixes
