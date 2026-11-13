@@ -298,6 +298,23 @@ test("the editor offers the systems found and keeps the YAML minimal", () => {
   assert.deepEqual(plain(changes.at(-1)), { type: "custom:energy-card", integration: "fronius" });
 });
 
+test("the mini card editor offers the full card's options its detail view uses", () => {
+  const names = (schema) => schema.flatMap((s) => (s.schema ? names(s.schema) : [s.name]));
+  const full = new ec.EnergyCardEditor();
+  full.setConfig({ type: "custom:energy-card" });
+  full.hass = makeHass();
+  const mini = new ec.EnergyMiniCardEditor();
+  mini.setConfig({ type: "custom:energy-mini-card" });
+  mini.hass = makeHass();
+  const miniNames = names(plain(mini._form.schema));
+  for (const n of names(plain(full._form.schema))) assert.ok(miniNames.includes(n), n);
+  assert.ok(miniNames.includes("zoom"));
+  for (const n of ["show_flow", "show_week", "collapsed", "invert_grid", "invert_battery", "solar"]) assert.ok(miniNames.includes(n), n);
+  const collapsed = plain(full._form.schema).find((s) => s.name === "collapsed");
+  assert.deepEqual(collapsed.selector.select.options.map((o) => o.value), ["battery", "today", "week", "options"]);
+  assert.equal(mini._form.data.zoom, true);
+});
+
 test("both cards are registered for the card picker", () => {
   assert.deepEqual(plain(ec.window.customCards.map((c) => c.type)), ["energy-card", "energy-mini-card"]);
   for (const p of Object.keys(ec.PLATFORMS)) assert.ok(ec.BRANDS[ec.PLATFORMS[p]], p);

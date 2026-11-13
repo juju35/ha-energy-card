@@ -3105,7 +3105,7 @@ class EnergyCardEditor extends EnergyEditorBase {
     return [
       {
         name: "collapsed",
-        selector: { select: { multiple: true, mode: "list", options: ["battery", "today", "options"].map((value) => ({ value, label: tr(value) })) } },
+        selector: { select: { multiple: true, mode: "list", options: ["battery", "today", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
       },
       {
         type: "expandable",
@@ -3123,9 +3123,10 @@ class EnergyCardEditor extends EnergyEditorBase {
   }
 }
 
-class EnergyMiniCardEditor extends EnergyEditorBase {
+// The mini card's detail button shows the full card: its editor offers the full card's options as well.
+class EnergyMiniCardEditor extends EnergyCardEditor {
   static get toggles() {
-    return [["zoom", true]];
+    return [["zoom", true], ...EnergyCardEditor.toggles];
   }
 }
 

@@ -173,14 +173,14 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | `title` | both | Brand name | Card title |
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | both | `true` | Show the subtitle under the title |
-| `zoom` | mini | `true` | Detail button at the top right of the mini card: it shows the full card's content (with the same options, so `show_today`, `collapsed`… can be set on the mini card too) and switches back to the compact view; a click outside the card also brings the compact view back. `false` removes the button |
-| `show_flow` | full | `true` | Power flow diagram |
-| `show_battery` | full | `true` | Battery section |
-| `show_today` | full | `true` | Today's energy |
-| `show_week` | full | `true` | Production and consumption of each of the last 7 days (bars named by their short day, a day's figures on hover or when tapped) and their totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour) |
-| `show_options` | full | `true` | Options: the integration's switches and selects |
-| `show_controls` | full | `true` | Toggles of the switches; `false` shows their state only |
-| `collapsed` | full | `[options]` | Sections folded by default, among `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
+| `zoom` | mini | `true` | Detail button at the top right of the mini card: it shows the full card's content (with the same options, so `show_today`, `collapsed`… can be set on the mini card too, in YAML or in its visual editor) and switches back to the compact view; a click outside the card also brings the compact view back. `false` removes the button |
+| `show_flow` | both | `true` | Power flow diagram |
+| `show_battery` | both | `true` | Battery section |
+| `show_today` | both | `true` | Today's energy |
+| `show_week` | both | `true` | Production and consumption of each of the last 7 days (bars named by their short day, a day's figures on hover or when tapped) and their totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour) |
+| `show_options` | both | `true` | Options: the integration's switches and selects |
+| `show_controls` | both | `true` | Toggles of the switches; `false` shows their state only |
+| `collapsed` | both | `[options]` | Sections folded by default, among `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
 | `entities` | both | — | Entities set by hand, by role: `solar`, `home`, `grid` (+ import, − export), `grid_import`, `grid_export`, `battery` (+ discharge, − charge), `battery_charge`, `battery_discharge`, `soc`, `solar_today`, `home_today`, `import_today`, `export_today`, `charge_today`, `discharge_today`, `battery_energy`, `battery_capacity`, `reserve`, `mode`, `status`, `error`, `grid_status` |
 | `invert_grid` | both | `false` | The grid sensor is positive when exporting |
 | `invert_battery` | both | `false` | The battery sensor is positive when charging |

@@ -112,7 +112,7 @@ export const load = () => {
   return vm.runInContext(
     `${source}
     ({ fmtHours, fmtPower, fmtEnergy, watts, kwh, esc, resolve, findSystem, powersOf, flowsOf, flowSpeed, lang, intlLocale, brandOf, BRANDS, PLATFORMS, KEYS, STRINGS,
-       EnergyCard: customElements.get("energy-card"), EnergyMiniCard: customElements.get("energy-mini-card"), EnergyCardEditor: customElements.get("energy-card-editor"), window, document })`,
+       EnergyCard: customElements.get("energy-card"), EnergyMiniCard: customElements.get("energy-mini-card"), EnergyCardEditor: customElements.get("energy-card-editor"), EnergyMiniCardEditor: customElements.get("energy-mini-card-editor"), window, document })`,
     sandbox,
   );
 };
