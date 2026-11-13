@@ -185,8 +185,52 @@ test("sections fold on a click on their title, and back on a click elsewhere", (
   assert.match(card.shadowRoot.innerHTML, /data-section="options" aria-expanded="false"/);
   click(card, { action: "toggle_section", section: "options" });
   assert.match(card.shadowRoot.innerHTML, /data-section="options" aria-expanded="true"/);
-  card._onOutside({ composedPath: () => [] });
+  card._outside.tap({ composedPath: () => [] });
   assert.match(card.shadowRoot.innerHTML, /data-section="options" aria-expanded="false"/);
+});
+
+test("no rewrite under a press: an update is held until the click, which draws it at once, or the release", async () => {
+  const card = newCard(makeHass(), { collapsed: undefined });
+  const open = /data-section="options" aria-expanded="true"/;
+  // Pressed: an update (here the section's state changed from elsewhere) does not rewrite the card under the pointer.
+  card._onPress();
+  card._toggled = new Map([["options", false]]);
+  card._update();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, open, "held under the press");
+  // Released without a click: drawn right after.
+  card._onPressEnd();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.match(card.shadowRoot.innerHTML, open);
+  // The click itself draws at once.
+  card._onPress();
+  card._onPressClick({ detail: 1 });
+  click(card, { action: "toggle_section", section: "options" });
+  assert.doesNotMatch(card.shadowRoot.innerHTML, open);
+  card._onPressEnd();
+  await new Promise((r) => setTimeout(r, 0));
+});
+
+test("folding: a tap elsewhere (pointer), not a drag that ends outside; leaving the page folds back too", () => {
+  const card = newCard(makeHass(), { collapsed: undefined });
+  card.connectedCallback();
+  const open = /data-section="options" aria-expanded="true"/;
+  click(card, { action: "toggle_section", section: "options" });
+  // A slider pressed in the card and released outside of it: nothing folds.
+  card._outside.tap({ composedPath: () => [card] });
+  assert.match(card.shadowRoot.innerHTML, open);
+  // Left with the section open and back: folded.
+  card.disconnectedCallback();
+  card.connectedCallback();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, open);
+  card.disconnectedCallback();
+  const mini = newCard(makeHass(), {}, ec.EnergyMiniCard);
+  mini.connectedCallback();
+  click(mini, { action: "zoom" });
+  assert.match(mini.shadowRoot.innerHTML, /class="flow"/);
+  mini.disconnectedCallback();
+  mini.connectedCallback();
+  assert.doesNotMatch(mini.shadowRoot.innerHTML, /class="flow"/, "back compact");
+  mini.disconnectedCallback();
 });
 
 test("entities set by hand replace or complete the roles, and alone are enough", () => {
@@ -237,7 +281,7 @@ test("the mini card shows the sun, the home, the grid and the battery, and its d
   html = card.shadowRoot.innerHTML;
   assert.match(html, /class="flow"/);
   assert.deepEqual(plain(card.getGridOptions()), { columns: 12, min_columns: 9, rows: "auto" });
-  card._onUnzoom({ composedPath: () => [] });
+  card._unzoom.tap({ composedPath: () => [] });
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="flow"/);
 });
 
