@@ -2019,6 +2019,34 @@ class EnergyBase extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this._html = "";
+    // No rewrite of the card between a press and its click: Home Assistant updates the card several times a second,
+    // and a rewrite under the pointer replaces the element pressed, so that the click lands on the card itself and
+    // does nothing. The update held back is drawn once released: by the click (registered before the card's own
+    // handler, which renders at once), else right after the release.
+    this._onPress = () => {
+      this._byPointer = true;
+      this._pressing = true;
+      window.addEventListener("pointerup", this._onPressEnd, true);
+      window.addEventListener("pointercancel", this._onPressEnd, true);
+    };
+    this._onPressEnd = () => {
+      window.removeEventListener("pointerup", this._onPressEnd, true);
+      window.removeEventListener("pointercancel", this._onPressEnd, true);
+      setTimeout(() => {
+        this._pressing = false;
+        if (this._dirty) this._update();
+      }, 0);
+    };
+    this._onPressClick = (ev) => {
+      if (ev.detail === 0) this._byPointer = false;
+      this._pressing = false;
+    };
+    this.shadowRoot.addEventListener("pointerdown", this._onPress);
+    this.shadowRoot.addEventListener("click", this._onPressClick);
+    // From the keyboard, the focus is kept across rewrites (with the pointer it would draw the focus ring).
+    this.shadowRoot.addEventListener("keydown", () => {
+      this._byPointer = false;
+    });
     this.shadowRoot.addEventListener("click", (ev) => this._onClick(ev));
     // Enter / Space on an element with the button role acts as a click, as on a <button>.
     this.shadowRoot.addEventListener("keydown", (ev) => {
@@ -2077,6 +2105,9 @@ class EnergyBase extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._pressing = this._dirty = false;
+    window.removeEventListener("pointerup", this._onPressEnd, true);
+    window.removeEventListener("pointercancel", this._onPressEnd, true);
     this._outside?.off();
     window.removeEventListener("keydown", this._onKey);
     clearTimeout(this._pendingTimer);
@@ -2121,13 +2152,19 @@ class EnergyBase extends HTMLElement {
 
   _update() {
     if (!this._hass || !this._config) return;
+    // Held back under a press (see the constructor): drawn once released.
+    if (this._pressing) {
+      this._dirty = true;
+      return;
+    }
+    this._dirty = false;
     let html = this._render();
     if (this._confirm) {
       html = html.replace(/<ha-card>([\s\S]*)<\/ha-card>\s*$/, (_, inner) => `<ha-card class="dialog-open">${inner}${this._confirmHtml()}</ha-card>`);
     }
     if (html === this._html) return;
     const focused = this._confirm && this.shadowRoot.activeElement?.dataset?.action;
-    const kept = this._confirm ? null : this._focusedSpot();
+    const kept = this._confirm || this._byPointer ? null : this._focusedSpot();
     this._html = html;
     this.shadowRoot.innerHTML = html;
     this._placeImages();
