@@ -32,7 +32,10 @@ const powers = (integration, overrides, config = {}) => {
 test("the known integrations are listed as systems, sorted by name, other integrations are not", () => {
   const m = ec.resolve(makeHass());
   assert.deepEqual(plain(m.systems.map((s) => [s.platform, s.name])), [
+    ["apsystems_ecu_reader", "APsystems"],
+    ["apsystems_modbus", "APsystems"],
     ["enphase_envoy", "Enphase"],
+    ["foxess_modbus", "Fox ESS"],
     ["fronius", "Fronius"],
     ["huawei_solar", "Huawei FusionSolar"],
     ["solaredge", "SolarEdge"],
@@ -290,7 +293,7 @@ test("the editor offers the systems found and keeps the YAML minimal", () => {
   ed.setConfig({ type: "custom:energy-card" });
   ed.hass = makeHass();
   const form = ed._form;
-  assert.deepEqual(plain(form.schema[0].selector.select.options.map((o) => o.value)), ["enphase_envoy", "fronius", "huawei_solar", "solaredge", "powerwall"]);
+  assert.deepEqual(plain(form.schema[0].selector.select.options.map((o) => o.value)), ["apsystems_ecu_reader", "apsystems_modbus", "enphase_envoy", "foxess_modbus", "fronius", "huawei_solar", "solaredge", "powerwall"]);
   assert.equal(form.data.integration, "enphase_envoy");
   const changes = [];
   ed.dispatchEvent = (ev) => changes.push(ev.detail.config);
@@ -311,7 +314,7 @@ test("the mini card editor offers the full card's options its detail view uses",
   assert.ok(miniNames.includes("zoom"));
   for (const n of ["show_flow", "show_week", "collapsed", "invert_grid", "invert_battery", "solar"]) assert.ok(miniNames.includes(n), n);
   const collapsed = plain(full._form.schema).find((s) => s.name === "collapsed");
-  assert.deepEqual(collapsed.selector.select.options.map((o) => o.value), ["battery", "today", "week", "options"]);
+  assert.deepEqual(collapsed.selector.select.options.map((o) => o.value), ["sources", "battery", "today", "week", "options"]);
   assert.equal(mini._form.data.zoom, true);
 });
 
@@ -367,4 +370,64 @@ test("last 7 days: production and consumption per day from one daily statistics 
   await new Promise((r) => setTimeout(r, 10));
   assert.equal(calls.length, 1);
   assert.doesNotMatch(newCard(makeHass(), { show_week: false }).shadowRoot.innerHTML, /data-section="week"/);
+});
+
+test("a card without integration shows the most complete system, not micro-inverters that only produce", () => {
+  const hass = makeHass();
+  assert.equal(ec.findSystem(hass, {}).sys.platform, "enphase_envoy");
+  assert.equal(ec.EnergyCard.getStubConfig(hass).integration, "enphase_envoy");
+});
+
+test("APsystems ECU Reader: ECU totals, panel channels apart", () => {
+  const p = ec.resolve(makeHass()).platforms.apsystems_ecu_reader;
+  assert.equal(p.brand, "apsystems");
+  assert.equal(p.roles.solar, "sensor.ecu_215000123456_current_power");
+  assert.equal(p.roles.solar_today, "sensor.ecu_215000123456_today_energy");
+  assert.equal(p.strings.length, 6);
+  assert.equal(p.strings[0], "sensor.inverter_703000111111_power_ch_1");
+});
+
+test("APsystems Modbus: the ECU's total wins over its inverters' power of the same key", () => {
+  const p = ec.resolve(makeHass()).platforms.apsystems_modbus;
+  assert.equal(p.roles.solar, "sensor.ecu_r_power");
+  assert.equal(p.roles.solar_today, "sensor.ecu_r_energy_today");
+  assert.deepEqual(plain(p.strings), ["sensor.ds3_h_703000444444_dc_power_1"]);
+});
+
+test("Fox ESS Modbus: one-way kW powers of a hybrid inverter", () => {
+  const r = ec.resolve(makeHass()).platforms.foxess_modbus.roles;
+  assert.equal(r.solar, "sensor.foxess_pv_power_now");
+  assert.equal(r.grid_export, "sensor.foxess_feed_in");
+  assert.equal(r.battery_charge, "sensor.foxess_battery_charge");
+  assert.equal(r.soc, "sensor.foxess_battery_soc");
+  assert.equal(r.charge_today, "sensor.foxess_battery_charge_today");
+  assert.equal(r.reserve, "number.foxess_min_soc_on_grid");
+  assert.equal(r.mode, "select.foxess_work_mode");
+  assert.deepEqual(powers("foxess_modbus"), { solar: 2100, grid: -2900, battery: -800, home: 400 });
+});
+
+test("solar_sources: the production of every source adds up, the home comes from the balance", () => {
+  const config = { solar_sources: ["apsystems_ecu_reader"] };
+  // Fox ESS 2.1 kW + APsystems 3.4 kW = 5.5 kW: 2.9 kW exported and 0.8 kW charged leave 1.8 kW for the home.
+  assert.deepEqual(powers("foxess_modbus", {}, config), { solar: 5500, grid: -2900, battery: -800, home: 1800 });
+  const card = newCard(makeHass(), { integration: "foxess_modbus", ...config });
+  const d = card._today();
+  assert.equal(Math.round(d.produced * 10) / 10, 25.3);
+  // 25.3 produced + 1.4 imported − 12.8 exported + 1.9 discharged − 5.2 charged.
+  assert.equal(Math.round(d.consumed * 10) / 10, 10.6);
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /data-section="sources"/);
+  assert.match(html, /APsystems/);
+  assert.doesNotMatch(html, /power_ch_1/);
+});
+
+test("show_strings: the power of each panel input under its source", () => {
+  const card = newCard(makeHass(), { integration: "foxess_modbus", solar_sources: [{ integration: "apsystems_ecu_reader", name: "Garage roof" }], show_strings: true });
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /Garage roof/);
+  for (const id of ["sensor.foxess_pv1_power", "sensor.foxess_pv2_power", "sensor.inverter_703000333333_power_ch_2"]) assert.match(html, new RegExp(`data-entity="${id}"`));
+});
+
+test("without solar_sources nor show_strings, no production section", () => {
+  assert.doesNotMatch(newCard(makeHass(), { integration: "foxess_modbus" }).shadowRoot.innerHTML, /data-section="sources"/);
 });

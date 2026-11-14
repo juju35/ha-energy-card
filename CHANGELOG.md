@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Features
+- [APsystems ECU Reader](https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader) (`apsystems_ecu_reader`), [APsystems Modbus](https://github.com/christianvaes/homeassistant-apsystems_modbus) (`apsystems_modbus`) and [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus) (`foxess_modbus`) are supported, with the Fox ESS logo (asked in juju35/ha-public-transport#4).
+- `solar_sources`: the production of other integrations adds to the card's (micro-inverters next to a hybrid inverter); the home and today's consumption then come from the balance at the grid meter, and a new *Production by source* section (`show_sources`, foldable as `sources`) lists each source.
+- `show_strings`: the power of each PV string or micro-inverter channel under its source.
+- Without `integration`, the cards show the most complete integration (production, grid, home and battery) rather than the first by name.
 ## 1.3.2 - 2026-11-14
 
 ### Fixes

@@ -8,7 +8,7 @@ import { splitDist } from "./i18n-split.mjs";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(`${root}package.json`, "utf8"));
 const dataUri = (file) => `data:image/png;base64,${readFileSync(`${root}images/${file}`).toString("base64")}`;
-export const LOGOS = ["enphase", "solaredge", "fronius", "huawei", "sma", "tesla", "growatt", "apsystems", "solax", "goodwe"];
+export const LOGOS = ["enphase", "solaredge", "fronius", "huawei", "sma", "tesla", "growatt", "apsystems", "solax", "goodwe", "foxess"];
 
 let out = readFileSync(`${root}src/energy-card.js`, "utf8").replace("__VERSION__", pkg.version);
 for (const brand of LOGOS) out = out.replace(`__IMG_LOGO_${brand.toUpperCase()}__`, dataUri(`${brand}.png`));

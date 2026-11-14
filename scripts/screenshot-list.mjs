@@ -26,6 +26,14 @@ export const shots = [
   ...bothDark("card-fronius", "energy-card", 460, { integration: "fronius" }),
   // SolarEdge: unsigned powers read with their flow direction sensors.
   ...both("card-solaredge", "energy-card", 460, { integration: "solaredge" }),
+  // Fox ESS hybrid inverter with APsystems micro-inverters on the same home (solar_sources): production by source and
+  // the power of each panel input.
+  ...bothDark("card-foxess", "energy-card", 460, {
+    integration: "foxess_modbus",
+    solar_sources: [{ integration: "apsystems_ecu_reader", name: "APsystems" }],
+    show_strings: true,
+    show_week: false,
+  }),
   // Mini card switched to the full card by its detail button.
   ...both("mini-card-zoom", "energy-mini-card", 460, {}, { clicks: [".zoom"] }),
   // Confirmation popup of a switch.
