@@ -20,12 +20,13 @@
   <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/growatt.png" alt="Growatt" width="56">&nbsp;&nbsp;
   <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="APsystems" width="56">&nbsp;&nbsp;
   <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/solax.png" alt="SolaX" width="56">&nbsp;&nbsp;
-  <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/goodwe.png" alt="GoodWe" width="56">
+  <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/goodwe.png" alt="GoodWe" width="56">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="Fox ESS" width="56">
 </p>
 
-Lovelace cards for Home Assistant to follow solar inverters and home batteries from **[Enphase](https://enphase.com)**, **[SolarEdge](https://www.solaredge.com)**, **[Fronius](https://www.fronius.com)**, **[Huawei](https://solar.huawei.com)** (SUN2000, LUNA2000), **[SMA](https://www.sma.de)**, **[Tesla](https://www.tesla.com/powerwall)** (Powerwall), **[Growatt](https://www.growatt.com)**, **[APsystems](https://apsystems.com)**, **[SolaX](https://www.solaxpower.com)** and **[GoodWe](https://www.goodwe.com)** — and any other integration that provides power sensors: live power flow between the sun, the grid, the home and the battery, battery level and time to full or empty, today's energy, self-consumption and self-sufficiency, and the integration's switches.
+Lovelace cards for Home Assistant to follow solar inverters and home batteries from **[Enphase](https://enphase.com)**, **[SolarEdge](https://www.solaredge.com)**, **[Fronius](https://www.fronius.com)**, **[Huawei](https://solar.huawei.com)** (SUN2000, LUNA2000), **[SMA](https://www.sma.de)**, **[Tesla](https://www.tesla.com/powerwall)** (Powerwall), **[Growatt](https://www.growatt.com)**, **[APsystems](https://apsystems.com)**, **[SolaX](https://www.solaxpower.com)**, **[GoodWe](https://www.goodwe.com)** and **[Fox ESS](https://www.fox-ess.com)** — and any other integration that provides power sensors: live power flow between the sun, the grid, the home and the battery, battery level and time to full or empty, today's energy, self-consumption and self-sufficiency, and the integration's switches.
 
-The cards work on top of the integrations you already use — [Enphase Envoy](https://www.home-assistant.io/integrations/enphase_envoy/), [SolarEdge](https://www.home-assistant.io/integrations/solaredge/), [Fronius](https://www.home-assistant.io/integrations/fronius/), [Huawei Solar](https://github.com/wlcrs/huawei_solar), [SMA](https://www.home-assistant.io/integrations/sma/), [Tesla Powerwall](https://www.home-assistant.io/integrations/powerwall/), [Growatt](https://www.home-assistant.io/integrations/growatt_server/), [APsystems](https://www.home-assistant.io/integrations/apsystems/), [SolaX](https://www.home-assistant.io/integrations/solax/), [GoodWe](https://www.home-assistant.io/integrations/goodwe/)… Entities are **discovered automatically** from the Home Assistant registries, whatever your Home Assistant language or entity ids, and each integration's sign conventions (a meter positive when exporting, a battery positive when charging, a load negative while consuming, unsigned powers with a direction sensor) are taken care of. Any role can also be set by hand.
+The cards work on top of the integrations you already use — [Enphase Envoy](https://www.home-assistant.io/integrations/enphase_envoy/), [SolarEdge](https://www.home-assistant.io/integrations/solaredge/), [Fronius](https://www.home-assistant.io/integrations/fronius/), [Huawei Solar](https://github.com/wlcrs/huawei_solar), [SMA](https://www.home-assistant.io/integrations/sma/), [Tesla Powerwall](https://www.home-assistant.io/integrations/powerwall/), [Growatt](https://www.home-assistant.io/integrations/growatt_server/), [APsystems](https://www.home-assistant.io/integrations/apsystems/), [SolaX](https://www.home-assistant.io/integrations/solax/), [GoodWe](https://www.home-assistant.io/integrations/goodwe/), [APsystems ECU Reader](https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader), [APsystems Modbus](https://github.com/christianvaes/homeassistant-apsystems_modbus), [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus)… Entities are **discovered automatically** from the Home Assistant registries, whatever your Home Assistant language or entity ids, and each integration's sign conventions (a meter positive when exporting, a battery positive when charging, a load negative while consuming, unsigned powers with a direction sensor) are taken care of. Any role can also be set by hand.
 
 [![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-energy-card&category=plugin)
 
@@ -37,6 +38,10 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/solaredge.png" alt="" width="20"> SolarEdge | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/fronius.png" alt="" width="20"> Fronius (no battery) |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-solaredge.png" alt="solaredge card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-fronius.png" alt="fronius card" width="400"> |
+
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="" width="20"> Fox ESS + <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="20"> APsystems (`solar_sources`, `show_strings`) |
+|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-foxess.png" alt="fox ess and apsystems card" width="400"> |
 
 ## Features
 
@@ -72,8 +77,11 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/tesla.png" alt="" width="16"> [Tesla Powerwall](https://www.home-assistant.io/integrations/powerwall/) (core) | Tesla Powerwall | Solar, load, site and battery power, charge, remaining energy and capacity, backup reserve, operation mode, grid status (outage), off-grid switch |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/growatt.png" alt="" width="16"> [Growatt](https://www.home-assistant.io/integrations/growatt_server/) (core) | Growatt | PV, load, grid import and export, battery charge and discharge power, level, and their energy today |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="16"> [APsystems](https://www.home-assistant.io/integrations/apsystems/) (core) | APsystems EZ1 | Total power and production today |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="16"> [APsystems ECU Reader](https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader) (custom) | APsystems ECU-B, ECU-R, ECU-R-Pro, ECU-C with DS3, QS1, YC600… micro-inverters | Current power and energy today of the ECU, the ECU-C's grid and consumption CTs (phase A), the power of each inverter channel (`show_strings`) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="16"> [APsystems Modbus](https://github.com/christianvaes/homeassistant-apsystems_modbus) (custom) | APsystems ECU over Modbus TCP | Power and energy today of the ECU (its inverters' own power left aside), the DC power of each inverter input (`show_strings`) |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/solax.png" alt="" width="16"> [SolaX](https://www.home-assistant.io/integrations/solax/) (core) | SolaX | Power and battery level sensors, read by their name |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/goodwe.png" alt="" width="16"> [GoodWe](https://www.home-assistant.io/integrations/goodwe/) (core) | GoodWe | PV, house consumption, active (grid) and battery power, battery level, PV generation today, work mode |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="" width="16"> [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus) (custom) | Fox ESS H1, H3, KH, AC1, AIO… | PV power, load, grid consumption and feed-in, battery charge and discharge power, battery level, solar, load, grid and battery energy today, minimum level on grid, work mode, inverter state, the power of each PV string (`show_strings`) |
 | Any other | — | Power sensors read by their name (solar / PV, grid / meter, battery / storage, load / consumption), battery level by its device class, or every role set by hand with `entities` |
 
 Details in [Integrations](#integrations).
@@ -131,7 +139,7 @@ type: custom:energy-card
 type: custom:energy-mini-card
 ```
 
-Without `integration`, the cards show the first supported integration found.
+Without `integration`, the cards show the most complete supported integration found (production, grid, home and battery), the first by name between equals.
 
 ### Full options
 
@@ -163,24 +171,38 @@ integration: huawei_solar
 zoom: true                    # detail button at the top right
 ```
 
+Two installations on the same home — a hybrid inverter with its battery and AC-coupled micro-inverters, say — make one card: the main integration gives the grid and the battery, `solar_sources` adds the production of the others.
+
+```yaml
+type: custom:energy-card
+integration: foxess_modbus          # hybrid inverter, battery and grid meter
+solar_sources:
+  - integration: apsystems_ecu_reader
+    name: APsystems                 # optional, defaults to the brand
+show_strings: true                  # power of each string and micro-inverter channel
+```
+
 A card can also be built from `entities` alone, without `integration` (a meter and a few sensors of different integrations, say).
 
 ### Options reference
 
 | Option | Card | Default | Description |
 |---|---|---|---|
-| `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `solax`, `goodwe`, or any other domain with power sensors) |
+| `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `apsystems_ecu_reader`, `apsystems_modbus`, `solax`, `goodwe`, `foxess_modbus`, or any other domain with power sensors) |
+| `solar_sources` | both | — | Other integrations whose production adds to this one's, by domain or as `{integration, name}`: the sun shows their sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one |
 | `title` | both | Brand name | Card title |
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | both | `true` | Show the subtitle under the title |
 | `zoom` | mini | `true` | Detail button at the top right of the mini card: it shows the full card's content (with the same options, so `show_today`, `collapsed`… can be set on the mini card too, in YAML or in its visual editor) and switches back to the compact view; a click outside the card also brings the compact view back. `false` removes the button |
 | `show_flow` | both | `true` | Power flow diagram |
+| `show_sources` | both | `true` | *Production by source*: the power and energy today of each source, shown with `solar_sources` (or with `show_strings`) |
+| `show_strings` | both | `false` | Under each source, the power of each panel input: PV strings of an inverter, channels of micro-inverters (APsystems ECU Reader and Modbus, Fox ESS Modbus, Huawei Solar, GoodWe) |
 | `show_battery` | both | `true` | Battery section |
 | `show_today` | both | `true` | Today's energy |
 | `show_week` | both | `true` | Production and consumption of each of the last 7 days (bars named by their short day, a day's figures on hover or when tapped) and their totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour) |
 | `show_options` | both | `true` | Options: the integration's switches and selects |
 | `show_controls` | both | `true` | Toggles of the switches; `false` shows their state only |
-| `collapsed` | both | `[options]` | Sections folded by default, among `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
+| `collapsed` | both | `[options]` | Sections folded by default, among `sources`, `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
 | `entities` | both | — | Entities set by hand, by role: `solar`, `home`, `grid` (+ import, − export), `grid_import`, `grid_export`, `battery` (+ discharge, − charge), `battery_charge`, `battery_discharge`, `soc`, `solar_today`, `home_today`, `import_today`, `export_today`, `charge_today`, `discharge_today`, `battery_energy`, `battery_capacity`, `reserve`, `mode`, `status`, `error`, `grid_status` |
 | `invert_grid` | both | `false` | The grid sensor is positive when exporting |
 | `invert_battery` | both | `false` | The battery sensor is positive when charging |
@@ -257,7 +279,7 @@ The full card at its minimum width (9 of 12 columns of a narrow Sections view) a
 
 ### Integrations
 
-The cards group the entities of an integration (its domain), whatever the device they belong to: an Enphase gateway and its batteries, a Huawei inverter, its battery and its meter make one system. Each entity gets a role (solar, home, grid, battery, battery level, today's energy, reserve, mode…) from its `translation_key`, mapped per integration; integrations without translation keys (GoodWe) are read by the end of their entity ids. Power sensors the mapping leaves out are read by their name (`pv`, `solar`, `grid`, `meter`, `battery`, `storage`, `load`, `consumption`…), and a battery level by its `battery` device class. `entities` sets or replaces any role.
+The cards group the entities of an integration (its domain), whatever the device they belong to: an Enphase gateway and its batteries, a Huawei inverter, its battery and its meter make one system. Each entity gets a role (solar, home, grid, battery, battery level, today's energy, reserve, mode…) from its `translation_key`, mapped per integration; integrations without translation keys (GoodWe, APsystems ECU Reader, Fox ESS Modbus) are read by the end of their entity ids. When a hub and the devices behind it share a key (an APsystems ECU and its inverters), the hub's entity wins. Power sensors the mapping leaves out are read by their name (`pv`, `solar`, `grid`, `meter`, `battery`, `storage`, `load`, `consumption`…), and a battery level by its `battery` device class. `entities` sets or replaces any role.
 
 ### Signs and units
 

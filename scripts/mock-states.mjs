@@ -100,6 +100,47 @@ se("sensor.se_consommation", "consumption_energy", 7.9, KWH);
 se("sensor.se_achat", "purchased_energy", 1.2, KWH);
 se("sensor.se_vente", "feedin_energy", 3.1, KWH);
 
+// Fox ESS H1 hybrid inverter (Fox ESS Modbus, entity id prefix "foxess"): powers in kW, one-way grid and battery
+// powers, two PV strings. Its own load reading only sees what it produces itself.
+device("fox", "Fox ESS H1", "H1-3.7-E", "Fox ESS");
+const fx = (id, state, attrs, cat) => entity(`${id.includes(".") ? id : `sensor.foxess_${id}`}`, "fox", "foxess_modbus", null, state, attrs, cat);
+fx("pv_power_now", 2.1, KW);
+fx("pv1_power", 1.15, KW);
+fx("pv2_power", 0.95, KW);
+fx("load_power", 0.4, KW);
+fx("grid_consumption", 0, KW);
+fx("feed_in", 2.9, KW);
+fx("battery_charge", 0.8, KW);
+fx("battery_discharge", 0, KW);
+fx("battery_soc", 72, PCT);
+fx("solar_energy_today", 9.6, KWH);
+fx("load_energy_today", 3.1, KWH);
+fx("grid_consumption_energy_today", 1.4, KWH);
+fx("feed_in_energy_today", 12.8, KWH);
+fx("battery_charge_today", 5.2, KWH);
+fx("battery_discharge_today", 1.9, KWH);
+fx("number.foxess_min_soc_on_grid", 10, { unit_of_measurement: "%" }, "config");
+fx("select.foxess_work_mode", "Self Use", { options: ["Self Use", "Feed-in First", "Back-up"], friendly_name: "Fox ESS H1 Work mode" }, "config");
+
+// APsystems ECU-C (APsystems ECU Reader): AC-coupled DS3-H micro-inverters on the same home, two panels each; no
+// translation keys, entity ids ecu_<ECU id>_<field> and inverter_<uid>_power_ch_<n>.
+device("ecu", "ECU 215000123456", "ECU-C", "APsystems");
+const ap = (id, state, attrs) => entity(id, "ecu", "apsystems_ecu_reader", null, state, attrs);
+ap("sensor.ecu_215000123456_current_power", 3400, W);
+ap("sensor.ecu_215000123456_today_energy", 15.7, KWH);
+for (const [uid, ch1, ch2] of [["703000111111", 610, 590], ["703000222222", 580, 560], ["703000333333", 540, 520]]) {
+  ap(`sensor.inverter_${uid}_power_ch_1`, ch1, W);
+  ap(`sensor.inverter_${uid}_power_ch_2`, ch2, W);
+}
+
+// APsystems Modbus: the ECU's total and its inverters share the translation key "power".
+device("ecu_mb", "ECU-R", "ECU-R", "APsystems");
+devices.inv_mb = { id: "inv_mb", name: "DS3-H 703000444444", model: "DS3-H", manufacturer: "APsystems", name_by_user: null, via_device_id: "ecu_mb" };
+entity("sensor.ds3_h_703000444444_power", "inv_mb", "apsystems_modbus", "power", 700, W);
+entity("sensor.ds3_h_703000444444_dc_power_1", "inv_mb", "apsystems_modbus", "dc_power", 360, W);
+entity("sensor.ecu_r_power", "ecu_mb", "apsystems_modbus", "power", 1900, W);
+entity("sensor.ecu_r_energy_today", "ecu_mb", "apsystems_modbus", "energy_today", 6.2, KWH);
+
 // A device of another integration (a smart plug): never a system of its own.
 device("prise", "Plug", "Plug S", "Shelly");
 entity("sensor.prise_puissance", "prise", "shelly", "power", 42, W);

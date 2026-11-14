@@ -3,7 +3,7 @@
  * https://github.com/juju35/ha-energy-card
  *
  * Lovelace cards for solar inverters and home batteries, whatever the integration: Enphase Envoy, SolarEdge, Fronius,
- * Huawei Solar (https://github.com/wlcrs/huawei_solar), SMA, Tesla Powerwall, Growatt, APsystems, SolaX, GoodWe and
+ * Huawei Solar (https://github.com/wlcrs/huawei_solar), SMA, Tesla Powerwall, Growatt, APsystems (core, ECU Reader, Modbus), SolaX, GoodWe, Fox ESS Modbus and
  * any other integration that provides power sensors. Entities are resolved through the entity registry (platform and
  * translation_key, else the end of the entity id), so they work whatever the Home Assistant language or entity ids;
  * every role can also be set by hand (`entities:`).
@@ -20,6 +20,7 @@ const IMG_LOGO_GROWATT = "__IMG_LOGO_GROWATT__";
 const IMG_LOGO_APSYSTEMS = "__IMG_LOGO_APSYSTEMS__";
 const IMG_LOGO_SOLAX = "__IMG_LOGO_SOLAX__";
 const IMG_LOGO_GOODWE = "__IMG_LOGO_GOODWE__";
+const IMG_LOGO_FOXESS = "__IMG_LOGO_FOXESS__";
 
 // ---------------------------------------------------------------------------
 // Brands and integrations
@@ -38,6 +39,7 @@ const BRANDS = {
   apsystems: { logo: IMG_LOGO_APSYSTEMS, name: "APsystems", site: "https://apsystems.com", accent: ["#0d6aa8", "#4fb0ef"] },
   solax: { logo: IMG_LOGO_SOLAX, name: "SolaX", site: "https://www.solaxpower.com", accent: ["#0060a8", "#4ea8f0"] },
   goodwe: { logo: IMG_LOGO_GOODWE, name: "GoodWe", site: "https://www.goodwe.com", accent: ["#b3141a", "#ff7a7f"] },
+  foxess: { logo: IMG_LOGO_FOXESS, name: "Fox ESS", site: "https://www.fox-ess.com", accent: ["#00796b", "#4fc3b7"] },
   generic: { logo: null, name: "", site: "", accent: ["#a35f00", "#ffb74d"] },
 };
 
@@ -52,8 +54,11 @@ const PLATFORMS = {
   powerwall: "tesla",
   growatt_server: "growatt",
   apsystems: "apsystems",
+  apsystems_ecu_reader: "apsystems",
+  apsystems_modbus: "apsystems",
   solax: "solax",
   goodwe: "goodwe",
+  foxess_modbus: "foxess",
 };
 const brandOf = (platform) => PLATFORMS[platform] || "generic";
 
@@ -189,6 +194,39 @@ const KEYS = {
     ["total_power", "solar"],
     ["today_production", "solar_today"],
   ],
+  // APsystems ECU Reader (ECU-B / ECU-R / ECU-C): no translation keys, entity ids ecu_<ECU id>_<field>. The ECU-C's
+  // CTs give the grid (+ import) and the consumption, per phase (A on a single-phase home).
+  apsystems_ecu_reader: [
+    ["current_power", "solar"],
+    ["grid_ct_a", "grid"],
+    ["consumed_a", "home"],
+    ["today_energy", "solar_today"],
+  ],
+  // APsystems Modbus (ECU over Modbus TCP): the ECU's totals; its inverters have the same keys (see the via_device
+  // preference in resolve).
+  apsystems_modbus: [
+    ["power", "solar"],
+    ["energy_today", "solar_today"],
+  ],
+  // Fox ESS Modbus: no translation keys, entity ids [<prefix>_]<key>, powers in kW.
+  foxess_modbus: [
+    ["pv_power_now", "solar"],
+    ["load_power", "home"],
+    ["grid_consumption", "grid_import"],
+    ["feed_in", "grid_export"],
+    ["battery_discharge", "battery_discharge"],
+    ["battery_charge", "battery_charge"],
+    ["battery_soc", "soc"],
+    ["solar_energy_today", "solar_today"],
+    ["load_energy_today", "home_today"],
+    ["grid_consumption_energy_today", "import_today"],
+    ["feed_in_energy_today", "export_today"],
+    ["battery_charge_today", "charge_today"],
+    ["battery_discharge_today", "discharge_today"],
+    ["min_soc_on_grid", "reserve"],
+    ["work_mode", "mode"],
+    ["inverter_state", "status"],
+  ],
   goodwe: [
     ["pv_power", "solar"],
     ["house_consumption", "home"],
@@ -202,6 +240,20 @@ const KEYS = {
   ],
 };
 KEYS.solaredge_modbus = KEYS.solaredge;
+
+// Power of each panel input (string, micro-inverter channel), shown with `show_strings`: matched on the translation
+// key, else on the end of the entity id.
+const STRING_KEYS = {
+  apsystems_ecu_reader: /_power_ch_\d+$/,
+  apsystems_modbus: /^dc_power$/,
+  foxess_modbus: /(^|_)pv\d+_power$/,
+  huawei_solar: /^pv_\d+_power$|_pv_\d+_power$/,
+  goodwe: /_ppv\d+$/,
+};
+const isString = (e, domain) => {
+  const re = STRING_KEYS[e.platform];
+  return !!re && domain === "sensor" && (re.test(e.translation_key || "") || re.test(e.entity_id.slice(domain.length + 1)));
+};
 
 // Sign of the integration's signed power sensors, when it is not the cards' own (grid + import, battery + discharge):
 // Huawei Solar's power meter is positive when exporting and its battery positive when charging; GoodWe's active power
@@ -217,6 +269,9 @@ const GUESSES = [
 ];
 
 const DEFAULT_COLLAPSED = ["options"];
+// Energy sensors of the last 7 days: production and consumption, and with `solar_sources` the grid and battery ones
+// for the balance.
+const WEEK_ROLES = ["solar_today", "home_today", "import_today", "export_today", "charge_today", "discharge_today"];
 const PENDING_MS = 30000;
 // Below this, a flow is drawn at rest (inverter standby draw, meter noise).
 const FLOW_MIN_W = 10;
@@ -313,6 +368,10 @@ const STRINGS = {
     zoom_helper: "Switches the mini card to the full card and back",
     entities: "Entities (optional)",
     soc: "Battery level",
+    sources: "Production by source",
+    show_sources: "Production by source",
+    show_strings: "Power of each panel input",
+    solar_sources: "Other solar integrations (added to the production)",
   },
   fr: {
     solar: "Solaire",
@@ -374,6 +433,10 @@ const STRINGS = {
     zoom_helper: "Bascule la mini-carte vers la carte complète et inversement",
     entities: "Entités (facultatif)",
     soc: "Niveau de batterie",
+    sources: "Production par source",
+    show_sources: "Production par source",
+    show_strings: "Puissance de chaque entrée de panneaux",
+    solar_sources: "Autres intégrations solaires (ajoutées à la production)",
   },
   de: {
     solar: "Solar",
@@ -435,6 +498,10 @@ const STRINGS = {
     zoom_helper: "Schaltet die Mini-Karte auf die vollständige Karte um und zurück",
     entities: "Entitäten (optional)",
     soc: "Batteriestand",
+    sources: "Erzeugung nach Quelle",
+    show_sources: "Erzeugung nach Quelle",
+    show_strings: "Leistung jedes Moduleingangs",
+    solar_sources: "Weitere Solar-Integrationen (zur Erzeugung addiert)",
   },
   es: {
     solar: "Solar",
@@ -496,6 +563,10 @@ const STRINGS = {
     zoom_helper: "Cambia la minitarjeta a la tarjeta completa y viceversa",
     entities: "Entidades (opcional)",
     soc: "Nivel de batería",
+    sources: "Producción por fuente",
+    show_sources: "Producción por fuente",
+    show_strings: "Potencia de cada entrada de paneles",
+    solar_sources: "Otras integraciones solares (sumadas a la producción)",
   },
   sr: {
     solar: "Соларно",
@@ -557,6 +628,10 @@ const STRINGS = {
     zoom_helper: "Пребацује мини картицу на пуну картицу и назад",
     entities: "Ентитети (опционо)",
     soc: "Ниво батерије",
+    sources: "Производња по извору",
+    show_sources: "Производња по извору",
+    show_strings: "Снага сваког улаза панела",
+    solar_sources: "Друге соларне интеграције (додате производњи)",
   },
   "sr-Latn": {
     solar: "Solarno",
@@ -618,6 +693,10 @@ const STRINGS = {
     zoom_helper: "Prebacuje mini karticu na punu karticu i nazad",
     entities: "Entiteti (opciono)",
     soc: "Nivo baterije",
+    sources: "Proizvodnja po izvoru",
+    show_sources: "Proizvodnja po izvoru",
+    show_strings: "Snaga svakog ulaza panela",
+    solar_sources: "Druge solarne integracije (dodate proizvodnji)",
   },
   it: {
     solar: "Solare",
@@ -679,6 +758,10 @@ const STRINGS = {
     zoom_helper: "Passa dalla mini scheda alla scheda completa e viceversa",
     entities: "Entità (facoltativo)",
     soc: "Livello batteria",
+    sources: "Produzione per fonte",
+    show_sources: "Produzione per fonte",
+    show_strings: "Potenza di ogni ingresso dei pannelli",
+    solar_sources: "Altre integrazioni solari (sommate alla produzione)",
   },
   nl: {
     solar: "Zon",
@@ -740,6 +823,10 @@ const STRINGS = {
     zoom_helper: "Schakelt de minikaart naar de volledige kaart en terug",
     entities: "Entiteiten (optioneel)",
     soc: "Batterijniveau",
+    sources: "Productie per bron",
+    show_sources: "Productie per bron",
+    show_strings: "Vermogen van elke paneelingang",
+    solar_sources: "Andere zonne-integraties (opgeteld bij de productie)",
   },
   pt: {
     solar: "Solar",
@@ -801,6 +888,10 @@ const STRINGS = {
     zoom_helper: "Alterna o mini cartão para o cartão completo e vice-versa",
     entities: "Entidades (opcional)",
     soc: "Nível da bateria",
+    sources: "Produção por fonte",
+    show_sources: "Produção por fonte",
+    show_strings: "Potência de cada entrada de painéis",
+    solar_sources: "Outras integrações solares (somadas à produção)",
   },
   pl: {
     solar: "Słońce",
@@ -862,6 +953,10 @@ const STRINGS = {
     zoom_helper: "Przełącza mini kartę na pełną kartę i z powrotem",
     entities: "Encje (opcjonalnie)",
     soc: "Poziom baterii",
+    sources: "Produkcja według źródła",
+    show_sources: "Produkcja według źródła",
+    show_strings: "Moc każdego wejścia paneli",
+    solar_sources: "Inne integracje solarne (dodawane do produkcji)",
   },
   ro: {
     solar: "Solar",
@@ -923,6 +1018,10 @@ const STRINGS = {
     zoom_helper: "Comută mini cardul la cardul complet și înapoi",
     entities: "Entități (opțional)",
     soc: "Nivelul bateriei",
+    sources: "Producție pe sursă",
+    show_sources: "Producție pe sursă",
+    show_strings: "Puterea fiecărei intrări de panouri",
+    solar_sources: "Alte integrări solare (adăugate la producție)",
   },
   da: {
     solar: "Sol",
@@ -984,6 +1083,10 @@ const STRINGS = {
     zoom_helper: "Skifter minikortet til det fulde kort og tilbage",
     entities: "Enheder (valgfrit)",
     soc: "Batteriniveau",
+    sources: "Produktion pr. kilde",
+    show_sources: "Produktion pr. kilde",
+    show_strings: "Effekt for hver panelindgang",
+    solar_sources: "Andre solcelleintegrationer (lagt til produktionen)",
   },
   sv: {
     solar: "Sol",
@@ -1045,6 +1148,10 @@ const STRINGS = {
     zoom_helper: "Växlar minikortet till det fullständiga kortet och tillbaka",
     entities: "Entiteter (valfritt)",
     soc: "Batterinivå",
+    sources: "Produktion per källa",
+    show_sources: "Produktion per källa",
+    show_strings: "Effekt för varje panelingång",
+    solar_sources: "Andra solintegrationer (läggs till produktionen)",
   },
   bg: {
     solar: "Слънце",
@@ -1106,6 +1213,10 @@ const STRINGS = {
     zoom_helper: "Превключва мини картата към пълната карта и обратно",
     entities: "Обекти (по избор)",
     soc: "Ниво на батерията",
+    sources: "Производство по източник",
+    show_sources: "Производство по източник",
+    show_strings: "Мощност на всеки вход на панели",
+    solar_sources: "Други соларни интеграции (добавени към производството)",
   },
   ru: {
     solar: "Солнце",
@@ -1167,6 +1278,10 @@ const STRINGS = {
     zoom_helper: "Переключает мини-карточку на полную и обратно",
     entities: "Объекты (необязательно)",
     soc: "Уровень заряда",
+    sources: "Выработка по источникам",
+    show_sources: "Выработка по источникам",
+    show_strings: "Мощность каждого входа панелей",
+    solar_sources: "Другие солнечные интеграции (добавляются к выработке)",
   },
   uk: {
     solar: "Сонце",
@@ -1228,6 +1343,10 @@ const STRINGS = {
     zoom_helper: "Перемикає міні-картку на повну й назад",
     entities: "Об'єкти (необов'язково)",
     soc: "Рівень заряду",
+    sources: "Виробіток за джерелами",
+    show_sources: "Виробіток за джерелами",
+    show_strings: "Потужність кожного входу панелей",
+    solar_sources: "Інші сонячні інтеграції (додаються до виробітку)",
   },
   hu: {
     solar: "Napelem",
@@ -1289,6 +1408,10 @@ const STRINGS = {
     zoom_helper: "Átváltja a mini kártyát a teljes kártyára és vissza",
     entities: "Entitások (nem kötelező)",
     soc: "Akkumulátor töltöttsége",
+    sources: "Termelés forrásonként",
+    show_sources: "Termelés forrásonként",
+    show_strings: "Az egyes panelbemenetek teljesítménye",
+    solar_sources: "Más napelemes integrációk (hozzáadva a termeléshez)",
   },
   sk: {
     solar: "Slnko",
@@ -1350,6 +1473,10 @@ const STRINGS = {
     zoom_helper: "Prepne mini kartu na úplnú kartu a späť",
     entities: "Entity (voliteľné)",
     soc: "Úroveň batérie",
+    sources: "Výroba podľa zdroja",
+    show_sources: "Výroba podľa zdroja",
+    show_strings: "Výkon každého vstupu panelov",
+    solar_sources: "Ďalšie solárne integrácie (pripočítané k výrobe)",
   },
   cs: {
     solar: "Slunce",
@@ -1411,6 +1538,10 @@ const STRINGS = {
     zoom_helper: "Přepne mini kartu na úplnou kartu a zpět",
     entities: "Entity (volitelné)",
     soc: "Úroveň baterie",
+    sources: "Výroba podle zdroje",
+    show_sources: "Výroba podle zdroje",
+    show_strings: "Výkon každého vstupu panelů",
+    solar_sources: "Další solární integrace (přičtené k výrobě)",
   },
   sl: {
     solar: "Sonce",
@@ -1472,6 +1603,10 @@ const STRINGS = {
     zoom_helper: "Preklopi mini kartico na celotno kartico in nazaj",
     entities: "Entitete (neobvezno)",
     soc: "Raven baterije",
+    sources: "Proizvodnja po virih",
+    show_sources: "Proizvodnja po virih",
+    show_strings: "Moč vsakega vhoda panelov",
+    solar_sources: "Druge sončne integracije (prištete proizvodnji)",
   },
   lv: {
     solar: "Saule",
@@ -1533,6 +1668,10 @@ const STRINGS = {
     zoom_helper: "Pārslēdz mini karti uz pilno karti un atpakaļ",
     entities: "Entītijas (neobligāti)",
     soc: "Akumulatora līmenis",
+    sources: "Ražošana pa avotiem",
+    show_sources: "Ražošana pa avotiem",
+    show_strings: "Katras paneļu ieejas jauda",
+    solar_sources: "Citas saules integrācijas (pieskaitītas ražošanai)",
   },
   el: {
     solar: "Ηλιακά",
@@ -1594,6 +1733,10 @@ const STRINGS = {
     zoom_helper: "Εναλλάσσει τη μικρή κάρτα με την πλήρη κάρτα",
     entities: "Οντότητες (προαιρετικά)",
     soc: "Στάθμη μπαταρίας",
+    sources: "Παραγωγή ανά πηγή",
+    show_sources: "Παραγωγή ανά πηγή",
+    show_strings: "Ισχύς κάθε εισόδου πάνελ",
+    solar_sources: "Άλλες ηλιακές ενσωματώσεις (προστίθενται στην παραγωγή)",
   },
 };
 
@@ -1738,14 +1881,20 @@ const resolve = (hass) => {
   for (const e of Object.values(hass.entities)) {
     if (e.hidden || !e.platform) continue;
     const domain = e.entity_id.split(".")[0];
-    const p = (platforms[e.platform] ||= { platform: e.platform, brand: brandOf(e.platform), ranks: {}, roles: {}, guessed: [], switches: [], selects: [], devices: new Set() });
+    const p = (platforms[e.platform] ||= { platform: e.platform, brand: brandOf(e.platform), ranks: {}, roles: {}, guessed: [], strings: [], switches: [], selects: [], devices: new Set() });
     if (e.device_id) p.devices.add(e.device_id);
     if (domain === "switch" && e.entity_category !== "diagnostic") p.switches.push(e.entity_id);
     if (domain === "select" && e.entity_category !== "diagnostic") p.selects.push(e.entity_id);
+    if (isString(e, domain)) {
+      p.strings.push(e.entity_id);
+      continue;
+    }
     const found = roleOf(e, domain);
     if (found) {
       const [role, rank] = found;
-      if (!(role in p.ranks) || rank < p.ranks[role]) {
+      // Same key on a hub and on the devices behind it (APsystems Modbus: the ECU and its inverters): the hub's.
+      const sub = (id) => !!hass.devices[hass.entities[id]?.device_id]?.via_device_id;
+      if (!(role in p.ranks) || rank < p.ranks[role] || (rank === p.ranks[role] && sub(p.roles[role]) && !sub(e.entity_id))) {
         p.ranks[role] = rank;
         p.roles[role] = e.entity_id;
         if (role === "solar" && e.device_id) p.solarDevice = e.device_id;
@@ -1761,6 +1910,7 @@ const resolve = (hass) => {
   const systems = Object.values(platforms)
     .filter((p) => PLATFORMS[p.platform] && Object.keys(p.roles).some((r) => POWER_ROLES.includes(r) || r === "soc"))
     .sort((a, b) => a.name.localeCompare(b.name));
+  for (const p of Object.values(platforms)) p.strings.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   const model = { platforms, systems };
   _cache.set(hass.entities, { devices: hass.devices, model });
   return model;
@@ -1774,6 +1924,14 @@ const guessedRoles = (p, hass) => {
     if (role && !roles[role]) roles[role] = id;
   }
   return roles;
+};
+
+// The system a card without `integration` shows: the most complete one (a hybrid inverter with its battery and meter
+// rather than micro-inverters that only report their production), the first by name between equals.
+const CAPABILITIES = [["solar"], ["home"], ["grid", "grid_import", "grid_export"], ["battery", "battery_charge", "battery_discharge", "soc"]];
+const primary = (m) => {
+  const score = (p) => CAPABILITIES.filter((roles) => roles.some((r) => p.roles[r])).length;
+  return m.systems.reduce((best, p) => (!best || score(p) > score(best) ? p : best), null);
 };
 
 const listSystems = (hass) => {
@@ -1792,21 +1950,39 @@ const findSystem = (hass, config) => {
     p = m.platforms[config.integration];
     if (!p && !Object.keys(manual).length) return { error: "unknown_integration" };
   } else if (!Object.keys(manual).length) {
-    p = m.systems[0];
+    p = primary(m);
     if (!p) return { error: "no_system" };
   }
   const roles = { ...(p ? guessedRoles(p, hass) : {}), ...manual };
+  // `solar_sources`: other integrations whose production adds to this one's (micro-inverters next to a hybrid
+  // inverter): an integration domain, or { integration, name }.
+  const extra = (Array.isArray(config.solar_sources) ? config.solar_sources : [])
+    .map((x) => (typeof x === "string" ? { integration: x } : x || {}))
+    .map((x) => ({ x, q: m.platforms[x.integration] }))
+    .filter(({ q }) => q && q !== p)
+    .map(({ x, q }) => {
+      const r = guessedRoles(q, hass);
+      return { platform: q.platform, brand: q.brand, name: x.name || q.name, solar: r.solar, solar_today: r.solar_today, strings: q.strings };
+    });
   return {
     sys: {
       platform: p?.platform || "",
       brand: p?.brand || "generic",
       name: p?.name || "",
       roles,
+      strings: p?.strings || [],
+      extra,
       switches: p?.switches || [],
       selects: p?.selects || [],
       sign: { ...SIGNS[p?.platform] },
     },
   };
+};
+
+// Sum of the values of some sensors, null when none has one.
+const sumOf = (values) => {
+  const known = values.filter((v) => v !== null);
+  return known.length ? known.reduce((t, v) => t + v, 0) : null;
 };
 
 // Same dependency list (same length, same objects): what a memoized value was built from has not changed.
@@ -1838,14 +2014,16 @@ const powersOf = (hass, sys, config) => {
     const b = watts(s(minus));
     return a === null && b === null ? null : Math.abs(a ?? 0) - Math.abs(b ?? 0);
   };
-  const solarW = watts(s("solar"));
+  const solarW = sumOf([watts(s("solar")), ...(sys.extra || []).map((x) => watts(hass.states[x.solar]))]);
   const solar = solarW === null ? null : Math.max(0, solarW);
   let grid = signed("grid", "grid_dir", "export", config.invert_grid);
   if (grid === null) grid = pair("grid_import", "grid_export");
   let battery = signed("battery", "battery_dir", "charg", config.invert_battery);
   if (battery === null) battery = pair("battery_discharge", "battery_charge");
   const homeW = watts(s("home"));
-  let home = homeW === null ? null : Math.abs(homeW);
+  // With other sources, the main inverter's own load reading misses what they produce: the home is what the balance
+  // at the grid meter gives.
+  let home = homeW === null || (sys.extra?.length && grid !== null) ? null : Math.abs(homeW);
   if (home === null && grid !== null) home = Math.max(0, (solar ?? 0) + grid + (battery ?? 0));
   if (grid === null && home !== null) grid = home - (solar ?? 0) - (battery ?? 0);
   return { solar, grid, battery, home };
@@ -2083,7 +2261,8 @@ class EnergyBase extends HTMLElement {
     if (!h || !this._config) return null;
     const { sys } = findSystem(h, this._config);
     if (!sys) return null;
-    const ids = [...Object.values(sys.roles), ...sys.switches, ...sys.selects];
+    const extra = sys.extra.flatMap((x) => [x.solar, x.solar_today, ...(this._config.show_strings ? x.strings : [])]);
+    const ids = [...Object.values(sys.roles), ...extra, ...(this._config.show_strings ? sys.strings : []), ...sys.switches, ...sys.selects];
     return [h.entities, h.devices, h.language, h.locale, h.themes?.darkMode, ...ids.map((id) => h.states[id])];
   }
 
@@ -2366,7 +2545,10 @@ class EnergyBase extends HTMLElement {
   // out from the others when the integration gives none.
   _today() {
     const g = (role) => kwh(this._r(role));
-    const d = { produced: g("solar_today"), consumed: g("home_today"), imported: g("import_today"), exported: g("export_today"), charged: g("charge_today"), discharged: g("discharge_today") };
+    const extra = this._sys.extra || [];
+    const produced = sumOf([g("solar_today"), ...extra.map((x) => kwh(this._s(x.solar_today)))]);
+    const d = { produced, consumed: g("home_today"), imported: g("import_today"), exported: g("export_today"), charged: g("charge_today"), discharged: g("discharge_today") };
+    if (extra.length && d.produced !== null && d.imported !== null && d.exported !== null) d.consumed = null;
     if (d.consumed === null && d.produced !== null && d.imported !== null && d.exported !== null)
       d.consumed = Math.max(0, d.produced + d.imported - d.exported + (d.discharged ?? 0) - (d.charged ?? 0));
     d.selfConsumption = d.produced > 0 && d.exported !== null ? clamp((d.produced - d.exported) / d.produced, 0, 1) * 100 : null;
@@ -2528,6 +2710,8 @@ const FULL_STYLE = `
   .tile .k .icon { width: 14px; height: 14px; color: var(--c, var(--secondary-text-color)); }
   .tile .v { font-size: 14px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
   .options { display: flex; flex-direction: column; gap: 4px; }
+  .source { display: flex; flex-direction: column; gap: 4px; }
+  .source .tags { padding-left: 22px; }
   .option { display: flex; align-items: center; gap: 8px; font-size: 13px; min-width: 0; }
   .option .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .option .lbl .icon { width: 16px; height: 16px; color: var(--secondary-text-color); vertical-align: -3px; margin-right: 6px; }
@@ -2557,7 +2741,8 @@ class EnergyCard extends EnergyBase {
 
   static getStubConfig(hass) {
     const m = hass && resolve(hass);
-    return m?.systems[0] ? { integration: m.systems[0].platform } : {};
+    const p = m && primary(m);
+    return p ? { integration: p.platform } : {};
   }
 
   getCardSize() {
@@ -2579,6 +2764,7 @@ class EnergyCard extends EnergyBase {
     const err = this._error();
     if (err) parts.push(`<div class="alert-line clickable" role="button" tabindex="0" data-entity="${esc(err.entity)}">${svgIcon(ICONS.alert)}<span>${esc(err.text)}</span></div>`);
     if (c.show_flow !== false) parts.push(this._flow(p));
+    if (c.show_sources !== false) parts.push(this._sourcesSection());
     if (c.show_battery !== false) parts.push(this._battery(p));
     if (c.show_today !== false) parts.push(this._todaySection());
     if (c.show_week !== false) parts.push(this._weekSection());
@@ -2721,6 +2907,33 @@ class EnergyCard extends EnergyBase {
     </div>`;
   }
 
+  // Production by source (with `solar_sources`): each integration's power and energy today, and with `show_strings`
+  // the power of each of its panel inputs (strings, micro-inverter channels).
+  _sourcesSection() {
+    const strings = this._config.show_strings === true;
+    const main = { name: this._sys.name || this._t("solar"), solar: this._sys.roles.solar, solar_today: this._sys.roles.solar_today, strings: this._sys.strings };
+    const sources = [main, ...this._sys.extra];
+    if (sources.length < 2 && !(strings && main.strings.length)) return "";
+    const title = this._sectionTitle("sources", ICONS.solar, this._t("sources"));
+    if (this._isCollapsed("sources")) return `<div>${title}</div>`;
+    const L = this._locale();
+    const rows = sources.map((x) => {
+      const w = watts(this._s(x.solar));
+      const e = kwh(this._s(x.solar_today));
+      const val = [w === null ? null : fmtPower(w, L), e === null ? null : fmtEnergy(e, L)].filter(Boolean).join(" · ");
+      const id = x.solar || x.solar_today || "";
+      const tags = strings
+        ? x.strings
+            .map((sid) => this._s(sid))
+            .filter((st) => st && watts(st) !== null)
+            .map((st) => `<span class="tag clickable" role="button" tabindex="0" data-entity="${esc(st.entity_id)}" title="${esc(this._shortName(st))}">${svgIcon(ICONS.panel)}<span>${esc(fmtPower(watts(st), L))}</span></span>`)
+            .join("")
+        : "";
+      return `<div class="source"><div class="option${id ? ` clickable" role="button" tabindex="0" data-entity="${esc(id)}` : ""}"><span class="lbl">${svgIcon(ICONS.solar)}${esc(x.name)}</span><span class="val">${esc(val)}</span></div>${tags ? `<div class="tags">${tags}</div>` : ""}</div>`;
+    });
+    return `<div>${title}<div class="options">${rows.join("")}</div></div>`;
+  }
+
   // Today's energy: one tile per figure the integration gives, plus self-consumption and self-sufficiency.
   _todaySection() {
     const d = this._today();
@@ -2751,7 +2964,8 @@ class EnergyCard extends EnergyBase {
   // Production and consumption of each of the last 7 days (today included), from the daily change of the "today"
   // energy sensors in the recorder's statistics: one query, again every hour; rendered again when it comes.
   _fetchWeek() {
-    const ids = ["solar_today", "home_today"].map((role) => this._sys.roles[role]).filter(Boolean);
+    const roles = this._sys.extra.length ? WEEK_ROLES : WEEK_ROLES.slice(0, 2);
+    const ids = [...roles.map((role) => this._sys.roles[role]), ...this._sys.extra.map((x) => x.solar_today)].filter(Boolean);
     const key = ids.join(",");
     if (!key || !this._hass.callWS || this._weekBusy) return;
     if (this._weekKey === key && Date.now() - (this._weekAt || 0) < 3600000) return;
@@ -2777,9 +2991,9 @@ class EnergyCard extends EnergyBase {
   // The 7 days, oldest first: { day (ms), produced, consumed } (null where unknown).
   _weekDays() {
     if (!this._week) return [];
-    const byDay = (role) => {
+    const byDay = (role, id = this._sys.roles[role]) => {
       const out = new Map();
-      for (const r of this._week.rows[this._sys.roles[role]] || []) {
+      for (const r of this._week.rows[id] || []) {
         const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
         const d = new Date(t);
         d.setHours(0, 0, 0, 0);
@@ -2787,13 +3001,19 @@ class EnergyCard extends EnergyBase {
       }
       return out;
     };
-    const prod = byDay("solar_today");
+    const extra = this._sys.extra;
+    const prods = [byDay("solar_today"), ...extra.map((x) => byDay(null, x.solar_today))];
     const cons = byDay("home_today");
+    const [imp, exp, chg, dis] = ["import_today", "export_today", "charge_today", "discharge_today"].map((r) => byDay(r));
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(this._week.start);
       d.setDate(d.getDate() + i);
       const t = d.getTime();
-      return { day: t, produced: prod.get(t) ?? null, consumed: cons.get(t) ?? null };
+      const produced = sumOf(prods.map((m) => m.get(t) ?? null));
+      // With other sources, the day's consumption from the balance (the main inverter's own load misses them).
+      const balance =
+        extra.length && produced !== null && imp.has(t) && exp.has(t) ? Math.max(0, produced + imp.get(t) - exp.get(t) + (dis.get(t) ?? 0) - (chg.get(t) ?? 0)) : null;
+      return { day: t, produced, consumed: balance ?? cons.get(t) ?? null };
     });
   }
 
@@ -3026,6 +3246,7 @@ class EnergyEditorBase extends HTMLElement {
     const systems = listSystems(this._hass);
     return [
       { name: "integration", selector: { select: { mode: "dropdown", custom_value: true, options: systems } } },
+      { name: "solar_sources", selector: { select: { multiple: true, mode: "dropdown", custom_value: true, options: systems } } },
       { name: "title", selector: { text: {} } },
       ...this.constructor.extraFields(tr),
       { type: "grid", name: "", schema: this.constructor.toggles.map(([name]) => ({ name, selector: { boolean: {} } })) },
@@ -3052,6 +3273,7 @@ class EnergyEditorBase extends HTMLElement {
           if (Object.keys(ents).length) config.entities = ents;
           else delete config.entities;
         }
+        if (Array.isArray(config.solar_sources) && !config.solar_sources.length) delete config.solar_sources;
         // Keep the YAML minimal: drop empty values and options left at their default.
         for (const [k, v] of Object.entries(config)) {
           if (v === "" || v === undefined || v === null || (k in defaults && JSON.stringify(v) === JSON.stringify(defaults[k]))) delete config[k];
@@ -3086,6 +3308,8 @@ class EnergyCardEditor extends EnergyEditorBase {
       ["show_title", true],
       ["show_subtitle", true],
       ["show_flow", true],
+      ["show_sources", true],
+      ["show_strings", false],
       ["show_battery", true],
       ["show_today", true],
       ["show_week", true],
@@ -3105,7 +3329,7 @@ class EnergyCardEditor extends EnergyEditorBase {
     return [
       {
         name: "collapsed",
-        selector: { select: { multiple: true, mode: "list", options: ["battery", "today", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
+        selector: { select: { multiple: true, mode: "list", options: ["sources", "battery", "today", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
       },
       {
         type: "expandable",
