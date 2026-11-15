@@ -195,6 +195,19 @@ solar_sources:
   #   energy: sensor.apsystems_energy_today
 ```
 
+When an integration's own production reading is wrong or too slow (a total off by a factor, a value that only refreshes every few minutes), a `power` sensor — a CT clamp, say — gives each source an accurate, real-time reading while the integration keeps naming it and providing the rest (`energy` overrides its energy-today too). The main integration takes the same override through `entities: { solar: … }`:
+
+```yaml
+type: custom:energy-card
+integration: foxess_modbus
+entities:
+  solar: sensor.pv_clamp_foxess       # real-time production, Fox ESS keeps its energy-today
+solar_sources:
+  - integration: apsystems_ecu_reader
+    power: sensor.pv_clamp_apsystems   # real-time production, APsystems keeps its energy-today
+    # energy: sensor.apsystems_energy_today   # optional, to override its energy-today as well
+```
+
 A card can also be built from `entities` alone, without `integration` (a meter and a few sensors of different integrations, say).
 
 ### Options reference
@@ -202,7 +215,7 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | Option | Card | Default | Description |
 |---|---|---|---|
 | `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `apsystems_ecu_reader`, `apsystems_modbus`, `solax`, `goodwe`, `foxess_modbus`, or any other domain with power sensors) |
-| `solar_sources` | both | — | Other production whose power adds to this system's: the sun shows the sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one. Each entry is either another integration — a domain or `{integration, name}` — or a single power sensor — an entity id or `{entity, name, energy}` (with an optional energy-today sensor) — for a second inverter measured by a clamp of the main one, like a Fox ESS CT2 meter |
+| `solar_sources` | both | — | Other production whose power adds to this system's: the sun shows the sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one. Each entry is either another integration — a domain or `{integration, name}`, with an optional `power` sensor read instead of its real-time production (a CT clamp) and `energy` for its energy-today — or a single power sensor — an entity id or `{entity, name, energy}` (with an optional energy-today sensor) — for a second inverter measured by a clamp of the main one, like a Fox ESS CT2 meter |
 | `title` | both | Brand name | Card title |
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | both | `true` | Show the subtitle under the title |
