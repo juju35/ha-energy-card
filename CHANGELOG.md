@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 - 2026-11-15
+
+### Features
+- `solar_sources` entries can now be a single power sensor, not only another integration: an entity id, or `{entity, name, energy}` with an optional energy-today sensor. This adds a second inverter measured by a clamp of the main one to the production — a Fox ESS CT2 meter reading AC-coupled APsystems micro-inverters, say (asked in #20).
+
+### Fixes
+- A CT2 clamp (Fox ESS's `ct2_meter`…) is no longer read as a grid meter by the name fallbacks: it measures a second source, so it carries no role of its own and is added to the production with `solar_sources`.
+
 ## 1.4.0 - 2026-11-14
 
 ### Features

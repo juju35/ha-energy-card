@@ -107,6 +107,9 @@ const fx = (id, state, attrs, cat) => entity(`${id.includes(".") ? id : `sensor.
 fx("pv_power_now", 2.1, KW);
 fx("pv1_power", 1.15, KW);
 fx("pv2_power", 0.95, KW);
+// CT2 clamp reading a second, AC-coupled inverter (APsystems micro-inverters), in kW: an auxiliary meter, added to
+// the production by hand with `solar_sources`, never read as the grid.
+fx("ct2_meter", 2.0, KW);
 fx("load_power", 0.4, KW);
 fx("grid_consumption", 0, KW);
 fx("feed_in", 2.9, KW);
