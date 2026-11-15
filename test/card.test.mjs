@@ -431,3 +431,24 @@ test("show_strings: the power of each panel input under its source", () => {
 test("without solar_sources nor show_strings, no production section", () => {
   assert.doesNotMatch(newCard(makeHass(), { integration: "foxess_modbus" }).shadowRoot.innerHTML, /data-section="sources"/);
 });
+
+test("a CT2 clamp carries no role on its own, so it is never read as the grid", () => {
+  const r = ec.resolve(makeHass()).platforms.foxess_modbus.roles;
+  assert.equal(Object.values(r).includes("sensor.foxess_ct2_meter"), false);
+  // Without it, the Fox ESS powers are unchanged.
+  assert.deepEqual(powers("foxess_modbus"), { solar: 2100, grid: -2900, battery: -800, home: 400 });
+});
+
+test("solar_sources: a bare power sensor adds to the production (Fox ESS's CT2 reading a second inverter)", () => {
+  const config = { solar_sources: ["sensor.foxess_ct2_meter"] };
+  // Fox ESS 2.1 kW + CT2 2.0 kW = 4.1 kW: 2.9 kW exported and 0.8 kW charged leave 0.4 kW for the home.
+  assert.deepEqual(powers("foxess_modbus", {}, config), { solar: 4100, grid: -2900, battery: -800, home: 400 });
+  const html = newCard(makeHass(), { integration: "foxess_modbus", ...config }).shadowRoot.innerHTML;
+  assert.match(html, /data-section="sources"/);
+  assert.match(html, /data-entity="sensor\.foxess_ct2_meter"/);
+});
+
+test("solar_sources: a bare sensor source takes the name it is given", () => {
+  const config = { solar_sources: [{ entity: "sensor.foxess_ct2_meter", name: "APsystems" }] };
+  assert.match(newCard(makeHass(), { integration: "foxess_modbus", ...config }).shadowRoot.innerHTML, /APsystems/);
+});

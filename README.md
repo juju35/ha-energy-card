@@ -182,6 +182,19 @@ solar_sources:
 show_strings: true                  # power of each string and micro-inverter channel
 ```
 
+A source can also be a single power sensor, for a second inverter that has no integration of its own but whose output is measured by a clamp of the main one — a Fox ESS CT2 meter reading AC-coupled APsystems micro-inverters, say:
+
+```yaml
+type: custom:energy-card
+integration: foxess_modbus
+solar_sources:
+  - sensor.foxessmodbus_ct2_meter   # a bare power sensor, added to the production
+  # or, to name it and give its energy-today sensor:
+  # - entity: sensor.foxessmodbus_ct2_meter
+  #   name: APsystems
+  #   energy: sensor.apsystems_energy_today
+```
+
 A card can also be built from `entities` alone, without `integration` (a meter and a few sensors of different integrations, say).
 
 ### Options reference
@@ -189,7 +202,7 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | Option | Card | Default | Description |
 |---|---|---|---|
 | `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `apsystems_ecu_reader`, `apsystems_modbus`, `solax`, `goodwe`, `foxess_modbus`, or any other domain with power sensors) |
-| `solar_sources` | both | — | Other integrations whose production adds to this one's, by domain or as `{integration, name}`: the sun shows their sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one |
+| `solar_sources` | both | — | Other production whose power adds to this system's: the sun shows the sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one. Each entry is either another integration — a domain or `{integration, name}` — or a single power sensor — an entity id or `{entity, name, energy}` (with an optional energy-today sensor) — for a second inverter measured by a clamp of the main one, like a Fox ESS CT2 meter |
 | `title` | both | Brand name | Card title |
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | both | `true` | Show the subtitle under the title |

@@ -1861,6 +1861,9 @@ const guessRole = (id, st) => {
   if (a.device_class === "battery" && unitOf(st) === "%") return "soc";
   if (a.device_class !== "power" && !["W", "kW"].includes(unitOf(st))) return null;
   const text = `${id} ${a.friendly_name || ""}`.toLowerCase();
+  // An auxiliary CT clamp (Fox ESS's CT2 meter…) measures a second source (another inverter, a generator), not the
+  // grid: left unassigned here, it is added to the production by hand with `solar_sources`, not read as a grid meter.
+  if (/\bct2\b|_ct2(_|\b)/.test(text)) return null;
   for (const [re, role] of GUESSES) if (re.test(text)) return role;
   return null;
 };
@@ -1954,16 +1957,27 @@ const findSystem = (hass, config) => {
     if (!p) return { error: "no_system" };
   }
   const roles = { ...(p ? guessedRoles(p, hass) : {}), ...manual };
-  // `solar_sources`: other integrations whose production adds to this one's (micro-inverters next to a hybrid
-  // inverter): an integration domain, or { integration, name }.
+  // `solar_sources`: other production whose power adds to this system's. Each entry is an integration whose production
+  // adds (micro-inverters next to a hybrid inverter) — an integration domain, or { integration, name } — or a single
+  // power sensor — an entity id, or { entity, name, energy } with an optional energy-today sensor. A bare string is an
+  // entity id when it names one (holds a dot), otherwise an integration domain.
   const extra = (Array.isArray(config.solar_sources) ? config.solar_sources : [])
-    .map((x) => (typeof x === "string" ? { integration: x } : x || {}))
-    .map((x) => ({ x, q: m.platforms[x.integration] }))
-    .filter(({ q }) => q && q !== p)
-    .map(({ x, q }) => {
+    .map((x) => (typeof x === "string" ? (x.includes(".") ? { entity: x } : { integration: x }) : x || {}))
+    .map((x) => {
+      if (x.entity) {
+        if (!hass.states[x.entity]) return null;
+        return { platform: "", brand: "generic", name: x.name || hass.states[x.entity].attributes?.friendly_name || x.entity, solar: x.entity, solar_today: x.energy, strings: [] };
+      }
+      const q = m.platforms[x.integration];
+      if (!q || q === p) return null;
       const r = guessedRoles(q, hass);
       return { platform: q.platform, brand: q.brand, name: x.name || q.name, solar: r.solar, solar_today: r.solar_today, strings: q.strings };
-    });
+    })
+    .filter(Boolean);
+  // A sensor added by hand as its own source must not also stand for a role guessed from its name (Fox ESS's CT2 meter,
+  // read as "grid" by the mapping fallbacks): it would then be counted twice.
+  const extraIds = new Set(extra.map((e) => e.solar).filter(Boolean));
+  for (const role of Object.keys(roles)) if (extraIds.has(roles[role]) && !manual[role]) delete roles[role];
   return {
     sys: {
       platform: p?.platform || "",
