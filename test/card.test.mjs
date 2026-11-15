@@ -452,3 +452,15 @@ test("solar_sources: a bare sensor source takes the name it is given", () => {
   const config = { solar_sources: [{ entity: "sensor.foxess_ct2_meter", name: "APsystems" }] };
   assert.match(newCard(makeHass(), { integration: "foxess_modbus", ...config }).shadowRoot.innerHTML, /APsystems/);
 });
+
+test("solar_sources: `power` reads an integration's real-time production from a chosen sensor, energy-today kept", () => {
+  const config = { solar_sources: [{ integration: "apsystems_ecu_reader", power: "sensor.foxess_ct2_meter" }] };
+  // APsystems' own 3.4 kW is replaced by the 2.0 kW clamp: Fox ESS 2.1 + 2.0 = 4.1 kW (−2.9 exported, −0.8 charged).
+  assert.deepEqual(powers("foxess_modbus", {}, config), { solar: 4100, grid: -2900, battery: -800, home: 400 });
+  const card = newCard(makeHass(), { integration: "foxess_modbus", ...config });
+  // Energy-today still comes from APsystems, so the produced total is unchanged (25.3 kWh).
+  assert.equal(Math.round(card._today().produced * 10) / 10, 25.3);
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /APsystems/);
+  assert.match(html, /data-entity="sensor\.foxess_ct2_meter"/);
+});

@@ -1958,9 +1958,10 @@ const findSystem = (hass, config) => {
   }
   const roles = { ...(p ? guessedRoles(p, hass) : {}), ...manual };
   // `solar_sources`: other production whose power adds to this system's. Each entry is an integration whose production
-  // adds (micro-inverters next to a hybrid inverter) — an integration domain, or { integration, name } — or a single
-  // power sensor — an entity id, or { entity, name, energy } with an optional energy-today sensor. A bare string is an
-  // entity id when it names one (holds a dot), otherwise an integration domain.
+  // adds (micro-inverters next to a hybrid inverter) — an integration domain, or { integration, name } with an optional
+  // `power` (a sensor, e.g. a CT clamp, read instead of the integration's own real-time production) and `energy` (its
+  // energy-today) — or a single power sensor — an entity id, or { entity, name, energy } with an optional energy-today
+  // sensor. A bare string is an entity id when it names one (holds a dot), otherwise an integration domain.
   const extra = (Array.isArray(config.solar_sources) ? config.solar_sources : [])
     .map((x) => (typeof x === "string" ? (x.includes(".") ? { entity: x } : { integration: x }) : x || {}))
     .map((x) => {
@@ -1971,7 +1972,9 @@ const findSystem = (hass, config) => {
       const q = m.platforms[x.integration];
       if (!q || q === p) return null;
       const r = guessedRoles(q, hass);
-      return { platform: q.platform, brand: q.brand, name: x.name || q.name, solar: r.solar, solar_today: r.solar_today, strings: q.strings };
+      // `power` / `energy` replace the integration's real-time production / energy-today by a chosen sensor (a CT
+      // clamp for an accurate, faster instantaneous reading), the integration still naming the source and the rest.
+      return { platform: q.platform, brand: q.brand, name: x.name || q.name, solar: x.power || r.solar, solar_today: x.energy || r.solar_today, strings: q.strings };
     })
     .filter(Boolean);
   // A sensor added by hand as its own source must not also stand for a role guessed from its name (Fox ESS's CT2 meter,

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0 - 2026-11-15
+
+### Features
+- A `solar_sources` integration entry can now take a `power` sensor, read as its real-time production instead of the integration's own, and an `energy` sensor for its energy-today. When an integration's instantaneous reading is wrong or too slow (a total off by a factor, a value refreshing only every few minutes), a CT clamp gives an accurate, real-time figure while the integration keeps naming the source and providing the rest. The main integration takes the same override through `entities: { solar: … }` (asked in #22).
+
 ## 1.5.0 - 2026-11-15
 
 ### Features
