@@ -2203,14 +2203,12 @@ const EC_STARS = [
   [70, 30, 0.45],
 ];
 
-// Night picture: forced by illustration_theme, else the sun below the horizon, else Home Assistant's dark mode.
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme.
 const ecIsNight = (hass, config) => {
   const theme = config.illustration_theme;
   if (theme === "night") return true;
   if (theme === "day") return false;
-  const sun = hass?.states?.["sun.sun"];
-  if (valid(sun)) return sun.state === "below_horizon";
-  return !!hass?.themes?.darkMode;
+  return hass?.states?.["sun.sun"]?.state === "below_horizon" || !!hass?.themes?.darkMode;
 };
 
 // One flow of the picture, drawn from where the power comes from to where it goes; `w` sets its speed.

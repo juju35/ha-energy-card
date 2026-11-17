@@ -220,7 +220,7 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | both | `true` | Show the subtitle under the title |
 | `illustration` | both | `true` | Illustrated header: a house with solar panels, its battery and the grid's pylon, with the live power flows, the sun or the moon and a lawn strip. The header icon's color gives the status (producing, battery in use, idle, low battery, error or grid outage). `false` keeps the classic header |
-| `illustration_theme` | both | `auto` | Day or night picture: `auto` follows `sun.sun` (else the dark theme), `day` or `night` forces it |
+| `illustration_theme` | both | `auto` | Day or night picture: `auto` shows the night when `sun.sun` is below the horizon or the theme is dark, `day` or `night` forces it |
 | `zoom` | mini | `true` | Detail button at the top right of the mini card: it shows the full card's content (with the same options, so `show_today`, `collapsed`… can be set on the mini card too, in YAML or in its visual editor) and switches back to the compact view; a click outside the card also brings the compact view back. `false` removes the button |
 | `show_flow` | both | `true` | Power flow diagram |
 | `show_sources` | both | `true` | *Production by source*: the power and energy today of each source, shown with `solar_sources` (or with `show_strings`) |

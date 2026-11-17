@@ -478,6 +478,10 @@ test("the illustrated header shows the flows, follows the night and the status, 
   const dark = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "below_horizon", attributes: {} } })).shadowRoot.innerHTML;
   assert.match(dark, /class="banner night"/);
   assert.match(newCard(makeHass(), { illustration_theme: "night" }).shadowRoot.innerHTML, /class="banner night"/);
+  const sunUp = makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: {} } });
+  sunUp.themes = { darkMode: true };
+  assert.match(newCard(sunUp).shadowRoot.innerHTML, /class="banner night"/, "dark theme while the sun is up: night");
+  assert.match(newCard(sunUp, { illustration_theme: "day" }).shadowRoot.innerHTML, /class="banner"/);
   const out = newCard(makeHass(withOverrides(outage)), { integration: "powerwall" }).shadowRoot.innerHTML;
   assert.match(out, /ec-pylon down/);
   assert.match(out, /type-icon crit/);
