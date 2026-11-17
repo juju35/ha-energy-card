@@ -126,7 +126,7 @@ test("the full card draws the header, the diagram, the battery, today's energy a
 
 test("today's self-consumption and self-sufficiency are worked out, the subtitle shows the self-sufficiency", () => {
   const html = newCard(makeHass(), { integration: "huawei_solar" }).shadowRoot.innerHTML;
-  assert.match(html, /class="sub">81 % self-sufficient today</);
+  assert.match(html, /class="sub">(?:[^<]* · )?81 % self-sufficient today</);
   assert.match(html, /Self-consumption[\s\S]*60 %/);
 });
 
@@ -134,7 +134,10 @@ test("without a battery the diagram is a triangle and the battery section is lef
   const html = newCard(makeHass(), { integration: "fronius" }).shadowRoot.innerHTML;
   assert.doesNotMatch(html, /data-section="battery"/);
   assert.match(html, /viewBox="0 -2 320 174"/);
-  assert.match(html, /class="sub">Running</);
+  assert.match(html, /class="sub">(?:[^<]* · )?Running</);
+  // The status pill right after the title (moved under the subtitle by _fitPill when it does not fit), in the icon's colour.
+  assert.match(html, /class="title-row"><div class="name">[^<]+<\/div><span class="chip clickable active"[^>]*>.*Producing/s);
+  assert.match(html, /logo-link type-icon active/);
 });
 
 test("evening and night: the battery, then the grid, cover the home", () => {
@@ -286,6 +289,19 @@ test("the mini card shows the sun, the home, the grid and the battery, and its d
   assert.deepEqual(plain(card.getGridOptions()), { columns: 12, min_columns: 9, rows: "auto" });
   card._unzoom.tap({ composedPath: () => [] });
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="flow"/);
+});
+
+test("the subtitle tells the live power only on the compact mini card, today's production where the diagram shows it", () => {
+  const sub = (h) => h.match(/class="sub">([^<]*)</)?.[1];
+  const full = sub(newCard(makeHass()).shadowRoot.innerHTML);
+  assert.match(full, /^[\d.]+ kWh produced today/);
+  assert.doesNotMatch(full, / kW( |$)/, "no live power: the diagram shows it");
+  const mini = newCard(makeHass(), {}, ec.EnergyMiniCard);
+  assert.match(sub(mini.shadowRoot.innerHTML), /^[\d.]+ kW$/);
+  click(mini, { action: "zoom" });
+  assert.equal(sub(mini.shadowRoot.innerHTML), full);
+  // The classic header keeps its subtitle (no power in it).
+  assert.doesNotMatch(newCard(makeHass(), { illustration: false }).shadowRoot.innerHTML, /produced today/);
 });
 
 test("the editor offers the systems found and keeps the YAML minimal", () => {
@@ -463,4 +479,28 @@ test("solar_sources: `power` reads an integration's real-time production from a 
   const html = card.shadowRoot.innerHTML;
   assert.match(html, /APsystems/);
   assert.match(html, /data-entity="sensor\.foxess_ct2_meter"/);
+});
+
+test("the illustrated header shows the flows, follows the night and the status, and can be turned off", () => {
+  const day = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: {} } })).shadowRoot.innerHTML;
+  assert.match(day, /class="banner"/);
+  assert.match(day, /ec-scene producing/);
+  assert.match(day, /stroke:var\(--ec-solar\)/);
+  assert.match(day, /type-icon active/);
+  const dark = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "below_horizon", attributes: {} } })).shadowRoot.innerHTML;
+  assert.match(dark, /class="banner night"/);
+  assert.match(newCard(makeHass(), { illustration_theme: "night" }).shadowRoot.innerHTML, /class="banner night"/);
+  const sunUp = makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: {} } });
+  sunUp.themes = { darkMode: true };
+  assert.match(newCard(sunUp).shadowRoot.innerHTML, /class="banner night"/, "dark theme while the sun is up: night");
+  assert.match(newCard(sunUp, { illustration_theme: "day" }).shadowRoot.innerHTML, /class="banner"/);
+  const out = newCard(makeHass(withOverrides(outage)), { integration: "powerwall" }).shadowRoot.innerHTML;
+  assert.match(out, /ec-pylon down/);
+  assert.match(out, /type-icon crit/);
+  // Two cards on a page: their gradients' ids differ.
+  const ids = [newCard(makeHass()), newCard(makeHass())].map((c) => c.shadowRoot.innerHTML.match(/id="(ec-glow-\d+)"/)[1]);
+  assert.notEqual(ids[0], ids[1]);
+  const classic = newCard(makeHass(), { illustration: false }).shadowRoot.innerHTML;
+  assert.doesNotMatch(classic, /class="banner/);
+  assert.match(classic, /class="header"/);
 });
