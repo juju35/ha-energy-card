@@ -464,3 +464,23 @@ test("solar_sources: `power` reads an integration's real-time production from a 
   assert.match(html, /APsystems/);
   assert.match(html, /data-entity="sensor\.foxess_ct2_meter"/);
 });
+
+test("the illustrated header shows the flows, follows the night and the status, and can be turned off", () => {
+  const day = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: {} } })).shadowRoot.innerHTML;
+  assert.match(day, /class="banner"/);
+  assert.match(day, /ec-scene producing/);
+  assert.match(day, /stroke:var\(--ec-solar\)/);
+  assert.match(day, /type-icon active/);
+  const dark = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "below_horizon", attributes: {} } })).shadowRoot.innerHTML;
+  assert.match(dark, /class="banner night"/);
+  assert.match(newCard(makeHass(), { illustration_theme: "night" }).shadowRoot.innerHTML, /class="banner night"/);
+  const out = newCard(makeHass(withOverrides(outage)), { integration: "powerwall" }).shadowRoot.innerHTML;
+  assert.match(out, /ec-pylon down/);
+  assert.match(out, /type-icon crit/);
+  // Two cards on a page: their gradients' ids differ.
+  const ids = [newCard(makeHass()), newCard(makeHass())].map((c) => c.shadowRoot.innerHTML.match(/id="(ec-glow-\d+)"/)[1]);
+  assert.notEqual(ids[0], ids[1]);
+  const classic = newCard(makeHass(), { illustration: false }).shadowRoot.innerHTML;
+  assert.doesNotMatch(classic, /class="banner/);
+  assert.match(classic, /class="header"/);
+});

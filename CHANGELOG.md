@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 - 2026-11-17
+
+### Features
+- Animated illustrated header on the full and mini cards (90 px): a house with solar panels on its roof, its home battery (filled to its level) and the grid's pylon, linked by the live power flows in the flow diagram's colors, with the sun feeding the panels while they produce, the moon and lit windows at night, and a lawn strip at the bottom. The grid crossed out on an outage, an alert sign on an inverter error. Night follows `sun.sun` (else the dark theme), forced by `illustration_theme: day | night`; `illustration: false` keeps the classic header. Both options are in the visual editors.
+- The header icon (now `mdi:flash`, with the integration's logo badge) is colored by the status: producing, battery in use, idle, low battery, error or grid outage.
+
 ## 1.6.0 - 2026-11-15
 
 ### Features

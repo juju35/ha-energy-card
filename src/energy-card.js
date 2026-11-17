@@ -287,7 +287,9 @@ const ICONS = {
   grid: "M8.28,5.45L6.5,4.55L7.76,2H16.23L17.5,4.55L15.72,5.44L15,4H9L8.28,5.45M18.62,8H14.09L13.3,5H10.7L9.91,8H5.38L4.1,10.55L5.89,11.44L6.62,10H17.38L18.1,11.45L19.89,10.56L18.62,8M17.77,22H15.7L15.46,21.1L12,15.9L8.53,21.1L8.3,22H6.23L9.12,11H11.19L10.83,12.35L12,14.1L13.16,12.35L12.81,11H14.88L17.77,22M11.4,15L10.5,13.65L9.32,18.13L11.4,15M14.68,18.12L13.5,13.64L12.6,15L14.68,18.12Z",
   home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
   battery: "M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z",
-  // mdi:solar-panel (header icon)
+  // mdi:flash (header icon)
+  flash: "M7,2V13H10V22L17,10H13L17,2H7Z",
+  // mdi:solar-panel
   panel: "M4,2H20A2,2 0 0,1 22,4V14A2,2 0 0,1 20,16H15V20H18V22H13V16H11V22H6V20H9V16H4A2,2 0 0,1 2,14V4A2,2 0 0,1 4,2M4,4V8H11V4H4M4,14H11V10H4V14M20,14V10H13V14H20M20,4H13V8H20V4Z",
   bolt: "M11,15H6L13,1V9H18L11,23V15Z",
   down: "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z",
@@ -353,6 +355,11 @@ const STRINGS = {
     show_flow: "Power flow",
     show_title: "Show title",
     show_subtitle: "Show subtitle",
+    illustration: "Illustration",
+    illustration_theme: "Illustration theme",
+    theme_auto: "Automatic (sun / theme)",
+    theme_day: "Day",
+    theme_night: "Night",
     show_battery: "Battery",
     show_today: "Today's energy",
     show_week: "Last 7 days (production and consumption per day)",
@@ -418,6 +425,11 @@ const STRINGS = {
     show_flow: "Flux d'énergie",
     show_title: "Afficher le titre",
     show_subtitle: "Afficher le sous-titre",
+    illustration: "Illustration",
+    illustration_theme: "Thème de l'illustration",
+    theme_auto: "Automatique (soleil / thème)",
+    theme_day: "Jour",
+    theme_night: "Nuit",
     show_battery: "Batterie",
     show_today: "Énergie du jour",
     show_week: "7 derniers jours (production et consommation par jour)",
@@ -483,6 +495,11 @@ const STRINGS = {
     show_flow: "Energiefluss",
     show_title: "Titel anzeigen",
     show_subtitle: "Untertitel anzeigen",
+    illustration: "Illustration",
+    illustration_theme: "Illustrationsthema",
+    theme_auto: "Automatisch (Sonne / Design)",
+    theme_day: "Tag",
+    theme_night: "Nacht",
     show_battery: "Batterie",
     show_today: "Energie heute",
     show_week: "Letzte 7 Tage (Erzeugung und Verbrauch pro Tag)",
@@ -548,6 +565,11 @@ const STRINGS = {
     show_flow: "Flujo de energía",
     show_title: "Mostrar el título",
     show_subtitle: "Mostrar el subtítulo",
+    illustration: "Ilustración",
+    illustration_theme: "Tema de la ilustración",
+    theme_auto: "Automático (sol / tema)",
+    theme_day: "Día",
+    theme_night: "Noche",
     show_battery: "Batería",
     show_today: "Energía de hoy",
     show_week: "Últimos 7 días (producción y consumo por día)",
@@ -613,6 +635,11 @@ const STRINGS = {
     show_flow: "Ток енергије",
     show_title: "Прикажи наслов",
     show_subtitle: "Прикажи поднаслов",
+    illustration: "Илустрација",
+    illustration_theme: "Тема илустрације",
+    theme_auto: "Аутоматски (сунце / тема)",
+    theme_day: "Дан",
+    theme_night: "Ноћ",
     show_battery: "Батерија",
     show_today: "Данашња енергија",
     show_week: "Последњих 7 дана (производња и потрошња по дану)",
@@ -678,6 +705,11 @@ const STRINGS = {
     show_flow: "Tok energije",
     show_title: "Prikaži naslov",
     show_subtitle: "Prikaži podnaslov",
+    illustration: "Ilustracija",
+    illustration_theme: "Tema ilustracije",
+    theme_auto: "Automatski (sunce / tema)",
+    theme_day: "Dan",
+    theme_night: "Noć",
     show_battery: "Baterija",
     show_today: "Današnja energija",
     show_week: "Poslednjih 7 dana (proizvodnja i potrošnja po danu)",
@@ -743,6 +775,11 @@ const STRINGS = {
     show_flow: "Flusso di energia",
     show_title: "Mostra il titolo",
     show_subtitle: "Mostra il sottotitolo",
+    illustration: "Illustrazione",
+    illustration_theme: "Tema dell'illustrazione",
+    theme_auto: "Automatico (sole / tema)",
+    theme_day: "Giorno",
+    theme_night: "Notte",
     show_battery: "Batteria",
     show_today: "Energia di oggi",
     show_week: "Ultimi 7 giorni (produzione e consumo al giorno)",
@@ -808,6 +845,11 @@ const STRINGS = {
     show_flow: "Energiestroom",
     show_title: "Titel tonen",
     show_subtitle: "Ondertitel tonen",
+    illustration: "Illustratie",
+    illustration_theme: "Thema van de illustratie",
+    theme_auto: "Automatisch (zon / thema)",
+    theme_day: "Dag",
+    theme_night: "Nacht",
     show_battery: "Batterij",
     show_today: "Energie vandaag",
     show_week: "Laatste 7 dagen (opwek en verbruik per dag)",
@@ -873,6 +915,11 @@ const STRINGS = {
     show_flow: "Fluxo de energia",
     show_title: "Mostrar o título",
     show_subtitle: "Mostrar o subtítulo",
+    illustration: "Ilustração",
+    illustration_theme: "Tema da ilustração",
+    theme_auto: "Automático (sol / tema)",
+    theme_day: "Dia",
+    theme_night: "Noite",
     show_battery: "Bateria",
     show_today: "Energia de hoje",
     show_week: "Últimos 7 dias (produção e consumo por dia)",
@@ -938,6 +985,11 @@ const STRINGS = {
     show_flow: "Przepływ energii",
     show_title: "Pokaż tytuł",
     show_subtitle: "Pokaż podtytuł",
+    illustration: "Ilustracja",
+    illustration_theme: "Motyw ilustracji",
+    theme_auto: "Automatyczny (słońce / motyw)",
+    theme_day: "Dzień",
+    theme_night: "Noc",
     show_battery: "Bateria",
     show_today: "Energia dzisiaj",
     show_week: "Ostatnie 7 dni (produkcja i zużycie dziennie)",
@@ -1003,6 +1055,11 @@ const STRINGS = {
     show_flow: "Flux de energie",
     show_title: "Afișează titlul",
     show_subtitle: "Afișează subtitlul",
+    illustration: "Ilustrație",
+    illustration_theme: "Tema ilustrației",
+    theme_auto: "Automat (soare / temă)",
+    theme_day: "Zi",
+    theme_night: "Noapte",
     show_battery: "Baterie",
     show_today: "Energia de azi",
     show_week: "Ultimele 7 zile (producție și consum pe zi)",
@@ -1068,6 +1125,11 @@ const STRINGS = {
     show_flow: "Energiflow",
     show_title: "Vis titel",
     show_subtitle: "Vis undertitel",
+    illustration: "Illustration",
+    illustration_theme: "Illustrationstema",
+    theme_auto: "Automatisk (sol / tema)",
+    theme_day: "Dag",
+    theme_night: "Nat",
     show_battery: "Batteri",
     show_today: "Energi i dag",
     show_week: "Seneste 7 dage (produktion og forbrug pr. dag)",
@@ -1133,6 +1195,11 @@ const STRINGS = {
     show_flow: "Energiflöde",
     show_title: "Visa rubrik",
     show_subtitle: "Visa underrubrik",
+    illustration: "Illustration",
+    illustration_theme: "Illustrationstema",
+    theme_auto: "Automatiskt (sol / tema)",
+    theme_day: "Dag",
+    theme_night: "Natt",
     show_battery: "Batteri",
     show_today: "Energi i dag",
     show_week: "Senaste 7 dagarna (produktion och förbrukning per dag)",
@@ -1198,6 +1265,11 @@ const STRINGS = {
     show_flow: "Енергиен поток",
     show_title: "Показване на заглавието",
     show_subtitle: "Показване на подзаглавието",
+    illustration: "Илюстрация",
+    illustration_theme: "Тема на илюстрацията",
+    theme_auto: "Автоматично (слънце / тема)",
+    theme_day: "Ден",
+    theme_night: "Нощ",
     show_battery: "Батерия",
     show_today: "Енергия днес",
     show_week: "Последните 7 дни (производство и потребление на ден)",
@@ -1263,6 +1335,11 @@ const STRINGS = {
     show_flow: "Поток энергии",
     show_title: "Показывать заголовок",
     show_subtitle: "Показывать подзаголовок",
+    illustration: "Иллюстрация",
+    illustration_theme: "Тема иллюстрации",
+    theme_auto: "Автоматически (солнце / тема)",
+    theme_day: "День",
+    theme_night: "Ночь",
     show_battery: "Батарея",
     show_today: "Энергия за сегодня",
     show_week: "Последние 7 дней (выработка и потребление за день)",
@@ -1328,6 +1405,11 @@ const STRINGS = {
     show_flow: "Потік енергії",
     show_title: "Показувати заголовок",
     show_subtitle: "Показувати підзаголовок",
+    illustration: "Ілюстрація",
+    illustration_theme: "Тема ілюстрації",
+    theme_auto: "Автоматично (сонце / тема)",
+    theme_day: "День",
+    theme_night: "Ніч",
     show_battery: "Батарея",
     show_today: "Енергія за сьогодні",
     show_week: "Останні 7 днів (вироблення та споживання за день)",
@@ -1393,6 +1475,11 @@ const STRINGS = {
     show_flow: "Energiaáramlás",
     show_title: "Cím megjelenítése",
     show_subtitle: "Alcím megjelenítése",
+    illustration: "Illusztráció",
+    illustration_theme: "Illusztráció témája",
+    theme_auto: "Automatikus (nap / téma)",
+    theme_day: "Nappal",
+    theme_night: "Éjszaka",
     show_battery: "Akkumulátor",
     show_today: "Mai energia",
     show_week: "Utolsó 7 nap (napi termelés és fogyasztás)",
@@ -1458,6 +1545,11 @@ const STRINGS = {
     show_flow: "Tok energie",
     show_title: "Zobraziť názov",
     show_subtitle: "Zobraziť podnázov",
+    illustration: "Ilustrácia",
+    illustration_theme: "Téma ilustrácie",
+    theme_auto: "Automaticky (slnko / téma)",
+    theme_day: "Deň",
+    theme_night: "Noc",
     show_battery: "Batéria",
     show_today: "Dnešná energia",
     show_week: "Posledných 7 dní (výroba a spotreba za deň)",
@@ -1523,6 +1615,11 @@ const STRINGS = {
     show_flow: "Tok energie",
     show_title: "Zobrazit název",
     show_subtitle: "Zobrazit podnázev",
+    illustration: "Ilustrace",
+    illustration_theme: "Motiv ilustrace",
+    theme_auto: "Automaticky (slunce / motiv)",
+    theme_day: "Den",
+    theme_night: "Noc",
     show_battery: "Baterie",
     show_today: "Dnešní energie",
     show_week: "Posledních 7 dní (výroba a spotřeba za den)",
@@ -1588,6 +1685,11 @@ const STRINGS = {
     show_flow: "Tok energije",
     show_title: "Prikaži naslov",
     show_subtitle: "Prikaži podnaslov",
+    illustration: "Ilustracija",
+    illustration_theme: "Tema ilustracije",
+    theme_auto: "Samodejno (sonce / tema)",
+    theme_day: "Dan",
+    theme_night: "Noč",
     show_battery: "Baterija",
     show_today: "Današnja energija",
     show_week: "Zadnjih 7 dni (proizvodnja in poraba na dan)",
@@ -1653,6 +1755,11 @@ const STRINGS = {
     show_flow: "Enerģijas plūsma",
     show_title: "Rādīt virsrakstu",
     show_subtitle: "Rādīt apakšvirsrakstu",
+    illustration: "Ilustrācija",
+    illustration_theme: "Ilustrācijas motīvs",
+    theme_auto: "Automātiski (saule / motīvs)",
+    theme_day: "Diena",
+    theme_night: "Nakts",
     show_battery: "Akumulators",
     show_today: "Šodienas enerģija",
     show_week: "Pēdējās 7 dienas (ražošana un patēriņš dienā)",
@@ -1718,6 +1825,11 @@ const STRINGS = {
     show_flow: "Ροή ενέργειας",
     show_title: "Εμφάνιση τίτλου",
     show_subtitle: "Εμφάνιση υπότιτλου",
+    illustration: "Εικονογράφηση",
+    illustration_theme: "Θέμα εικονογράφησης",
+    theme_auto: "Αυτόματο (ήλιος / θέμα)",
+    theme_day: "Ημέρα",
+    theme_night: "Νύχτα",
     show_battery: "Μπαταρία",
     show_today: "Ενέργεια σήμερα",
     show_week: "Τελευταίες 7 ημέρες (παραγωγή και κατανάλωση ανά ημέρα)",
@@ -2072,6 +2184,151 @@ const flowsOf = ({ solar, grid, battery, home }) => {
 const flowSpeed = (w) => (w >= 3000 ? 0.75 : w >= 1000 ? 1 : w >= 300 ? 1.5 : 3);
 
 // ---------------------------------------------------------------------------
+// The illustrated header ("banner"): the title on the sky at the left, and at the right a house with solar panels
+// on its roof, its home battery and the grid's pylon, linked by the live power flows (the colors of the flow
+// diagram), over a 10 px lawn strip edge to edge. The sun (or the moon at night) feeds the panels while they
+// produce. Drawn in a 200 × 80 picture anchored at the bottom right of the banner, above the strip.
+// ---------------------------------------------------------------------------
+
+let _ecUid = 0;
+
+// Sky positions of the stars (night).
+const EC_STARS = [
+  [12, 8, 0.6],
+  [44, 18, 0.5],
+  [96, 6, 0.6],
+  [132, 24, 0.5],
+  [168, 10, 0.6],
+  [188, 30, 0.5],
+  [70, 30, 0.45],
+];
+
+// Night picture: forced by illustration_theme, else the sun below the horizon, else Home Assistant's dark mode.
+const ecIsNight = (hass, config) => {
+  const theme = config.illustration_theme;
+  if (theme === "night") return true;
+  if (theme === "day") return false;
+  const sun = hass?.states?.["sun.sun"];
+  if (valid(sun)) return sun.state === "below_horizon";
+  return !!hass?.themes?.darkMode;
+};
+
+// One flow of the picture, drawn from where the power comes from to where it goes; `w` sets its speed.
+const ecFlow = (d, color, w) => `<path class="ec-flow" d="${d}" style="stroke:var(--ec-${color});animation-duration:${flowSpeed(w)}s"/>`;
+
+// The picture. `s`: { solar, flows, hasBattery, hasGrid, soc, batteryState, gridDown, error }; `uid` keeps the ids
+// of each card apart on a page with several cards.
+const ecSceneSvg = (uid, s) => {
+  const f = s.flows;
+  const producing = s.solar !== null && s.solar >= FLOW_MIN_W;
+  const stars = EC_STARS.map(([x, y, r], i) => `<circle class="ec-star${i % 3 ? "" : " tw"}" cx="${x}" cy="${y}" r="${r}"/>`).join("");
+  const panels = [0, 1, 2].map((i) => `<rect class="ec-pv" x="${i * 9}" y="-12" width="8" height="12"/>`).join("");
+  const win = (x, lit) => `<rect class="ec-win${lit ? " lit" : ""}" x="${x}" y="12" width="10" height="9" rx=".6"/>`;
+  const flows = [];
+  if (producing) flows.push(ecFlow("M36 22Q74 18 122 32", "solar", s.solar));
+  const toBattery = (f.solarToBattery || 0) + (f.gridToBattery || 0);
+  const fromBattery = (f.batteryToHome || 0) + (f.batteryToGrid || 0);
+  if (s.hasBattery && toBattery >= FLOW_MIN_W) flows.push(ecFlow("M152 70H159", "charge", toBattery));
+  else if (s.hasBattery && fromBattery >= FLOW_MIN_W) flows.push(ecFlow("M159 70H152", "battery", fromBattery));
+  const imp = (f.gridToHome || 0) + (f.gridToBattery || 0);
+  const exp = (f.solarToGrid || 0) + (f.batteryToGrid || 0);
+  if (s.hasGrid && !s.gridDown && imp >= FLOW_MIN_W) flows.push(ecFlow("M188 34Q172 42 152 54", "grid", imp));
+  else if (s.hasGrid && !s.gridDown && exp >= FLOW_MIN_W) flows.push(ecFlow("M152 54Q172 42 188 34", "export", exp));
+  const soc = s.soc === null ? 0.6 : s.soc / 100;
+  const level = 14 * soc;
+  const battery = s.hasBattery
+    ? `<g class="ec-batt ${s.batteryState}" transform="translate(159 58)"><rect class="ec-batt-body" width="11" height="22" rx="2"/><rect class="ec-batt-cap" x="3.5" y="-1.6" width="4" height="2" rx=".6"/><rect class="ec-batt-in" x="2" y="4" width="7" height="14" rx="1"/><rect class="ec-batt-lvl ${levelClass(s.soc)}" x="2" y="${(18 - level).toFixed(2)}" width="7" height="${level.toFixed(2)}" rx="1"/></g>`
+    : "";
+  const pylon = s.hasGrid
+    ? `<g class="ec-pylon${s.gridDown ? " down" : ""}"><path d="M181 80 L188 30 L195 80 M183 42 h10 M181.5 54 h13 M185 42 L191 54 M191 42 L185 54"/><path class="ec-wire" d="M176 34 H200"/>${
+        s.gridDown ? '<path class="ec-cut" d="M183 60 l10 10 M193 60 l-10 10"/>' : ""
+      }</g>`
+    : "";
+  const alert = s.error ? '<g class="ec-alert" transform="translate(124 6)"><path d="M0 12 L7 0 L14 12Z"/><path class="mark" d="M7 4v4.2M7 9.6v.6"/></g>' : "";
+  return `<svg class="ec-scene${producing ? " producing" : ""}" viewBox="0 0 200 80" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false">
+    <defs><radialGradient id="ec-glow-${uid}"><stop offset="0" stop-color="#ffd65a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd65a" stop-opacity="0"/></radialGradient></defs>
+    <g class="ec-day"><circle class="ec-halo" cx="30" cy="18" r="13" fill="url(#ec-glow-${uid})"/><circle class="ec-sun" cx="30" cy="18" r="6"/>
+      <path class="ec-cloud" d="M66,16 C63,16 62,12 65.5,11 C66,7 72,6 74,9 C76,4 84,4 85,10 C89,9 92,12 90,16 Z"/></g>
+    <g class="ec-night">${stars}<circle class="ec-moon" cx="30" cy="18" r="5.5"/><circle class="ec-moon-cut" cx="32.5" cy="16" r="4.5"/></g>
+    <path class="ec-hill far" d="M0,80 C30,70 60,64 100,66 C140,68 170,60 200,62 L200,80Z"/>
+    <path class="ec-hill" d="M0,80 C40,74 90,75 200,72 L200,80Z"/>
+    <g class="ec-house" transform="translate(96 44)">
+      <rect class="ec-wall" width="56" height="36"/><path class="ec-roof" d="M-6 1 L28 -22 L62 1Z"/>
+      <g class="ec-panels" transform="translate(30 -4) skewX(-34)">${panels}<rect class="ec-glint" x="0" y="-12" width="3" height="12"/></g>
+      ${win(8, s.night)}<rect class="ec-door" x="24" y="18" width="10" height="18"/>${win(40, false)}
+    </g>
+    ${battery}${pylon}${flows.join("")}${alert}
+  </svg>`;
+};
+
+// The banner's colors and animations, day and night.
+const EC_SCENE_STYLE = `
+  .banner { position: relative; overflow: hidden; height: 90px; --ec-g: 10px; --ec-scene-w: min(calc((90px - var(--ec-g)) * 2.5), 62%);
+            color: #0d2a45; background: linear-gradient(90deg, #f1f8ff 0%, #e2f1fd 34%, #b9def8 70%, #9fd0f3 100%); }
+  .banner.night { color: #fff; background: linear-gradient(90deg, #1b2f52 0%, #15284a 36%, #0f1f3d 72%, #0a1830 100%); }
+  .ec-scene { position: absolute; right: 0; bottom: var(--ec-g); height: calc(100% - var(--ec-g)); width: var(--ec-scene-w); overflow: visible; }
+  .ec-ground { position: absolute; left: 0; right: 0; bottom: 0; height: var(--ec-g);
+               background: repeating-linear-gradient(90deg, #5aa83d 0 22px, #6cbb4c 22px 44px); }
+  .night .ec-ground { background: repeating-linear-gradient(90deg, #1f4a2a 0 22px, #245433 22px 44px); }
+  .htext { position: absolute; z-index: 1; left: 0; top: 0; bottom: var(--ec-g); right: var(--ec-scene-w); padding: 6px 8px 6px 12px;
+           display: flex; align-items: center; gap: 10px; min-width: 0; box-sizing: border-box; }
+  .htext .titles { display: flex; flex-direction: column; gap: 2px; }
+  .banner .type-icon { background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(47,128,237,.18); }
+  .banner.night .type-icon { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+  .banner .type-icon .logo { background: #fff; box-shadow: 0 0 0 1px rgba(13,42,69,.16), 0 1px 3px rgba(13,42,69,.18); }
+  .banner .name { font-weight: 500; }
+  .banner .sub { color: #3b5b78; }
+  .banner.night .sub { color: rgba(255,255,255,.78); }
+  /* The power goes (to a hidden second line) rather than being cut when it does not fit beside the status. */
+  .banner .status-line { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center; gap: 0 6px; min-width: 0; font-size: 13px; height: 20px; overflow: hidden; }
+  .banner .status-line .chip { max-width: none; flex: 0 1 auto; height: 20px; background: rgba(255,255,255,.7); color: color-mix(in srgb, var(--c) 60%, #0d2a45); }
+  .banner.night .status-line .chip { background: rgba(10,20,40,.5); color: color-mix(in srgb, var(--c) 45%, #fff); }
+  .banner .power { flex: none; line-height: 20px; color: #3b5b78; white-space: nowrap; }
+  .banner.night .power { color: rgba(255,255,255,.78); }
+  .banner .zoom { position: absolute; z-index: 2; top: 6px; right: 6px; margin: 0; color: #0d2a45; background: rgba(255,255,255,.55); }
+  .banner.night .zoom { color: #fff; background: rgba(10,20,40,.45); }
+  .banner .zoom:hover { background: rgba(255,255,255,.8); }
+  .banner.night .zoom:hover { background: rgba(10,20,40,.7); }
+  /* Narrow card: no room for the picture beside the text, the sky and the lawn stay. */
+  @container (max-width: 300px) { .ec-scene { display: none; } .htext { right: 36px; } }
+  .ec-night, .night .ec-day { display: none; }
+  .night .ec-night { display: inline; }
+  .ec-sun { fill: #ffd65a; } .ec-halo { opacity: .5; }
+  .producing .ec-halo { animation: ec-halo-pulse 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .ec-cloud { fill: #fff; opacity: .92; animation: ec-drift 4s ease-in-out infinite alternate; }
+  .ec-star { fill: #fff; opacity: .8; } .ec-star.tw { animation: ec-twinkle 3s ease-in-out infinite alternate; }
+  .ec-moon { fill: #f3eed2; } .ec-moon-cut { fill: #13254a; }
+  .ec-hill.far { fill: #a7d39f; } .ec-hill { fill: #86c27f; }
+  .night .ec-hill.far { fill: #1d3a4a; } .night .ec-hill { fill: #17303d; }
+  .ec-wall { fill: #f3e6d3; } .night .ec-wall { fill: #2a3646; }
+  .ec-roof { fill: #c0603a; } .night .ec-roof { fill: #3a2a2a; }
+  .ec-door { fill: #8a5a3a; }
+  .ec-win { fill: #86b9de; } .night .ec-win { fill: #3b4b5e; } .night .ec-win.lit { fill: #ffcf6e; filter: drop-shadow(0 0 1.4px #ffb347); }
+  .ec-pv { fill: #1e3a6e; stroke: #9cc3ff; stroke-width: .5; }
+  .ec-glint { fill: #fff; opacity: 0; }
+  .producing .ec-glint { animation: ec-glint 3s ease-in-out infinite; }
+  .ec-batt-body { fill: #e9edf1; stroke: #9aa3ae; stroke-width: .6; } .night .ec-batt-body { fill: #3d475c; stroke: #6b7587; }
+  .ec-batt-cap { fill: #9aa3ae; }
+  .ec-batt-in { fill: #2a3038; }
+  .ec-batt-lvl { fill: var(--c, var(--ec-ok)); }
+  .ec-batt.charging .ec-batt-lvl { animation: ec-blink 1.5s ease-in-out infinite; }
+  .ec-pylon path { stroke: #5f6b7a; stroke-width: 1.2; fill: none; stroke-linejoin: round; }
+  .night .ec-pylon path { stroke: #7d8793; }
+  .ec-pylon .ec-wire { stroke-width: .5; }
+  .ec-pylon.down path:not(.ec-cut) { opacity: .55; }
+  .ec-pylon .ec-cut, .night .ec-pylon .ec-cut { stroke: var(--ec-crit); stroke-width: 2; stroke-linecap: round; opacity: 1; }
+  .ec-flow { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 0 5; animation: ec-dots linear infinite; }
+  .ec-alert path { fill: var(--ec-crit); } .ec-alert .mark { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; }
+  .ec-alert { animation: ec-blink 1.2s ease-in-out infinite; }
+  @keyframes ec-dots { to { stroke-dashoffset: -10; } }
+  @keyframes ec-halo-pulse { 0%, 100% { opacity: .45; transform: scale(1); } 50% { opacity: .9; transform: scale(1.15); } }
+  @keyframes ec-drift { to { transform: translateX(4px); } }
+  @keyframes ec-twinkle { from { opacity: .3; } to { opacity: 1; } }
+  @keyframes ec-glint { 0%, 55% { opacity: 0; transform: translateX(0); } 70% { opacity: .55; } 85%, 100% { opacity: 0; transform: translateX(24px); } }
+  @keyframes ec-blink { 50% { opacity: .45; } }
+`;
+
+// ---------------------------------------------------------------------------
 // Shared styles
 // ---------------------------------------------------------------------------
 
@@ -2103,7 +2360,10 @@ const BASE_STYLE = `
   a.logo-link { display: flex; flex: none; text-decoration: none; }
   .type-icon { position: relative; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none;
                background: color-mix(in srgb, var(--ec-accent) 16%, transparent); }
-  .type-icon .icon.type { width: 24px; height: 24px; fill: var(--ec-accent); }
+  /* The header icon's color always gives the status: producing (sun), battery in use, idle (grey), low battery
+     (amber), error or grid outage (red). */
+  .type-icon .icon.type { width: 24px; height: 24px; fill: var(--c, var(--ec-idle)); }
+  .type-icon.ok { --c: var(--ec-battery); }
   .type-icon .logo { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 5px;
                      background: var(--card-background-color, #fff);
                      box-shadow: 0 0 0 1px var(--divider-color, rgba(0,0,0,.12)), 0 0 0 3px var(--card-background-color, #fff); }
@@ -2214,6 +2474,8 @@ class EnergyBase extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this._html = "";
+    // Ids of the illustration's gradients, apart from those of the other cards on the page.
+    this._uid = ++_ecUid;
     // No rewrite of the card between a press and its click: Home Assistant updates the card several times a second,
     // and a rewrite under the pointer replaces the element pressed, so that the click lands on the card itself and
     // does nothing. The update held back is drawn once released: by the click (registered before the card's own
@@ -2280,7 +2542,7 @@ class EnergyBase extends HTMLElement {
     if (!sys) return null;
     const extra = sys.extra.flatMap((x) => [x.solar, x.solar_today, ...(this._config.show_strings ? x.strings : [])]);
     const ids = [...Object.values(sys.roles), ...extra, ...(this._config.show_strings ? sys.strings : []), ...sys.switches, ...sys.selects];
-    return [h.entities, h.devices, h.language, h.locale, h.themes?.darkMode, ...ids.map((id) => h.states[id])];
+    return [h.entities, h.devices, h.language, h.locale, h.themes?.darkMode, h.states["sun.sun"]?.state, ...ids.map((id) => h.states[id])];
   }
 
   // A click elsewhere on the page folds the sections back to their defaults and closes the popup.
@@ -2581,28 +2843,78 @@ class EnergyBase extends HTMLElement {
     return valid(st) ? this._fmt(st) : "";
   }
 
-  // Icon of the kind of device, tinted with the brand color, with the integration's logo as a badge.
-  _logo() {
+  // Icon of the card, colored by the status (`cls`), with the integration's logo as a badge.
+  _logo(cls) {
     const b = BRANDS[this._sys.brand];
-    const icon = svgIcon(ICONS.panel, "type");
-    if (!b.logo) return `<span class="type-icon">${icon}</span>`;
-    return `<a class="logo-link type-icon" href="${b.site}" target="_blank" rel="noopener noreferrer" title="${esc(b.name)}">${imgTag(b.logo, `class="logo" alt="${esc(b.name)}"`)}${icon}</a>`;
+    const icon = svgIcon(ICONS.flash, "type");
+    if (!b.logo) return `<span class="type-icon ${cls}">${icon}</span>`;
+    return `<a class="logo-link type-icon ${cls}" href="${b.site}" target="_blank" rel="noopener noreferrer" title="${esc(b.name)}">${imgTag(b.logo, `class="logo" alt="${esc(b.name)}"`)}${icon}</a>`;
   }
 
-  _header(status, sub) {
+  // Color of the header icon: the status, the battery's color while it runs (the sun down), or amber when the
+  // battery runs low while nothing else is wrong.
+  _iconClass(status, p) {
+    if (status.cls === "crit" || status.cls === "active") return status.cls;
+    const soc = this._soc();
+    if (soc !== null && levelClass(soc) === "crit") return "warn";
+    return this._batteryState(p) === "idle" ? status.cls : "ok";
+  }
+
+  _chip(status) {
+    return `<span class="chip ${status.entity ? "clickable " : ""}${status.cls}"${status.entity ? ` role="button" tabindex="0" data-entity="${esc(status.entity)}"` : ""} title="${esc(status.text)}" aria-label="${esc(
+      status.text,
+    )}"><span class="dot"></span><span class="chip-text">${esc(status.text)}</span></span>`;
+  }
+
+  // The header: the illustration with the title on its sky (see ecSceneSvg), or the classic header
+  // (`illustration: false`).
+  _header(status, sub, p) {
     const title = this._config.title || this._sys.name || this._t("solar");
-    return `
+    const icon = this._logo(this._iconClass(status, p));
+    if (this._config.illustration === false) {
+      return `
       <div class="header">
-        ${this._logo()}
+        ${icon}
         <div class="titles">
           <div class="name">${esc(title)}</div>
           ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
         </div>
-        <span class="chip ${status.entity ? "clickable " : ""}${status.cls}"${status.entity ? ` role="button" tabindex="0" data-entity="${esc(status.entity)}"` : ""} title="${esc(status.text)}" aria-label="${esc(
-          status.text,
-        )}"><span class="dot"></span><span class="chip-text">${esc(status.text)}</span></span>
+        ${this._chip(status)}
         ${this._zoomButton()}
       </div>`;
+    }
+    const L = this._locale();
+    const power = status.cls === "active" ? fmtPower(p.solar, L) : status.cls === "ok" && p.battery !== null ? fmtPower(Math.abs(p.battery), L) : "";
+    const night = ecIsNight(this._hass, this._config);
+    const scene = ecSceneSvg(this._uid, {
+      solar: p.solar,
+      flows: flowsOf(p),
+      hasBattery: this._hasBattery(p),
+      hasGrid: p.grid !== null || !!this._sys.roles.grid_status,
+      soc: this._soc(),
+      batteryState: this._batteryState(p),
+      gridDown: this._gridDown(),
+      error: !!this._error(),
+      night,
+    });
+    return `
+      <div class="banner${night ? " night" : ""}">
+        ${scene}<div class="ec-ground"></div>
+        <div class="htext">
+          ${icon}
+          <div class="titles">
+            <div class="name">${esc(title)}</div>
+            <div class="status-line">${this._chip(status)}${power ? `<span class="power">${esc(power)}</span>` : ""}</div>
+            ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
+          </div>
+        </div>
+        ${this._zoomButton()}
+      </div>`;
+  }
+
+  // The illustration's styles, only when it is shown.
+  _sceneStyle() {
+    return this._config.illustration === false ? "" : EC_SCENE_STYLE;
   }
 
   // Detail button at the far right of the header (mini card only).
@@ -2786,9 +3098,9 @@ class EnergyCard extends EnergyBase {
     if (c.show_today !== false) parts.push(this._todaySection());
     if (c.show_week !== false) parts.push(this._weekSection());
     if (c.show_options !== false) parts.push(this._options());
-    return `<style>${BASE_STYLE}${FULL_STYLE}${this._accent()}</style>
+    return `<style>${BASE_STYLE}${FULL_STYLE}${this._sceneStyle()}${this._accent()}</style>
       <ha-card>
-        ${this._header(this._status(p), this._subtitle())}
+        ${this._header(this._status(p), this._subtitle(), p)}
         <div class="content">${parts.filter(Boolean).join("")}</div>
       </ha-card>`;
   }
@@ -3197,9 +3509,9 @@ class EnergyMiniCard extends EnergyCard {
       const bar = soc === null ? "" : `<div class="bar ${levelClass(soc)}"><div style="width:${soc}%"></div></div>`;
       stat(r.soc || r.battery, state === "charging" ? ICONS.bolt : ICONS.battery, color, soc === null ? fmtPower(p.battery, L) : fmtPct(soc, L), this._t(state === "idle" ? "battery" : state), bar);
     }
-    return `<style>${BASE_STYLE}${MINI_STYLE}${this._accent()}</style>
+    return `<style>${BASE_STYLE}${MINI_STYLE}${this._sceneStyle()}${this._accent()}</style>
       <ha-card>
-        ${this._header(this._status(p), "")}
+        ${this._header(this._status(p), "", p)}
         <div class="content" style="--cols:${stats.length}">${stats.join("")}</div>
       </ha-card>`;
   }
@@ -3324,6 +3636,7 @@ class EnergyCardEditor extends EnergyEditorBase {
     return [
       ["show_title", true],
       ["show_subtitle", true],
+      ["illustration", true],
       ["show_flow", true],
       ["show_sources", true],
       ["show_strings", false],
@@ -3338,12 +3651,16 @@ class EnergyCardEditor extends EnergyEditorBase {
   }
 
   static get selects() {
-    return { collapsed: DEFAULT_COLLAPSED };
+    return { collapsed: DEFAULT_COLLAPSED, illustration_theme: "auto" };
   }
 
   static extraFields(tr) {
     const power = { entity: { domain: "sensor", device_class: "power" } };
     return [
+      {
+        name: "illustration_theme",
+        selector: { select: { mode: "dropdown", options: ["auto", "day", "night"].map((v) => ({ value: v, label: tr(`theme_${v}`) })) } },
+      },
       {
         name: "collapsed",
         selector: { select: { multiple: true, mode: "list", options: ["sources", "battery", "today", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
