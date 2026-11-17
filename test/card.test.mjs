@@ -292,6 +292,19 @@ test("the mini card shows the sun, the home, the grid and the battery, and its d
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="flow"/);
 });
 
+test("the subtitle tells the live power only on the compact mini card, today's production where the diagram shows it", () => {
+  const sub = (h) => h.match(/class="sub">([^<]*)</)?.[1];
+  const full = sub(newCard(makeHass()).shadowRoot.innerHTML);
+  assert.match(full, /^[\d.]+ kWh produced today/);
+  assert.doesNotMatch(full, / kW( |$)/, "no live power: the diagram shows it");
+  const mini = newCard(makeHass(), {}, ec.EnergyMiniCard);
+  assert.match(sub(mini.shadowRoot.innerHTML), /^[\d.]+ kW$/);
+  click(mini, { action: "zoom" });
+  assert.equal(sub(mini.shadowRoot.innerHTML), full);
+  // The classic header keeps its subtitle (no power in it).
+  assert.doesNotMatch(newCard(makeHass(), { illustration: false }).shadowRoot.innerHTML, /produced today/);
+});
+
 test("the editor offers the systems found and keeps the YAML minimal", () => {
   const ed = new ec.EnergyCardEditor();
   ed.setConfig({ type: "custom:energy-card" });

@@ -7,6 +7,7 @@
 - The header icon (now `mdi:flash`, with the integration's logo badge) is colored by the status: producing, battery in use, idle, low battery, error or grid outage.
 - Status pill on the title line, right after the title, in the header icon's colour (a line of its own under the subtitle when the title block is narrow, only its dot below 200 px); the power that sat beside it now leads the subtitle. The mini card's detail button is a 24 px round glass button in the top right corner of the header.
 - Night picture with the dark theme even while the sun is up
+- No repeated power: where the flow diagram shows the live powers (full card, expanded mini card), the subtitle starts with today's production instead of repeating the solar power; the compact mini card keeps the live power in its subtitle.
 
 ## 1.6.0 - 2026-11-15
 

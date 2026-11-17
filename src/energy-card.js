@@ -324,6 +324,7 @@ const STRINGS = {
     not_producing: "Not producing",
     grid_outage: "Grid outage",
     self_sufficient: "{pct} % self-sufficient today",
+    produced_today: "{energy} produced today",
     flow: "Power flow",
     today: "Today",
     produced: "Produced",
@@ -394,6 +395,7 @@ const STRINGS = {
     not_producing: "Pas de production",
     grid_outage: "Coupure réseau",
     self_sufficient: "Autonomie de {pct} % aujourd'hui",
+    produced_today: "{energy} produits aujourd'hui",
     flow: "Flux d'énergie",
     today: "Aujourd'hui",
     produced: "Produite",
@@ -464,6 +466,7 @@ const STRINGS = {
     not_producing: "Keine Produktion",
     grid_outage: "Netzausfall",
     self_sufficient: "Heute {pct} % autark",
+    produced_today: "Heute {energy} erzeugt",
     flow: "Energiefluss",
     today: "Heute",
     produced: "Erzeugt",
@@ -534,6 +537,7 @@ const STRINGS = {
     not_producing: "Sin producción",
     grid_outage: "Corte de red",
     self_sufficient: "Autosuficiencia del {pct} % hoy",
+    produced_today: "{energy} producidos hoy",
     flow: "Flujo de energía",
     today: "Hoy",
     produced: "Producida",
@@ -604,6 +608,7 @@ const STRINGS = {
     not_producing: "Нема производње",
     grid_outage: "Нестанак мреже",
     self_sufficient: "Данас {pct} % самодовољно",
+    produced_today: "Данас произведено {energy}",
     flow: "Ток енергије",
     today: "Данас",
     produced: "Произведено",
@@ -674,6 +679,7 @@ const STRINGS = {
     not_producing: "Nema proizvodnje",
     grid_outage: "Nestanak mreže",
     self_sufficient: "Danas {pct} % samodovoljno",
+    produced_today: "Danas proizvedeno {energy}",
     flow: "Tok energije",
     today: "Danas",
     produced: "Proizvedeno",
@@ -744,6 +750,7 @@ const STRINGS = {
     not_producing: "Nessuna produzione",
     grid_outage: "Interruzione di rete",
     self_sufficient: "Autosufficienza del {pct} % oggi",
+    produced_today: "{energy} prodotti oggi",
     flow: "Flusso di energia",
     today: "Oggi",
     produced: "Prodotta",
@@ -814,6 +821,7 @@ const STRINGS = {
     not_producing: "Geen productie",
     grid_outage: "Netuitval",
     self_sufficient: "Vandaag {pct} % zelfvoorzienend",
+    produced_today: "Vandaag {energy} opgewekt",
     flow: "Energiestroom",
     today: "Vandaag",
     produced: "Opgewekt",
@@ -884,6 +892,7 @@ const STRINGS = {
     not_producing: "Sem produção",
     grid_outage: "Falha de rede",
     self_sufficient: "Autossuficiência de {pct} % hoje",
+    produced_today: "{energy} produzidos hoje",
     flow: "Fluxo de energia",
     today: "Hoje",
     produced: "Produzida",
@@ -954,6 +963,7 @@ const STRINGS = {
     not_producing: "Brak produkcji",
     grid_outage: "Awaria sieci",
     self_sufficient: "Dziś {pct} % samowystarczalności",
+    produced_today: "Dziś wyprodukowano {energy}",
     flow: "Przepływ energii",
     today: "Dziś",
     produced: "Wyprodukowano",
@@ -1024,6 +1034,7 @@ const STRINGS = {
     not_producing: "Fără producție",
     grid_outage: "Pană de rețea",
     self_sufficient: "Autonomie de {pct} % azi",
+    produced_today: "{energy} produși azi",
     flow: "Flux de energie",
     today: "Azi",
     produced: "Produsă",
@@ -1094,6 +1105,7 @@ const STRINGS = {
     not_producing: "Ingen produktion",
     grid_outage: "Netudfald",
     self_sufficient: "{pct} % selvforsynende i dag",
+    produced_today: "{energy} produceret i dag",
     flow: "Energiflow",
     today: "I dag",
     produced: "Produceret",
@@ -1164,6 +1176,7 @@ const STRINGS = {
     not_producing: "Ingen produktion",
     grid_outage: "Strömavbrott",
     self_sufficient: "{pct} % självförsörjande i dag",
+    produced_today: "{energy} producerat i dag",
     flow: "Energiflöde",
     today: "I dag",
     produced: "Producerad",
@@ -1234,6 +1247,7 @@ const STRINGS = {
     not_producing: "Няма производство",
     grid_outage: "Спиране на мрежата",
     self_sufficient: "Днес {pct} % самостоятелност",
+    produced_today: "Днес произведени {energy}",
     flow: "Енергиен поток",
     today: "Днес",
     produced: "Произведена",
@@ -1304,6 +1318,7 @@ const STRINGS = {
     not_producing: "Нет выработки",
     grid_outage: "Отключение сети",
     self_sufficient: "Сегодня {pct} % автономности",
+    produced_today: "Сегодня выработано {energy}",
     flow: "Поток энергии",
     today: "Сегодня",
     produced: "Выработано",
@@ -1374,6 +1389,7 @@ const STRINGS = {
     not_producing: "Немає генерації",
     grid_outage: "Відключення мережі",
     self_sufficient: "Сьогодні {pct} % автономності",
+    produced_today: "Сьогодні вироблено {energy}",
     flow: "Потік енергії",
     today: "Сьогодні",
     produced: "Вироблено",
@@ -1444,6 +1460,7 @@ const STRINGS = {
     not_producing: "Nincs termelés",
     grid_outage: "Hálózati kimaradás",
     self_sufficient: "Ma {pct} %-ban önellátó",
+    produced_today: "Ma {energy} termelés",
     flow: "Energiaáramlás",
     today: "Ma",
     produced: "Termelt",
@@ -1514,6 +1531,7 @@ const STRINGS = {
     not_producing: "Bez výroby",
     grid_outage: "Výpadok siete",
     self_sufficient: "Dnes {pct} % sebestačnosť",
+    produced_today: "Dnes vyrobené {energy}",
     flow: "Tok energie",
     today: "Dnes",
     produced: "Vyrobené",
@@ -1584,6 +1602,7 @@ const STRINGS = {
     not_producing: "Bez výroby",
     grid_outage: "Výpadek sítě",
     self_sufficient: "Dnes {pct} % soběstačnost",
+    produced_today: "Dnes vyrobeno {energy}",
     flow: "Tok energie",
     today: "Dnes",
     produced: "Vyrobeno",
@@ -1654,6 +1673,7 @@ const STRINGS = {
     not_producing: "Brez proizvodnje",
     grid_outage: "Izpad omrežja",
     self_sufficient: "Danes {pct} % samooskrbe",
+    produced_today: "Danes proizvedeno {energy}",
     flow: "Tok energije",
     today: "Danes",
     produced: "Proizvedeno",
@@ -1724,6 +1744,7 @@ const STRINGS = {
     not_producing: "Nav ražošanas",
     grid_outage: "Tīkla atslēgums",
     self_sufficient: "Šodien {pct} % pašpietiekamība",
+    produced_today: "Šodien saražots {energy}",
     flow: "Enerģijas plūsma",
     today: "Šodien",
     produced: "Saražots",
@@ -1794,6 +1815,7 @@ const STRINGS = {
     not_producing: "Χωρίς παραγωγή",
     grid_outage: "Διακοπή δικτύου",
     self_sufficient: "Σήμερα {pct} % αυτάρκεια",
+    produced_today: "Σήμερα παραγωγή {energy}",
     flow: "Ροή ενέργειας",
     today: "Σήμερα",
     produced: "Παραγωγή",
@@ -2850,12 +2872,19 @@ class EnergyBase extends HTMLElement {
     return d;
   }
 
-  // Subtitle: today's self-sufficiency, else the inverter status.
-  _subtitle() {
+  // Subtitle: today's self-sufficiency, else the inverter status. `produced` (the body shows the live powers): today's
+  // production first, where the illustrated header would otherwise repeat the power shown in the diagram.
+  _subtitle(produced = false) {
     const d = this._today();
-    if (d.selfSufficiency !== null) return this._t("self_sufficient", { pct: fmtNum(Math.round(d.selfSufficiency), 0, this._locale()) });
-    const st = this._r("status");
-    return valid(st) ? this._fmt(st) : "";
+    const L = this._locale();
+    const parts = [];
+    if (produced && d.produced !== null) parts.push(this._t("produced_today", { energy: fmtEnergy(d.produced, L) }));
+    if (d.selfSufficiency !== null) parts.push(this._t("self_sufficient", { pct: fmtNum(Math.round(d.selfSufficiency), 0, L) }));
+    else {
+      const st = this._r("status");
+      if (valid(st)) parts.push(this._fmt(st));
+    }
+    return parts.join(" · ");
   }
 
   // Icon of the card, colored by the status (`cls`), with the integration's logo as a badge.
@@ -2908,8 +2937,10 @@ class EnergyBase extends HTMLElement {
         ${this._zoomButton()}
       </div>`;
     }
+    // The compact mini card's subtitle tells the live power; where the body's diagram shows it (full card, expanded
+    // mini card), the subtitle tells today's figures instead (see _subtitle).
     const L = this._locale();
-    const power = status.cls === "active" ? fmtPower(p.solar, L) : status.cls === "ok" && p.battery !== null ? fmtPower(Math.abs(p.battery), L) : "";
+    const power = !this._heroInBody() && (status.cls === "active" ? fmtPower(p.solar, L) : status.cls === "ok" && p.battery !== null ? fmtPower(Math.abs(p.battery), L) : "");
     const night = ecIsNight(this._hass, this._config);
     const scene = ecSceneSvg(this._uid, {
       solar: p.solar,
@@ -2931,6 +2962,11 @@ class EnergyBase extends HTMLElement {
         </div>
         ${this._zoomButton()}
       </div>`;
+  }
+
+  // Whether the body shows the live powers (the diagram): always on the full card, only expanded on the mini card.
+  _heroInBody() {
+    return true;
   }
 
   // The illustration's styles, only when it is shown.
@@ -3121,7 +3157,7 @@ class EnergyCard extends EnergyBase {
     if (c.show_options !== false) parts.push(this._options());
     return `<style>${BASE_STYLE}${FULL_STYLE}${this._sceneStyle()}${this._accent()}</style>
       <ha-card>
-        ${this._header(this._status(p), this._subtitle(), p)}
+        ${this._header(this._status(p), this._subtitle(c.illustration !== false), p)}
         <div class="content">${parts.filter(Boolean).join("")}</div>
       </ha-card>`;
   }
@@ -3472,6 +3508,10 @@ class EnergyMiniCard extends EnergyCard {
     this._unzoom.off();
     // Back to the compact view once off the screen (see the full card).
     this._zoomed = false;
+  }
+
+  _heroInBody() {
+    return !!this._zoomed;
   }
 
   getCardSize() {
