@@ -126,7 +126,7 @@ test("the full card draws the header, the diagram, the battery, today's energy a
 
 test("today's self-consumption and self-sufficiency are worked out, the subtitle shows the self-sufficiency", () => {
   const html = newCard(makeHass(), { integration: "huawei_solar" }).shadowRoot.innerHTML;
-  assert.match(html, /class="sub">81 % self-sufficient today</);
+  assert.match(html, /class="sub">(?:[^<]* · )?81 % self-sufficient today</);
   assert.match(html, /Self-consumption[\s\S]*60 %/);
 });
 
@@ -134,7 +134,11 @@ test("without a battery the diagram is a triangle and the battery section is lef
   const html = newCard(makeHass(), { integration: "fronius" }).shadowRoot.innerHTML;
   assert.doesNotMatch(html, /data-section="battery"/);
   assert.match(html, /viewBox="0 -2 320 174"/);
-  assert.match(html, /class="sub">Running</);
+  assert.match(html, /class="sub">(?:[^<]* · )?Running</);
+  // The status pill right after the title (its copy for a narrow title block under the subtitle), in the icon's colour.
+  assert.match(html, /class="title-row"><div class="name">[^<]+<\/div><span class="chip clickable active"[^>]*>.*Producing/s);
+  assert.match(html, /class="pill-line"><span class="chip clickable active"/);
+  assert.match(html, /logo-link type-icon active/);
 });
 
 test("evening and night: the battery, then the grid, cover the home", () => {

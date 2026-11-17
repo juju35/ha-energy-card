@@ -2263,7 +2263,7 @@ const ecSceneSvg = (uid, s) => {
 
 // The banner's colors and animations, day and night.
 const EC_SCENE_STYLE = `
-  .banner { position: relative; overflow: hidden; height: 90px; --ec-g: 10px; --ec-scene-w: min(calc((90px - var(--ec-g)) * 2.5), 62%);
+  .banner { position: relative; overflow: hidden; height: 90px; --ec-g: 10px; --ec-scene-w: min(calc((90px - var(--ec-g)) * 2.5), 38%);
             color: #0d2a45; background: linear-gradient(90deg, #f1f8ff 0%, #e2f1fd 34%, #b9def8 70%, #9fd0f3 100%); }
   .banner.night { color: #fff; background: linear-gradient(90deg, #1b2f52 0%, #15284a 36%, #0f1f3d 72%, #0a1830 100%); }
   .ec-scene { position: absolute; right: 0; bottom: var(--ec-g); height: calc(100% - var(--ec-g)); width: var(--ec-scene-w); overflow: visible; }
@@ -2279,16 +2279,13 @@ const EC_SCENE_STYLE = `
   .banner .name { font-weight: 500; }
   .banner .sub { color: #3b5b78; }
   .banner.night .sub { color: rgba(255,255,255,.78); }
-  /* The power goes (to a hidden second line) rather than being cut when it does not fit beside the status. */
-  .banner .status-line { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center; gap: 0 6px; min-width: 0; font-size: 13px; height: 20px; overflow: hidden; }
-  .banner .status-line .chip { max-width: none; flex: 0 1 auto; height: 20px; background: rgba(255,255,255,.7); color: color-mix(in srgb, var(--c) 60%, #0d2a45); }
-  .banner.night .status-line .chip { background: rgba(10,20,40,.5); color: color-mix(in srgb, var(--c) 45%, #fff); }
-  .banner .power { flex: none; line-height: 20px; color: #3b5b78; white-space: nowrap; }
-  .banner.night .power { color: rgba(255,255,255,.78); }
-  .banner .zoom { position: absolute; z-index: 2; top: 6px; right: 6px; margin: 0; color: #0d2a45; background: rgba(255,255,255,.55); }
-  .banner.night .zoom { color: #fff; background: rgba(10,20,40,.45); }
-  .banner .zoom:hover { background: rgba(255,255,255,.8); }
-  .banner.night .zoom:hover { background: rgba(10,20,40,.7); }
+  .banner .chip { line-height: 16px; background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+  .banner.night .chip { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+  .banner .zoom { color: #33506b; background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+                  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .banner.night .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+  .banner .zoom:hover { background: rgba(255,255,255,.75); }
+  .banner.night .zoom:hover { background: rgba(255,255,255,.22); }
   /* Narrow card: no room for the picture beside the text, the sky and the lawn stay. */
   @container (max-width: 300px) { .ec-scene { display: none; } .htext { right: 36px; } }
   .ec-night, .night .ec-day { display: none; }
@@ -2339,7 +2336,7 @@ const BASE_STYLE = `
           --ec-charge: ${COLORS.charge}; --ec-home: ${COLORS.home};
           /* Text in a state or brand color is mixed with the text color so that it reads at 4.5:1 at least. */
           --ec-accent-text: color-mix(in srgb, var(--ec-accent) 50%, var(--primary-text-color)); }
-  ha-card { overflow: hidden; container-type: inline-size; }
+  ha-card { overflow: hidden; container: ec-card / inline-size; }
   /* A size container has no width of its own content: this empty grid gives the card a natural width. */
   :host { display: block; min-width: 0; --ec-natural-width: 380px; }
   :host::before { content: ""; display: grid; grid-template-columns: minmax(0, var(--ec-natural-width)); height: 0; }
@@ -2355,7 +2352,8 @@ const BASE_STYLE = `
   .chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .bar { position: relative; height: 4px; border-radius: 3px; background: var(--divider-color, rgba(127,127,127,.25)); overflow: hidden; }
   .bar > div { height: 100%; border-radius: 3px; background: var(--c, var(--ec-ok)); transition: width .6s ease; }
-  .header { display: flex; align-items: center; gap: 10px; padding: 12px 12px 0; }
+  .header { position: relative; display: flex; align-items: center; gap: 10px; padding: 12px 12px 0; }
+  .header:has(.zoom) { padding-right: 34px; }
   .logo { width: 40px; height: 40px; object-fit: contain; flex: none; }
   a.logo-link { display: flex; flex: none; text-decoration: none; }
   .type-icon { position: relative; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none;
@@ -2367,8 +2365,14 @@ const BASE_STYLE = `
   .type-icon .logo { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 5px;
                      background: var(--card-background-color, #fff);
                      box-shadow: 0 0 0 1px var(--divider-color, rgba(0,0,0,.12)), 0 0 0 3px var(--card-background-color, #fff); }
-  .titles { flex: 1 1 0; min-width: 5ch; font-size: 16px; }
-  :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
+  .titles { flex: 1 1 0; min-width: 5ch; font-size: 16px; container: ec-titles / inline-size; }
+  /* The title line: the title, then the status pill, which keeps its whole label (the title gives way first). */
+  .title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .title-row .name { flex: 0 1 auto; min-width: 4ch; }
+  .title-row .chip { flex: none; max-width: 51%; }
+  .chip.ok { --c: var(--ec-battery); }
+  .pill-line { display: none; }
+  :host([hide-title]) .title-row > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
   .name { font-size: 16px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .warning { padding: 16px; color: color-mix(in srgb, var(--ec-warn) 50%, var(--primary-text-color)); }
@@ -2378,14 +2382,27 @@ const BASE_STYLE = `
   .btn span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .btn.primary { background: color-mix(in srgb, var(--ec-accent) 16%, transparent); color: var(--ec-accent-text); }
   .btn.primary:hover { background: color-mix(in srgb, var(--ec-accent) 24%, transparent); }
-  .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; margin: -4px -4px -4px 0; border-radius: 50%;
-          display: grid; place-items: center; color: var(--secondary-text-color); }
+  /* The mini card's detail button: 24 px round, in the top right corner. */
+  .zoom { all: unset; position: absolute; z-index: 2; top: 5px; right: 5px; cursor: pointer; width: 24px; height: 24px; border-radius: 50%;
+          display: grid; place-items: center; color: var(--secondary-text-color); box-shadow: inset 0 0 0 1px var(--divider-color, rgba(127,127,127,.3)); }
   .zoom .icon { width: 16px; height: 16px; }
   .zoom:hover { background: color-mix(in srgb, var(--ec-idle) 16%, transparent); color: var(--primary-text-color); }
   .zoom:focus-visible { outline: 2px solid var(--primary-color, var(--ec-accent)); outline-offset: 1px; }
-  @container (max-width: 230px) {
-    .chip { padding: 4px; flex: none; }
-    .chip-text { display: none; }
+  /* Narrow title block: the pill leaves the title's line for a line of its own under the subtitle. */
+  @container ec-titles (max-width: 190px) {
+    .title-row .chip { display: none; }
+    .pill-line { display: flex; min-width: 0; margin-top: 3px; }
+    .pill-line .chip { max-width: 100%; }
+  }
+  @container ec-card (max-width: 260px) {
+    .title-row .chip { display: none; }
+    .pill-line { display: flex; min-width: 0; margin-top: 3px; }
+    .pill-line .chip { max-width: 100%; }
+  }
+  /* Very narrow card: only the pill's dot stays, on the title's line. */
+  @container ec-card (max-width: 200px) {
+    .title-row .chip { display: inline-flex; padding: 4px; }
+    .chip-text, .pill-line { display: none; }
   }
   @container (max-width: 200px) { .header { gap: 6px; } }
 `;
@@ -2860,26 +2877,36 @@ class EnergyBase extends HTMLElement {
     return this._batteryState(p) === "idle" ? status.cls : "ok";
   }
 
-  _chip(status) {
-    return `<span class="chip ${status.entity ? "clickable " : ""}${status.cls}"${status.entity ? ` role="button" tabindex="0" data-entity="${esc(status.entity)}"` : ""} title="${esc(status.text)}" aria-label="${esc(
+  // The status pill, in the header icon's colour (`cls`).
+  _chip(status, cls) {
+    return `<span class="chip ${status.entity ? "clickable " : ""}${cls}"${status.entity ? ` role="button" tabindex="0" data-entity="${esc(status.entity)}"` : ""} title="${esc(status.text)}" aria-label="${esc(
       status.text,
     )}"><span class="dot"></span><span class="chip-text">${esc(status.text)}</span></span>`;
   }
 
   // The header: the illustration with the title on its sky (see ecSceneSvg), or the classic header
   // (`illustration: false`).
+  // The title, then the status pill right after it; when the title block is narrow (a narrow card, or the picture
+  // beside it) the pill takes a line of its own under the subtitle (the copy in .pill-line), and on a very narrow
+  // card only its dot stays (its text stays in its title and aria-label).
+  _titles(title, sub, pill) {
+    return `<div class="titles">
+          <div class="title-row"><div class="name">${esc(title)}</div>${pill}</div>
+          ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
+          <div class="pill-line">${pill}</div>
+        </div>`;
+  }
+
   _header(status, sub, p) {
     const title = this._config.title || this._sys.name || this._t("solar");
-    const icon = this._logo(this._iconClass(status, p));
+    const cls = this._iconClass(status, p);
+    const icon = this._logo(cls);
+    const pill = this._chip(status, cls);
     if (this._config.illustration === false) {
       return `
       <div class="header">
         ${icon}
-        <div class="titles">
-          <div class="name">${esc(title)}</div>
-          ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
-        </div>
-        ${this._chip(status)}
+        ${this._titles(title, sub, pill)}
         ${this._zoomButton()}
       </div>`;
     }
@@ -2902,11 +2929,7 @@ class EnergyBase extends HTMLElement {
         ${scene}<div class="ec-ground"></div>
         <div class="htext">
           ${icon}
-          <div class="titles">
-            <div class="name">${esc(title)}</div>
-            <div class="status-line">${this._chip(status)}${power ? `<span class="power">${esc(power)}</span>` : ""}</div>
-            ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
-          </div>
+          ${this._titles(title, [power, sub].filter(Boolean).join(" · "), pill)}
         </div>
         ${this._zoomButton()}
       </div>`;
