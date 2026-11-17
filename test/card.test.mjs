@@ -135,9 +135,8 @@ test("without a battery the diagram is a triangle and the battery section is lef
   assert.doesNotMatch(html, /data-section="battery"/);
   assert.match(html, /viewBox="0 -2 320 174"/);
   assert.match(html, /class="sub">(?:[^<]* · )?Running</);
-  // The status pill right after the title (its copy for a narrow title block under the subtitle), in the icon's colour.
+  // The status pill right after the title (moved under the subtitle by _fitPill when it does not fit), in the icon's colour.
   assert.match(html, /class="title-row"><div class="name">[^<]+<\/div><span class="chip clickable active"[^>]*>.*Producing/s);
-  assert.match(html, /class="pill-line"><span class="chip clickable active"/);
   assert.match(html, /logo-link type-icon active/);
 });
 

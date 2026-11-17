@@ -2226,6 +2226,14 @@ const EC_STARS = [
 ];
 
 // Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme.
+// The width of an element's whole text in fractional pixels, even while it is cut with an ellipsis (0 when hidden).
+const textWidth = (el) => {
+  if (!el?.getClientRects?.().length || typeof document.createRange !== "function") return 0;
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  return range.getBoundingClientRect().width;
+};
+
 const ecIsNight = (hass, config) => {
   const theme = config.illustration_theme;
   if (theme === "night") return true;
@@ -2386,12 +2394,17 @@ const BASE_STYLE = `
                      background: var(--card-background-color, #fff);
                      box-shadow: 0 0 0 1px var(--divider-color, rgba(0,0,0,.12)), 0 0 0 3px var(--card-background-color, #fff); }
   .titles { flex: 1 1 0; min-width: 5ch; font-size: 16px; container: ec-titles / inline-size; }
-  /* The title line: the title, then the status pill, which keeps its whole label (the title gives way first). */
+  /* The title line: the title, then the status pill, when the whole title and its whole label fit there; otherwise
+     the pill goes on its own line under the subtitle (kept to one line), and when even that is too tight only its dot
+     is left (its text stays in its title and aria-label). Decided by measure (see _fitPill). */
   .title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .title-row .name { flex: 0 1 auto; min-width: 4ch; }
-  .title-row .chip { flex: none; max-width: 51%; }
+  .title-row .name { flex: 0 1 auto; min-width: 0; }
+  .title-row .chip { flex: none; max-width: none; }
   .chip.ok { --c: var(--ec-battery); }
-  .pill-line { display: none; }
+  .titles.pill-below { display: flex; flex-direction: column; }
+  .titles.pill-below .title-row { display: contents; }
+  .titles.pill-below .title-row .chip { order: 3; align-self: flex-start; margin-top: 3px; max-width: 100%; }
+  .titles.pill-dot .title-row .chip { padding: 4px; } .titles.pill-dot .chip-text { display: none; }
   :host([hide-title]) .title-row > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
   .name { font-size: 16px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2408,21 +2421,10 @@ const BASE_STYLE = `
   .zoom .icon { width: 16px; height: 16px; }
   .zoom:hover { background: color-mix(in srgb, var(--ec-idle) 16%, transparent); color: var(--primary-text-color); }
   .zoom:focus-visible { outline: 2px solid var(--primary-color, var(--ec-accent)); outline-offset: 1px; }
-  /* Narrow title block: the pill leaves the title's line for a line of its own under the subtitle. */
-  @container ec-titles (max-width: 190px) {
-    .title-row .chip { display: none; }
-    .pill-line { display: flex; min-width: 0; margin-top: 3px; }
-    .pill-line .chip { max-width: 100%; }
-  }
-  @container ec-card (max-width: 260px) {
-    .title-row .chip { display: none; }
-    .pill-line { display: flex; min-width: 0; margin-top: 3px; }
-    .pill-line .chip { max-width: 100%; }
-  }
   /* Very narrow card: only the pill's dot stays, on the title's line. */
   @container ec-card (max-width: 200px) {
-    .title-row .chip { display: inline-flex; padding: 4px; }
-    .chip-text, .pill-line { display: none; }
+    .title-row .chip { padding: 4px; }
+    .chip-text { display: none; }
   }
   @container (max-width: 200px) { .header { gap: 6px; } }
 `;
@@ -2594,12 +2596,26 @@ class EnergyBase extends HTMLElement {
       },
     );
     this._outside.on();
+    // A new width (or the web font loaded): the status pill is fitted again, in the next frame.
+    if (typeof ResizeObserver === "function") {
+      this._pillResize ??= new ResizeObserver((entries) => {
+        const w = Math.round(entries.at(-1).contentRect.width);
+        if (w === this._pillWidth) return;
+        this._pillWidth = w;
+        cancelAnimationFrame(this._pillFrame);
+        this._pillFrame = requestAnimationFrame(() => this._fitPill());
+      });
+      this._pillResize.observe(this);
+    }
+    document.fonts?.ready?.then(() => this._fitPill());
     if (this._confirm) window.addEventListener("keydown", this._onKey);
     // Back on the page after leaving it: rendered again in its default state.
     if (this._hass && this._config) this._update();
   }
 
   disconnectedCallback() {
+    this._pillResize?.disconnect();
+    this._pillWidth = null;
     this._pressing = this._dirty = false;
     window.removeEventListener("pointerup", this._onPressEnd, true);
     window.removeEventListener("pointercancel", this._onPressEnd, true);
@@ -2645,6 +2661,39 @@ class EnergyBase extends HTMLElement {
     return this._s(this._sys?.roles[role]);
   }
 
+  // The status pill goes on the title row, right after the title, only when the whole title and the pill's whole
+  // label fit there; otherwise it takes its own line under the subtitle (.pill-below) and the title keeps its row
+  // (cut only when it does not fit alone). The subtitle then keeps one line (its whole text in its tooltip), and when
+  // the block still runs out of the banner or into its ground strip, or the label does not fit its own line, the pill
+  // keeps its dot alone (.pill-dot, the label in its tooltip and aria-label). Measured after each render and on each
+  // new width, never by a fixed width, so that every language fits.
+  _fitPill() {
+    for (const t of this.shadowRoot?.querySelectorAll?.(".titles") || []) {
+      const chips = [...t.querySelectorAll(".chip")];
+      if (!chips[0]?.getBoundingClientRect) continue;
+      t.classList.remove("pill-below", "pill-dot");
+      const sub = t.querySelector(".sub");
+      sub?.removeAttribute("title");
+      if (!chips[0].querySelector(".chip-text")?.getClientRects().length) continue;
+      const avail = t.getBoundingClientRect().width;
+      const gap = parseFloat(getComputedStyle(chips[0].parentElement).columnGap) || 0;
+      const widths = chips.map((c) => {
+        const cs = getComputedStyle(c);
+        return c.getBoundingClientRect().width + (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.marginRight) || 0);
+      });
+      if (textWidth(t.querySelector(".name")) + widths.reduce((w, c) => w + gap + c, 0) <= avail + 0.01) continue;
+      t.classList.add("pill-below");
+      if (sub && sub.scrollWidth > sub.clientWidth) sub.title = sub.textContent.trim();
+      const banner = t.closest(".banner");
+      const box = banner?.getBoundingClientRect();
+      const floor = banner?.querySelector(".ec-ground")?.getBoundingClientRect().top ?? box?.bottom;
+      const r = t.getBoundingClientRect();
+      const out = box && (r.top < box.top - 0.5 || r.bottom > floor + 0.5);
+      const room = avail;
+      if (out || widths.some((w) => w > room + 0.01)) t.classList.add("pill-dot");
+    }
+  }
+
   _update() {
     if (!this._hass || !this._config) return;
     // Held back under a press (see the constructor): drawn once released.
@@ -2662,6 +2711,7 @@ class EnergyBase extends HTMLElement {
     const kept = this._confirm || this._byPointer ? null : this._focusedSpot();
     this._html = html;
     this.shadowRoot.innerHTML = html;
+    this._fitPill();
     this._placeImages();
     if (kept) this._restoreFocus(kept);
     if (this._confirm) {
@@ -2913,14 +2963,12 @@ class EnergyBase extends HTMLElement {
 
   // The header: the illustration with the title on its sky (see ecSceneSvg), or the classic header
   // (`illustration: false`).
-  // The title, then the status pill right after it; when the title block is narrow (a narrow card, or the picture
-  // beside it) the pill takes a line of its own under the subtitle (the copy in .pill-line), and on a very narrow
-  // card only its dot stays (its text stays in its title and aria-label).
+  // The title, then the status pill right after it, or on a line of its own under the subtitle (see _fitPill); on a
+  // very narrow card only its dot stays (its text stays in its title and aria-label).
   _titles(title, sub, pill) {
     return `<div class="titles">
           <div class="title-row"><div class="name">${esc(title)}</div>${pill}</div>
           ${sub ? `<div class="sub">${esc(sub)}</div>` : ""}
-          <div class="pill-line">${pill}</div>
         </div>`;
   }
 
