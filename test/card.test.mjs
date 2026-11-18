@@ -487,8 +487,10 @@ test("the illustrated header shows the flows, follows the night and the status, 
   assert.match(day, /ec-scene producing/);
   assert.match(day, /stroke:var\(--ec-solar\)/);
   assert.match(day, /type-icon active/);
-  const dark = newCard(makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "below_horizon", attributes: {} } })).shadowRoot.innerHTML;
-  assert.match(dark, /class="banner night"/);
+  const sunDown = makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "below_horizon", attributes: {} } });
+  assert.match(newCard(sunDown).shadowRoot.innerHTML, /class="banner"/, "light theme after sunset: day");
+  sunDown.themes = { darkMode: true };
+  assert.match(newCard(sunDown).shadowRoot.innerHTML, /class="banner night"/, "dark theme after sunset: night");
   assert.match(newCard(makeHass(), { illustration_theme: "night" }).shadowRoot.innerHTML, /class="banner night"/);
   const sunUp = makeHass({ ...states, "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: {} } });
   sunUp.themes = { darkMode: true };
