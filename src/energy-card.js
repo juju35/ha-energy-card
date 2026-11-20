@@ -2624,9 +2624,10 @@ class EnergyBase extends HTMLElement {
     window.removeEventListener("keydown", this._onKey);
     clearTimeout(this._pendingTimer);
     // Left (another dashboard view, a conditional card hidden): back to the defaults, so that the card does not come
-    // back unfolded or with its popup open.
+    // back unfolded, with its popup open or a day of the week picked.
     this._toggled = new Map();
     this._confirm = null;
+    this._weekSel = null;
   }
 
   // Service call whose failure Home Assistant already reports (toast); `onError` undoes what the card showed.

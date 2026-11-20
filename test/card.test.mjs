@@ -380,6 +380,11 @@ test("last 7 days: production and consumption per day from one daily statistics 
   after = card.shadowRoot.innerHTML;
   assert.doesNotMatch(after, /class="wwhen"/);
   assert.match(after, /91\.0 kWh/);
+  // A day picked is dropped when the card leaves the page.
+  tap(3);
+  card.disconnectedCallback();
+  card.connectedCallback();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="wwhen"/);
   // Not queried again within the hour; hidden with show_week: false.
   card.hass = makeHass();
   card.hass.callWS = hass.callWS;
