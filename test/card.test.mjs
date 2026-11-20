@@ -511,3 +511,69 @@ test("the illustrated header shows the flows, follows the night and the status, 
   assert.doesNotMatch(classic, /class="banner/);
   assert.match(classic, /class="header"/);
 });
+
+test("last 7 days: the days are Home Assistant's, whatever the browser's time zone", async () => {
+  // Midnight in Tokyo (UTC+9) and New York (UTC-5 / -4 with DST), whatever the zone the tests run in.
+  assert.equal(ec.midnightOf("Asia/Tokyo", 2026, 11, 20), Date.UTC(2026, 10, 19, 15));
+  assert.equal(ec.midnightOf("America/New_York", 2026, 11, 20), Date.UTC(2026, 10, 20, 5));
+  assert.equal(ec.midnightOf("America/New_York", 2026, 3, 8), Date.UTC(2026, 2, 8, 5));
+  assert.equal(ec.midnightOf("America/New_York", 2026, 3, 9), Date.UTC(2026, 2, 9, 4));
+  assert.equal(ec.midnightOf("Asia/Tokyo", 2026, 12, 32), Date.UTC(2026, 11, 31, 15));
+  assert.equal(ec.dayOf(Date.UTC(2026, 10, 19, 16), "Asia/Tokyo"), Date.UTC(2026, 10, 19, 15));
+  const hass = makeHass();
+  hass.config = { ...(hass.config || {}), time_zone: "Asia/Tokyo" };
+  const calls = [];
+  hass.callWS = (msg) => {
+    calls.push(msg);
+    const start = Date.parse(msg.start_time);
+    const out = {};
+    // The recorder's daily buckets start at Tokyo's midnight.
+    for (const id of msg.statistic_ids) out[id] = Array.from({ length: 7 }, (_, i) => ({ start: start + i * 86400000, change: i + 1 }));
+    return Promise.resolve(out);
+  };
+  const card = newCard(hass);
+  await new Promise((r) => setTimeout(r, 10));
+  const start = Date.parse(calls[0].start_time);
+  const w = ec.wall(start, "Asia/Tokyo");
+  assert.deepEqual([w.h, w.mi], [0, 0]);
+  // Each bucket on its own day: 1 + 2 + … + 7 kWh produced.
+  assert.match(card.shadowRoot.innerHTML, /28\.0 kWh/);
+});
+
+test("last 7 days: a failed query is tried again after 5 minutes, not an hour", async () => {
+  const hass = makeHass();
+  let n = 0;
+  hass.callWS = () => {
+    n++;
+    return Promise.reject(new Error("recorder down"));
+  };
+  const card = newCard(hass);
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(n, 1);
+  card._weekAt -= 4 * 60000;
+  card._fetchWeek();
+  assert.equal(n, 1);
+  card._weekAt -= 2 * 60000;
+  card._fetchWeek();
+  assert.equal(n, 2);
+});
+
+test("logos: a logo of the built card comes from the preloaded set, any other src is used as it is", () => {
+  const img = () => {
+    const attrs = {};
+    return { attrs, style: {}, setAttribute: (k, v) => (attrs[k] = v) };
+  };
+  const direct = img();
+  ec.setLogo(direct, "data:image/png;base64,AAAA");
+  assert.equal(direct.attrs.src, "data:image/png;base64,AAAA");
+  ec.window.ENERGY_CARD_LOGOS = { sma: "data:image/png;base64,SMA" };
+  const sma = img();
+  ec.setLogo(sma, "logo:sma");
+  assert.equal(sma.attrs.src, "data:image/png;base64,SMA");
+  // Not loaded and no file to fetch it from (no script URL): hidden rather than an alt text in the badge.
+  const fox = img();
+  ec.setLogo(fox, "logo:foxess");
+  assert.equal(fox.attrs.src, undefined);
+  assert.equal(fox.style.visibility, "hidden");
+  delete ec.window.ENERGY_CARD_LOGOS;
+});

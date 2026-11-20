@@ -63,7 +63,7 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 - Click any value to open its Home Assistant history (more-info dialog)
 - Visual editor in the dashboard UI for both cards (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek
-- Single file, no external dependency, the logos are embedded
+- No external dependency: the brand logos ship with the card, and only the one of the integration shown is downloaded
 
 ## Supported integrations
 
@@ -109,8 +109,8 @@ Or manually:
 
 ### Manual
 
-1. Download `energy-card.js` and the `energy-card.i18n.*.js` translation files from the [latest release](https://github.com/juju35/ha-energy-card/releases/latest)
-2. Copy them all to `/config/www/` (without the translation files, the cards show in English)
+1. Download `energy-card.js`, the `energy-card.i18n.*.js` translation files and the `energy-card.logo.*.js` brand logos from the [latest release](https://github.com/juju35/ha-energy-card/releases/latest)
+2. Copy them all to `/config/www/` (without the translation files, the cards show in English; without the logo files, the header icon has no brand badge)
 3. Go to **Settings → Dashboards → ⋮ → Resources** → Add resource:
    - URL: `/local/energy-card.js`
    - Type: **JavaScript Module**
@@ -329,7 +329,7 @@ The integration gives the logo of the header badge and the accent color of the c
 
 ```bash
 npm install
-npm run build        # bundles src/energy-card.js + the logos of images/ into dist/energy-card.js
+npm run build        # bundles src/energy-card.js into dist/energy-card.js, the logos of images/ into dist/energy-card.logo.<brand>.js
 npm run check        # builds and checks the card (run in CI)
 npm test             # unit tests (node --test)
 npm run screenshots  # renders the cards (and one GIF per animated state, needs ffmpeg) with mock data into screenshots/

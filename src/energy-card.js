@@ -2486,8 +2486,56 @@ const watchOutside = (isOut, handler) => {
 // After the confirmation popup closes, clicks on the card are ignored for this long (the rest of a double click).
 const CONFIRM_GUARD_MS = 400;
 
-// Inlined logos (data: URIs) are written as <img data-img="id"> and get their src once, then the same node is moved
-// into every later render: the HTML stays small and the picture is not decoded again on each update.
+// The built card ships each brand logo in its own file next to it (energy-card.logo.<brand>.js, a data: URI), named
+// "logo:<brand>" here: only the logo of the integration shown is downloaded, once. Preloaded logos
+// (window.ENERGY_CARD_LOGOS, the screenshot harness) are used as they are; any other src is used directly.
+const LOGOS = {};
+const LOGO_LOADS = {};
+const LOGO_WAITING = {};
+let logoBase;
+const logoBaseUrl = () => {
+  if (logoBase !== undefined) return logoBase;
+  logoBase = null;
+  const re = /\/energy-card\.js(\?|$)/;
+  try {
+    const src = document.currentScript?.src;
+    if (src && re.test(src)) logoBase = src;
+    const entries = logoBase ? [] : performance.getEntriesByType("resource");
+    for (let i = entries.length - 1; i >= 0 && !logoBase; i--) if (re.test(entries[i].name)) logoBase = entries[i].name;
+    if (!logoBase) for (const el of document.querySelectorAll("script[src]")) if (re.test(el.src)) logoBase = el.src;
+  } catch (_err) {
+    /* no DOM */
+  }
+  return logoBase;
+};
+logoBaseUrl();
+// Gives `img` its picture: at once when known, else when its file is in.
+const setLogo = (img, src) => {
+  const brand = typeof src === "string" && src.startsWith("logo:") ? src.slice(5) : null;
+  if (!brand) return img.setAttribute("src", src);
+  const known = LOGOS[brand] ?? globalThis.ENERGY_CARD_LOGOS?.[brand];
+  if (known) return img.setAttribute("src", known);
+  // Hidden until it has a picture: no alt text nor broken-image glyph in the badge meanwhile.
+  img.style.visibility = "hidden";
+  (LOGO_WAITING[brand] ||= new Set()).add(img);
+  if (LOGO_LOADS[brand]) return;
+  const base = logoBaseUrl();
+  if (!base) return;
+  LOGO_LOADS[brand] = import(new URL(`energy-card.logo.${brand}.js?v=${VERSION}`, base).href).then(
+    (m) => {
+      LOGOS[brand] = m.default;
+      for (const el of LOGO_WAITING[brand]) {
+        el.setAttribute("src", m.default);
+        el.style.visibility = "";
+      }
+      delete LOGO_WAITING[brand];
+    },
+    (err) => console.warn(`energy-card: ${brand} logo not loaded (${err?.message ?? err})`),
+  );
+};
+
+// Logos are written as <img data-img="id"> and get their src once, then the same node is moved into every later
+// render: the HTML stays small and the picture is not decoded again on each update.
 const DATA_IMGS = [];
 const DATA_IMG_IDS = new Map();
 const imgTag = (src, attrs) => {
@@ -2750,7 +2798,7 @@ class EnergyBase extends HTMLElement {
         img.replaceWith(old);
         this._imgNodes.set(key, old);
       } else {
-        img.setAttribute("src", DATA_IMGS[img.dataset.img]);
+        setLogo(img, DATA_IMGS[img.dataset.img]);
         this._imgNodes.set(key, img);
       }
     }
