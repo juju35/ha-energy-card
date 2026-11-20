@@ -3816,6 +3816,10 @@ class EnergyEditorBase extends HTMLElement {
           else delete config.entities;
         }
         if (Array.isArray(config.solar_sources) && !config.solar_sources.length) delete config.solar_sources;
+        // The integration the form shows for a card without one is the card's own pick: not written to the YAML until
+        // another one is chosen.
+        const auto = !this._config.integration && !this._config.entities && !config.entities;
+        if (auto && config.integration === EnergyCard.getStubConfig(this._hass).integration) delete config.integration;
         // Keep the YAML minimal: drop empty values and options left at their default.
         for (const [k, v] of Object.entries(config)) {
           if (v === "" || v === undefined || v === null || (k in defaults && JSON.stringify(v) === JSON.stringify(defaults[k]))) delete config[k];

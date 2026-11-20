@@ -315,6 +315,16 @@ test("the editor offers the systems found and keeps the YAML minimal", () => {
   ed.dispatchEvent = (ev) => changes.push(ev.detail.config);
   form.listeners["value-changed"]({ stopPropagation() {}, detail: { value: { type: "custom:energy-card", integration: "fronius", show_flow: true, collapsed: ["options"], entities: { solar: "" } } } });
   assert.deepEqual(plain(changes.at(-1)), { type: "custom:energy-card", integration: "fronius" });
+  // A card without `integration`: the system the form shows for it (the card's own pick) is not written by another change.
+  const auto = new ec.EnergyCardEditor();
+  auto.setConfig({ type: "custom:energy-card" });
+  auto.hass = makeHass();
+  const sent = [];
+  auto.dispatchEvent = (ev) => sent.push(ev.detail.config);
+  auto._form.listeners["value-changed"]({ stopPropagation() {}, detail: { value: { type: "custom:energy-card", integration: "enphase_envoy", show_week: false } } });
+  assert.deepEqual(plain(sent.at(-1)), { type: "custom:energy-card", show_week: false });
+  auto._form.listeners["value-changed"]({ stopPropagation() {}, detail: { value: { type: "custom:energy-card", integration: "fronius", show_week: false } } });
+  assert.deepEqual(plain(sent.at(-1)), { type: "custom:energy-card", integration: "fronius", show_week: false });
 });
 
 test("the mini card editor offers the full card's options its detail view uses", () => {
