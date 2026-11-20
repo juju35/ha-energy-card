@@ -2053,14 +2053,20 @@ const resolve = (hass) => {
   return model;
 };
 
-// Roles of a platform completed with the guesses on its unmapped sensors (read from the states, which change).
+// Roles of a platform completed with the guesses on its unmapped sensors (read from the states, which change): guessed
+// again only when one of those states changed, not on every state change of the home.
+const GUESSED = new WeakMap();
 const guessedRoles = (p, hass) => {
+  const states = p.guessed.map((id) => hass.states[id]);
+  const hit = GUESSED.get(p);
+  if (hit && hit.states.every((st, i) => st === states[i])) return { ...hit.roles };
   const roles = { ...p.roles };
-  for (const id of p.guessed) {
-    const role = guessRole(id, hass.states[id]);
+  p.guessed.forEach((id, i) => {
+    const role = guessRole(id, states[i]);
     if (role && !roles[role]) roles[role] = id;
-  }
-  return roles;
+  });
+  GUESSED.set(p, { states, roles });
+  return { ...roles };
 };
 
 // The system a card without `integration` shows: the most complete one (a hybrid inverter with its battery and meter
