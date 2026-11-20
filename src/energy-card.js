@@ -2053,14 +2053,20 @@ const resolve = (hass) => {
   return model;
 };
 
-// Roles of a platform completed with the guesses on its unmapped sensors (read from the states, which change).
+// Roles of a platform completed with the guesses on its unmapped sensors (read from the states, which change): guessed
+// again only when one of those states changed, not on every state change of the home.
+const GUESSED = new WeakMap();
 const guessedRoles = (p, hass) => {
+  const states = p.guessed.map((id) => hass.states[id]);
+  const hit = GUESSED.get(p);
+  if (hit && hit.states.every((st, i) => st === states[i])) return { ...hit.roles };
   const roles = { ...p.roles };
-  for (const id of p.guessed) {
-    const role = guessRole(id, hass.states[id]);
+  p.guessed.forEach((id, i) => {
+    const role = guessRole(id, states[i]);
     if (role && !roles[role]) roles[role] = id;
-  }
-  return roles;
+  });
+  GUESSED.set(p, { states, roles });
+  return { ...roles };
 };
 
 // The system a card without `integration` shows: the most complete one (a hybrid inverter with its battery and meter
@@ -2131,6 +2137,40 @@ const findSystem = (hass, config) => {
 };
 
 // Sum of the values of some sensors, null when none has one.
+// Wall-clock date of an instant in a time zone: { y, mo (1-12), d, h, mi }. An unknown zone: the browser's.
+const WALL = {};
+const wall = (ms, tz) => {
+  let f = WALL[tz || ""];
+  if (!f) {
+    const opts = { hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric" };
+    try {
+      f = new Intl.DateTimeFormat("en-US", tz ? { ...opts, timeZone: tz } : opts);
+    } catch (_err) {
+      f = new Intl.DateTimeFormat("en-US", opts);
+    }
+    WALL[tz || ""] = f;
+  }
+  const p = {};
+  for (const x of f.formatToParts(new Date(ms))) if (x.type !== "literal") p[x.type] = Number(x.value);
+  return { y: p.year, mo: p.month, d: p.day, h: p.hour % 24, mi: p.minute };
+};
+
+// Midnight of a calendar day in a time zone (the day may overflow: day 0, day 32), as an instant.
+const midnightOf = (tz, y, mo, d) => {
+  const guess = Date.UTC(y, mo - 1, d);
+  const w = wall(guess, tz);
+  const at = guess - (Date.UTC(w.y, w.mo - 1, w.d, w.h, w.mi) - guess);
+  // A DST change between the guess and midnight: corrected once more.
+  const w2 = wall(at, tz);
+  return at - (Date.UTC(w2.y, w2.mo - 1, w2.d, w2.h, w2.mi) - Date.UTC(y, mo - 1, d));
+};
+
+// Midnight of the day an instant belongs to, in a time zone.
+const dayOf = (ms, tz) => {
+  const w = wall(ms, tz);
+  return midnightOf(tz, w.y, w.mo, w.d);
+};
+
 const sumOf = (values) => {
   const known = values.filter((v) => v !== null);
   return known.length ? known.reduce((t, v) => t + v, 0) : null;
@@ -2486,8 +2526,56 @@ const watchOutside = (isOut, handler) => {
 // After the confirmation popup closes, clicks on the card are ignored for this long (the rest of a double click).
 const CONFIRM_GUARD_MS = 400;
 
-// Inlined logos (data: URIs) are written as <img data-img="id"> and get their src once, then the same node is moved
-// into every later render: the HTML stays small and the picture is not decoded again on each update.
+// The built card ships each brand logo in its own file next to it (energy-card.logo.<brand>.js, a data: URI), named
+// "logo:<brand>" here: only the logo of the integration shown is downloaded, once. Preloaded logos
+// (window.ENERGY_CARD_LOGOS, the screenshot harness) are used as they are; any other src is used directly.
+const LOGOS = {};
+const LOGO_LOADS = {};
+const LOGO_WAITING = {};
+let logoBase;
+const logoBaseUrl = () => {
+  if (logoBase !== undefined) return logoBase;
+  logoBase = null;
+  const re = /\/energy-card\.js(\?|$)/;
+  try {
+    const src = document.currentScript?.src;
+    if (src && re.test(src)) logoBase = src;
+    const entries = logoBase ? [] : performance.getEntriesByType("resource");
+    for (let i = entries.length - 1; i >= 0 && !logoBase; i--) if (re.test(entries[i].name)) logoBase = entries[i].name;
+    if (!logoBase) for (const el of document.querySelectorAll("script[src]")) if (re.test(el.src)) logoBase = el.src;
+  } catch (_err) {
+    /* no DOM */
+  }
+  return logoBase;
+};
+logoBaseUrl();
+// Gives `img` its picture: at once when known, else when its file is in.
+const setLogo = (img, src) => {
+  const brand = typeof src === "string" && src.startsWith("logo:") ? src.slice(5) : null;
+  if (!brand) return img.setAttribute("src", src);
+  const known = LOGOS[brand] ?? globalThis.ENERGY_CARD_LOGOS?.[brand];
+  if (known) return img.setAttribute("src", known);
+  // Hidden until it has a picture: no alt text nor broken-image glyph in the badge meanwhile.
+  img.style.visibility = "hidden";
+  (LOGO_WAITING[brand] ||= new Set()).add(img);
+  if (LOGO_LOADS[brand]) return;
+  const base = logoBaseUrl();
+  if (!base) return;
+  LOGO_LOADS[brand] = import(new URL(`energy-card.logo.${brand}.js?v=${VERSION}`, base).href).then(
+    (m) => {
+      LOGOS[brand] = m.default;
+      for (const el of LOGO_WAITING[brand]) {
+        el.setAttribute("src", m.default);
+        el.style.visibility = "";
+      }
+      delete LOGO_WAITING[brand];
+    },
+    (err) => console.warn(`energy-card: ${brand} logo not loaded (${err?.message ?? err})`),
+  );
+};
+
+// Logos are written as <img data-img="id"> and get their src once, then the same node is moved into every later
+// render: the HTML stays small and the picture is not decoded again on each update.
 const DATA_IMGS = [];
 const DATA_IMG_IDS = new Map();
 const imgTag = (src, attrs) => {
@@ -2624,9 +2712,10 @@ class EnergyBase extends HTMLElement {
     window.removeEventListener("keydown", this._onKey);
     clearTimeout(this._pendingTimer);
     // Left (another dashboard view, a conditional card hidden): back to the defaults, so that the card does not come
-    // back unfolded or with its popup open.
+    // back unfolded, with its popup open or a day of the week picked.
     this._toggled = new Map();
     this._confirm = null;
+    this._weekSel = null;
   }
 
   // Service call whose failure Home Assistant already reports (toast); `onError` undoes what the card showed.
@@ -2647,6 +2736,18 @@ class EnergyBase extends HTMLElement {
 
   _t(key, vars) {
     return t(this._hass, this._config, key, vars);
+  }
+
+  // Home Assistant's time zone when the browser knows it, else undefined (the browser's own).
+  _tz() {
+    const tz = this._hass?.config?.time_zone;
+    if (!tz) return undefined;
+    try {
+      new Intl.DateTimeFormat("en-US", { timeZone: tz });
+      return tz;
+    } catch (_err) {
+      return undefined;
+    }
   }
 
   _locale() {
@@ -2749,7 +2850,7 @@ class EnergyBase extends HTMLElement {
         img.replaceWith(old);
         this._imgNodes.set(key, old);
       } else {
-        img.setAttribute("src", DATA_IMGS[img.dataset.img]);
+        setLogo(img, DATA_IMGS[img.dataset.img]);
         this._imgNodes.set(key, img);
       }
     }
@@ -3407,15 +3508,19 @@ class EnergyCard extends EnergyBase {
     this._weekBusy = true;
     this._weekKey = key;
     this._weekAt = Date.now();
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    start.setDate(start.getDate() - 6);
+    // The recorder's days are those of Home Assistant's time zone, not the browser's.
+    const tz = this._tz();
+    const today = wall(Date.now(), tz);
+    const start = midnightOf(tz, today.y, today.mo, today.d - 6);
     this._hass
-      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "day", types: ["change"], start_time: start.toISOString(), units: { energy: "kWh" } })
+      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "day", types: ["change"], start_time: new Date(start).toISOString(), units: { energy: "kWh" } })
       .then((x) => {
-        this._week = { start: start.getTime(), rows: x || {} };
+        this._week = { start, tz, rows: x || {} };
       })
-      .catch(() => {})
+      .catch(() => {
+        // Tried again in 5 minutes rather than in an hour.
+        this._weekAt = Date.now() - 3600000 + 300000;
+      })
       .finally(() => {
         this._weekBusy = false;
         this._html = null;
@@ -3430,9 +3535,7 @@ class EnergyCard extends EnergyBase {
       const out = new Map();
       for (const r of this._week.rows[id] || []) {
         const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
-        const d = new Date(t);
-        d.setHours(0, 0, 0, 0);
-        if (Number.isFinite(Number(r.change))) out.set(d.getTime(), Math.max(0, Number(r.change)));
+        if (Number.isFinite(Number(r.change))) out.set(dayOf(t, this._week.tz), Math.max(0, Number(r.change)));
       }
       return out;
     };
@@ -3440,10 +3543,9 @@ class EnergyCard extends EnergyBase {
     const prods = [byDay("solar_today"), ...extra.map((x) => byDay(null, x.solar_today))];
     const cons = byDay("home_today");
     const [imp, exp, chg, dis] = ["import_today", "export_today", "charge_today", "discharge_today"].map((r) => byDay(r));
+    const first = wall(this._week.start, this._week.tz);
     return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(this._week.start);
-      d.setDate(d.getDate() + i);
-      const t = d.getTime();
+      const t = midnightOf(this._week.tz, first.y, first.mo, first.d + i);
       const produced = sumOf(prods.map((m) => m.get(t) ?? null));
       // With other sources, the day's consumption from the balance (the main inverter's own load misses them).
       const balance =
@@ -3459,8 +3561,9 @@ class EnergyCard extends EnergyBase {
     const L = this._locale();
     const max = Math.max(...days.flatMap((d) => [d.produced || 0, d.consumed || 0]), 0.001);
     // Short names: the narrow letters repeat (T W T F S S M).
-    const weekday = new Intl.DateTimeFormat(L, { weekday: "short" });
-    const longDay = new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short" });
+    const tz = this._week.tz ? { timeZone: this._week.tz } : {};
+    const weekday = new Intl.DateTimeFormat(L, { weekday: "short", ...tz });
+    const longDay = new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short", ...tz });
     // A day tapped (or clicked): its values replace the week's totals until it is tapped again.
     const sel = Number.isInteger(this._weekSel) && days[this._weekSel] ? this._weekSel : null;
     const total = (k) => days.reduce((sum, d) => sum + (d[k] || 0), 0);
@@ -3713,6 +3816,10 @@ class EnergyEditorBase extends HTMLElement {
           else delete config.entities;
         }
         if (Array.isArray(config.solar_sources) && !config.solar_sources.length) delete config.solar_sources;
+        // The integration the form shows for a card without one is the card's own pick: not written to the YAML until
+        // another one is chosen.
+        const auto = !this._config.integration && !this._config.entities && !config.entities;
+        if (auto && config.integration === EnergyCard.getStubConfig(this._hass).integration) delete config.integration;
         // Keep the YAML minimal: drop empty values and options left at their default.
         for (const [k, v] of Object.entries(config)) {
           if (v === "" || v === undefined || v === null || (k in defaults && JSON.stringify(v) === JSON.stringify(defaults[k]))) delete config[k];

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.2 - 2026-11-20
+
+### Fixes
+- Last 7 days: a day picked in the week chart is dropped when the card leaves the page (another view, a conditional card hidden), like the folded sections and the popup, so the card comes back showing the week's totals.
+- Last 7 days: the days are those of Home Assistant's time zone, as the recorder's daily statistics are, instead of the browser's: away from home (or with a browser set to another zone), each bar now holds its own day and the day names match.
+- Visual editor: on a card without `integration`, the system the form shows (the one the card picks by itself) is no longer written to the YAML by the first change of another option.
+- Last 7 days: a query that failed (recorder busy, connection lost) is tried again after 5 minutes instead of an hour.
+
+### Performance
+- The brand logos are no longer inlined in the card: each is in its own file next to it (`energy-card.logo.<brand>.js`) and only the logo of the integration shown is downloaded — the bundle goes from 172.5 KB to 125.5 KB.
+- The roles guessed from the integration's unmapped sensors are guessed again only when one of those sensors changes, not on every state change of the home.
+
 ## 1.7.1 - 2026-11-18
 
 ### Fixes
