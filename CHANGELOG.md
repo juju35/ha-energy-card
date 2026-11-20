@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.2 - 2026-11-20
+
+### Fixes
+- Last 7 days: a day picked in the week chart is dropped when the card leaves the page (another view, a conditional card hidden), like the folded sections and the popup, so the card comes back showing the week's totals.
+
 ## 1.7.1 - 2026-11-18
 
 ### Fixes
