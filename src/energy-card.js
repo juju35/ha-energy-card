@@ -2131,6 +2131,40 @@ const findSystem = (hass, config) => {
 };
 
 // Sum of the values of some sensors, null when none has one.
+// Wall-clock date of an instant in a time zone: { y, mo (1-12), d, h, mi }. An unknown zone: the browser's.
+const WALL = {};
+const wall = (ms, tz) => {
+  let f = WALL[tz || ""];
+  if (!f) {
+    const opts = { hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric" };
+    try {
+      f = new Intl.DateTimeFormat("en-US", tz ? { ...opts, timeZone: tz } : opts);
+    } catch (_err) {
+      f = new Intl.DateTimeFormat("en-US", opts);
+    }
+    WALL[tz || ""] = f;
+  }
+  const p = {};
+  for (const x of f.formatToParts(new Date(ms))) if (x.type !== "literal") p[x.type] = Number(x.value);
+  return { y: p.year, mo: p.month, d: p.day, h: p.hour % 24, mi: p.minute };
+};
+
+// Midnight of a calendar day in a time zone (the day may overflow: day 0, day 32), as an instant.
+const midnightOf = (tz, y, mo, d) => {
+  const guess = Date.UTC(y, mo - 1, d);
+  const w = wall(guess, tz);
+  const at = guess - (Date.UTC(w.y, w.mo - 1, w.d, w.h, w.mi) - guess);
+  // A DST change between the guess and midnight: corrected once more.
+  const w2 = wall(at, tz);
+  return at - (Date.UTC(w2.y, w2.mo - 1, w2.d, w2.h, w2.mi) - Date.UTC(y, mo - 1, d));
+};
+
+// Midnight of the day an instant belongs to, in a time zone.
+const dayOf = (ms, tz) => {
+  const w = wall(ms, tz);
+  return midnightOf(tz, w.y, w.mo, w.d);
+};
+
 const sumOf = (values) => {
   const known = values.filter((v) => v !== null);
   return known.length ? known.reduce((t, v) => t + v, 0) : null;
@@ -2696,6 +2730,18 @@ class EnergyBase extends HTMLElement {
 
   _t(key, vars) {
     return t(this._hass, this._config, key, vars);
+  }
+
+  // Home Assistant's time zone when the browser knows it, else undefined (the browser's own).
+  _tz() {
+    const tz = this._hass?.config?.time_zone;
+    if (!tz) return undefined;
+    try {
+      new Intl.DateTimeFormat("en-US", { timeZone: tz });
+      return tz;
+    } catch (_err) {
+      return undefined;
+    }
   }
 
   _locale() {
@@ -3456,15 +3502,19 @@ class EnergyCard extends EnergyBase {
     this._weekBusy = true;
     this._weekKey = key;
     this._weekAt = Date.now();
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    start.setDate(start.getDate() - 6);
+    // The recorder's days are those of Home Assistant's time zone, not the browser's.
+    const tz = this._tz();
+    const today = wall(Date.now(), tz);
+    const start = midnightOf(tz, today.y, today.mo, today.d - 6);
     this._hass
-      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "day", types: ["change"], start_time: start.toISOString(), units: { energy: "kWh" } })
+      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "day", types: ["change"], start_time: new Date(start).toISOString(), units: { energy: "kWh" } })
       .then((x) => {
-        this._week = { start: start.getTime(), rows: x || {} };
+        this._week = { start, tz, rows: x || {} };
       })
-      .catch(() => {})
+      .catch(() => {
+        // Tried again in 5 minutes rather than in an hour.
+        this._weekAt = Date.now() - 3600000 + 300000;
+      })
       .finally(() => {
         this._weekBusy = false;
         this._html = null;
@@ -3479,9 +3529,7 @@ class EnergyCard extends EnergyBase {
       const out = new Map();
       for (const r of this._week.rows[id] || []) {
         const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
-        const d = new Date(t);
-        d.setHours(0, 0, 0, 0);
-        if (Number.isFinite(Number(r.change))) out.set(d.getTime(), Math.max(0, Number(r.change)));
+        if (Number.isFinite(Number(r.change))) out.set(dayOf(t, this._week.tz), Math.max(0, Number(r.change)));
       }
       return out;
     };
@@ -3489,10 +3537,9 @@ class EnergyCard extends EnergyBase {
     const prods = [byDay("solar_today"), ...extra.map((x) => byDay(null, x.solar_today))];
     const cons = byDay("home_today");
     const [imp, exp, chg, dis] = ["import_today", "export_today", "charge_today", "discharge_today"].map((r) => byDay(r));
+    const first = wall(this._week.start, this._week.tz);
     return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(this._week.start);
-      d.setDate(d.getDate() + i);
-      const t = d.getTime();
+      const t = midnightOf(this._week.tz, first.y, first.mo, first.d + i);
       const produced = sumOf(prods.map((m) => m.get(t) ?? null));
       // With other sources, the day's consumption from the balance (the main inverter's own load misses them).
       const balance =
@@ -3508,8 +3555,9 @@ class EnergyCard extends EnergyBase {
     const L = this._locale();
     const max = Math.max(...days.flatMap((d) => [d.produced || 0, d.consumed || 0]), 0.001);
     // Short names: the narrow letters repeat (T W T F S S M).
-    const weekday = new Intl.DateTimeFormat(L, { weekday: "short" });
-    const longDay = new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short" });
+    const tz = this._week.tz ? { timeZone: this._week.tz } : {};
+    const weekday = new Intl.DateTimeFormat(L, { weekday: "short", ...tz });
+    const longDay = new Intl.DateTimeFormat(L, { weekday: "long", day: "numeric", month: "short", ...tz });
     // A day tapped (or clicked): its values replace the week's totals until it is tapped again.
     const sel = Number.isInteger(this._weekSel) && days[this._weekSel] ? this._weekSel : null;
     const total = (k) => days.reduce((sum, d) => sum + (d[k] || 0), 0);
