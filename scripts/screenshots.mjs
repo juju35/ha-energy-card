@@ -1,7 +1,7 @@
 // Renders the cards with mock solar and battery data and saves the README screenshots.
 // Usage: npm run build && npm run screenshots
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,6 +22,15 @@ const keep = (fresh, name) => {
   console.log(`screenshots/${name}`);
 };
 const cardJs = readFileSync(`${root}dist/energy-card.js`, "utf8");
+// The card is injected as content (no URL to fetch its logo files from): the logos are handed to it beforehand.
+const logosJs = `window.ENERGY_CARD_LOGOS = ${JSON.stringify(
+  Object.fromEntries(
+    readdirSync(`${root}dist`)
+      .map((f) => f.match(/^energy-card\.logo\.(\w+)\.js$/))
+      .filter(Boolean)
+      .map(([f, brand]) => [brand, JSON.parse(readFileSync(`${root}dist/${f}`, "utf8").replace(/^export default /, "").replace(/;\s*$/, ""))]),
+  ),
+)};`;
 
 // Every uncaught page error is collected here; the script exits non-zero when any occurred,
 // so a card that throws on load cannot silently produce blank screenshots.
@@ -73,6 +82,7 @@ async function openCard(browser, { file, type, config, theme, width, overrides }
   });
   await page.setContent(page_html(theme, width));
   await page.addScriptTag({ content: HA_CARD });
+  await page.addScriptTag({ content: logosJs });
   await page.addScriptTag({ content: cardJs });
   await page.addScriptTag({ content: `window.allAnimations = ${allAnimations};` });
   await page.evaluate(
