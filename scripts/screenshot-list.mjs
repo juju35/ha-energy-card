@@ -1,7 +1,7 @@
 // The README screenshots (PNG) and animations (GIF) rendered by scripts/screenshots.mjs.
 // Every capture has a twin in the other theme ("-dark" for a light capture, "-light" for a dark one)
 // that shows exactly the same state: only the theme differs (checked by test/screenshots.test.mjs).
-import { evening, night, outage } from "./mock-states.mjs";
+import { evening, night, outage, redDay } from "./mock-states.mjs";
 
 const both = (file, type, width, config, extra = {}) => [
   { file, type, theme: "light", width, config, ...extra },
@@ -34,6 +34,15 @@ export const shots = [
     show_strings: true,
     show_week: false,
   }),
+  // Plug-and-play solar: an Anker SOLIX Solarbank with its balcony panels (the panels on the balcony's rail), and an
+  // EcoFlow PowerStream whose solar is the sum of its inputs.
+  ...both("card-anker", "energy-card", 460, { integration: "anker_solix", forecast: false, show_week: false }),
+  ...both("mini-card-anker", "energy-mini-card", 380, { integration: "anker_solix", forecast: false }),
+  ...bothDark("card-ecoflow", "energy-card", 460, { integration: "ecoflow_cloud", forecast: false, show_strings: true, show_week: false }),
+  // Forecast and savings: today's production against the Forecast.Solar forecast, then what the self-consumption saved
+  // and the export earned (EDF base and OA prices), the year so far and the payback; on an EDF Tempo red day, a banner.
+  ...both("card-savings", "energy-card", 460, { show_flow: false, show_battery: false, show_week: false, show_options: false, price_buy: 0.2516, price_sell: 0.04, system_cost: 9800 }),
+  ...bothDark("card-red-day", "energy-card", 460, { show_flow: false, show_battery: false, show_today: false, show_week: false, show_options: false, tempo: "sensor.tempo_couleur", tempo_prices: { blue: 0.1296, white: 0.1609, red: 0.7562 }, price_sell: 0.04 }, { overrides: redDay }),
   // Mini card switched to the full card by its detail button.
   ...both("mini-card-zoom", "energy-mini-card", 460, {}, { clicks: [".zoom"] }),
   // Confirmation popup of a switch.

@@ -95,6 +95,12 @@ async function openCard(browser, { file, type, config, theme, width, overrides }
       const callWS = async (msg) => {
         if (msg.type !== "recorder/statistics_during_period") return {};
         const start = Date.parse(msg.start_time);
+        // The savings section: this year's monthly production and export (kWh), the current month last.
+        if (msg.period === "month") {
+          const MONTHS = { produced: [210, 320, 480, 590, 680, 712, 731, 655, 512, 380, 240, 96], exported: [40, 90, 160, 230, 280, 300, 310, 260, 190, 110, 50, 12] };
+          const n = new Date().getMonth() + 1;
+          return Object.fromEntries(msg.statistic_ids.map((id, k) => [id, (k === 0 ? MONTHS.produced : MONTHS.exported).slice(0, n).map((change, i) => ({ start: new Date(new Date(start).getFullYear(), i, 1).getTime(), change }))]));
+        }
         return Object.fromEntries(
           msg.statistic_ids.map((id, k) => [
             id,

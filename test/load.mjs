@@ -111,7 +111,7 @@ export const load = () => {
   vm.createContext(sandbox);
   return vm.runInContext(
     `${source}
-    ({ fmtHours, setLogo, wall, midnightOf, dayOf, fmtPower, fmtEnergy, watts, kwh, esc, resolve, findSystem, powersOf, flowsOf, flowSpeed, lang, intlLocale, brandOf, BRANDS, PLATFORMS, KEYS, STRINGS,
+    ({ forecastOf, tempoColor, priceOf, fmtHours, setLogo, wall, midnightOf, dayOf, fmtPower, fmtEnergy, watts, kwh, esc, resolve, findSystem, powersOf, flowsOf, flowSpeed, lang, intlLocale, brandOf, BRANDS, PLATFORMS, KEYS, STRINGS,
        EnergyCard: customElements.get("energy-card"), EnergyMiniCard: customElements.get("energy-mini-card"), EnergyCardEditor: customElements.get("energy-card-editor"), EnergyMiniCardEditor: customElements.get("energy-mini-card-editor"), window, document })`,
     sandbox,
   );

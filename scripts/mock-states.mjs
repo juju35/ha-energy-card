@@ -144,6 +144,39 @@ entity("sensor.ds3_h_703000444444_dc_power_1", "inv_mb", "apsystems_modbus", "dc
 entity("sensor.ecu_r_power", "ecu_mb", "apsystems_modbus", "power", 1900, W);
 entity("sensor.ecu_r_energy_today", "ecu_mb", "apsystems_modbus", "energy_today", 6.2, KWH);
 
+// Plug-and-play solar. Anker SOLIX Solarbank 2 with its smart meter: two balcony panels charging the Solarbank, a little
+// export; its battery power is positive while charging.
+device("solarbank", "Solarbank 2 E1600 Pro", "A17C1", "Anker");
+const ak = (id, key, state, attrs, cat) => entity(id, "solarbank", "anker_solix", key, state, attrs, cat);
+ak("sensor.solarbank_solaire", "solar_power_total", 640, W);
+ak("sensor.solarbank_maison", "home_load_power", 310, W);
+ak("sensor.solarbank_reseau", "grid_power_signed", -50, W);
+ak("sensor.solarbank_batterie", "battery_power_signed", 280, W);
+ak("sensor.solarbank_niveau", "state_of_charge", 72, PCT);
+ak("sensor.solarbank_production_jour", "daily_solar_production", 3.1, KWH);
+ak("sensor.solarbank_conso_jour", "daily_home_usage", 2.4, KWH);
+ak("sensor.solarbank_import_jour", "daily_grid_import", 1.2, KWH);
+ak("sensor.solarbank_export_jour", "daily_export_energy", 0.3, KWH);
+ak("switch.solarbank_charge_prioritaire", "allow_grid_charge", "off", { friendly_name: "Solarbank 2 E1600 Pro Charge priority" });
+
+// EcoFlow PowerStream (EcoFlow Cloud): no translation keys; its solar is the sum of its two inputs, its battery input
+// negative while it charges.
+device("powerstream", "PowerStream", "PowerStream 800W", "EcoFlow");
+const efl = (id, state, attrs) => entity(id, "powerstream", "ecoflow_cloud", null, state, attrs);
+efl("sensor.powerstream_solar_1_watts", 210, W);
+efl("sensor.powerstream_solar_2_watts", 195, W);
+efl("sensor.powerstream_battery_input_watts", -120, W);
+efl("sensor.powerstream_battery_charge", 64, PCT);
+
+// Forecast.Solar (the roof's forecast) and the EDF Tempo colour of the day, read by the forecast and savings sections.
+device("forecast", "Roof", "Forecast.Solar", "Forecast.Solar");
+const fs = (id, key, state, attrs) => entity(id, "forecast", "forecast_solar", key, state, attrs);
+fs("sensor.prevision_production_jour", "energy_production_today", 24.6, KWH);
+fs("sensor.prevision_production_reste", "energy_production_today_remaining", 3.9, KWH);
+fs("sensor.prevision_production_demain", "energy_production_tomorrow", 27.3, KWH);
+device("tempo", "RTE Tempo", "Tempo", "RTE");
+entity("sensor.tempo_couleur", "tempo", "rte_tempo", null, "Bleu", { friendly_name: "Tempo colour today" });
+
 // A device of another integration (a smart plug): never a system of its own.
 device("prise", "Plug", "Plug S", "Shelly");
 entity("sensor.prise_puissance", "prise", "shelly", "power", 42, W);
@@ -165,6 +198,8 @@ export const night = {
   "sensor.envoy_decharge": { state: "0" },
   "sensor.encharge_niveau": { state: "20" },
 };
+// An EDF Tempo red day.
+export const redDay = { "sensor.tempo_couleur": { state: "Rouge" } };
 // Grid outage on the Powerwall: off the grid, the battery and the last sun cover the home.
 export const outage = {
   "binary_sensor.powerwall_reseau": { state: "off" },

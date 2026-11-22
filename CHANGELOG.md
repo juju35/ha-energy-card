@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0 - 2026-11-22
+
+### Features
+- Plug-and-play solar: Hoymiles Wi-Fi, EcoFlow Cloud, Anker Solix, Zendure, Marstek Local API and Beem Energy are supported like any other integration, with their brand logo and colour; their panels hang on the balcony of the header's house and on the power flow, and their switches and selects (zero feed-in, grid charging, work mode…) appear in the options.
+- Forecast: a new section shows today's production against the Forecast.Solar, Solcast or Open-Meteo Solar Forecast forecast ("18.4 of 24.6 kWh"), with a mark for what was expected by now, the gap ahead or behind, what is still to come and tomorrow's forecast (`show_forecast`, `forecast`); the compact mini card shows "18.4 / 24.6 kWh forecast" in its subtitle.
+- Savings: once `price_buy` or `price_sell` is set, a new section values today's self-consumed solar and the export (EDF OA feed-in tariff), this month and this year from the recorder's monthly statistics, and the payback of the installation (`system_cost`); with an EDF Tempo colour sensor (`tempo`, `tempo_prices`), the day's price and a banner on red days.
+- A card without `integration` picks a roof system before a balcony kit as complete.
+
 ## 1.7.2 - 2026-11-20
 
 ### Fixes

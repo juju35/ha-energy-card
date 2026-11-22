@@ -24,9 +24,18 @@
   <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="Fox ESS" width="56">
 </p>
 
-Lovelace cards for Home Assistant to follow solar inverters and home batteries from **[Enphase](https://enphase.com)**, **[SolarEdge](https://www.solaredge.com)**, **[Fronius](https://www.fronius.com)**, **[Huawei](https://solar.huawei.com)** (SUN2000, LUNA2000), **[SMA](https://www.sma.de)**, **[Tesla](https://www.tesla.com/powerwall)** (Powerwall), **[Growatt](https://www.growatt.com)**, **[APsystems](https://apsystems.com)**, **[SolaX](https://www.solaxpower.com)**, **[GoodWe](https://www.goodwe.com)** and **[Fox ESS](https://www.fox-ess.com)** — and any other integration that provides power sensors: live power flow between the sun, the grid, the home and the battery, battery level and time to full or empty, today's energy, self-consumption and self-sufficiency, and the integration's switches.
+<p align="center">
+  <a href="https://www.hoymiles.com"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/hoymiles.png" alt="Hoymiles" width="56"></a>&nbsp;&nbsp;
+  <a href="https://www.ecoflow.com"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/ecoflow.png" alt="EcoFlow" width="56"></a>&nbsp;&nbsp;
+  <a href="https://www.ankersolix.com"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/anker.png" alt="Anker SOLIX" width="56"></a>&nbsp;&nbsp;
+  <a href="https://zendure.com"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/zendure.png" alt="Zendure" width="56"></a>&nbsp;&nbsp;
+  <a href="https://www.marstekenergy.com"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/marstek.png" alt="Marstek" width="56"></a>&nbsp;&nbsp;
+  <a href="https://beem.energy"><img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/beem.png" alt="Beem" width="56"></a>
+</p>
 
-The cards work on top of the integrations you already use — [Enphase Envoy](https://www.home-assistant.io/integrations/enphase_envoy/), [SolarEdge](https://www.home-assistant.io/integrations/solaredge/), [Fronius](https://www.home-assistant.io/integrations/fronius/), [Huawei Solar](https://github.com/wlcrs/huawei_solar), [SMA](https://www.home-assistant.io/integrations/sma/), [Tesla Powerwall](https://www.home-assistant.io/integrations/powerwall/), [Growatt](https://www.home-assistant.io/integrations/growatt_server/), [APsystems](https://www.home-assistant.io/integrations/apsystems/), [SolaX](https://www.home-assistant.io/integrations/solax/), [GoodWe](https://www.home-assistant.io/integrations/goodwe/), [APsystems ECU Reader](https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader), [APsystems Modbus](https://github.com/christianvaes/homeassistant-apsystems_modbus), [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus)… Entities are **discovered automatically** from the Home Assistant registries, whatever your Home Assistant language or entity ids, and each integration's sign conventions (a meter positive when exporting, a battery positive when charging, a load negative while consuming, unsigned powers with a direction sensor) are taken care of. Any role can also be set by hand.
+Lovelace cards for Home Assistant to follow solar inverters and home batteries from **[Enphase](https://enphase.com)**, **[SolarEdge](https://www.solaredge.com)**, **[Fronius](https://www.fronius.com)**, **[Huawei](https://solar.huawei.com)** (SUN2000, LUNA2000), **[SMA](https://www.sma.de)**, **[Tesla](https://www.tesla.com/powerwall)** (Powerwall), **[Growatt](https://www.growatt.com)**, **[APsystems](https://apsystems.com)**, **[SolaX](https://www.solaxpower.com)**, **[GoodWe](https://www.goodwe.com)** and **[Fox ESS](https://www.fox-ess.com)**, plug-and-play balcony kits and batteries from **[Hoymiles](https://www.hoymiles.com)**, **[EcoFlow](https://www.ecoflow.com)**, **[Anker SOLIX](https://www.ankersolix.com)**, **[Zendure](https://zendure.com)**, **[Marstek](https://www.marstekenergy.com)** and **[Beem](https://beem.energy)** — and any other integration that provides power sensors: live power flow between the sun, the grid, the home and the battery, battery level and time to full or empty, today's energy, self-consumption and self-sufficiency, today's production against the solar forecast, what the panels save and earn, and the integration's switches.
+
+The cards work on top of the integrations you already use — [Enphase Envoy](https://www.home-assistant.io/integrations/enphase_envoy/), [SolarEdge](https://www.home-assistant.io/integrations/solaredge/), [Fronius](https://www.home-assistant.io/integrations/fronius/), [Huawei Solar](https://github.com/wlcrs/huawei_solar), [SMA](https://www.home-assistant.io/integrations/sma/), [Tesla Powerwall](https://www.home-assistant.io/integrations/powerwall/), [Growatt](https://www.home-assistant.io/integrations/growatt_server/), [APsystems](https://www.home-assistant.io/integrations/apsystems/), [SolaX](https://www.home-assistant.io/integrations/solax/), [GoodWe](https://www.home-assistant.io/integrations/goodwe/), [APsystems ECU Reader](https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader), [APsystems Modbus](https://github.com/christianvaes/homeassistant-apsystems_modbus), [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus), [Hoymiles Wi-Fi](https://github.com/suaveolent/ha-hoymiles-wifi), [EcoFlow Cloud](https://github.com/tolwi/hassio-ecoflow-cloud), [Anker Solix](https://github.com/thomluther/ha-anker-solix), [Zendure](https://github.com/Zendure/Zendure-HA), [Marstek Local API](https://github.com/jaapp/ha-marstek-local-api), [Beem Energy](https://github.com/CharlesP44/Beem_Energy)… Entities are **discovered automatically** from the Home Assistant registries, whatever your Home Assistant language or entity ids, and each integration's sign conventions (a meter positive when exporting, a battery positive when charging, a load negative while consuming, unsigned powers with a direction sensor) are taken care of. Any role can also be set by hand.
 
 [![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-energy-card&category=plugin)
 
@@ -43,6 +52,11 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 |---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-foxess.png" alt="fox ess and apsystems card" width="400"> |
 
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/anker.png" alt="" width="20"> Anker SOLIX (balcony kit) | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/ecoflow.png" alt="" width="20"> EcoFlow PowerStream |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-anker.png" alt="anker solix card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-ecoflow-light.png" alt="ecoflow card" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-anker.png" alt="anker solix mini card" width="400"> | |
+
 ## Features
 
 - Two cards: a full **Energy Card** (`custom:energy-card`) and a compact **Energy Mini Card** (`custom:energy-mini-card`)
@@ -53,6 +67,9 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 - Battery: level with the backup reserve marked on its bar, charging or discharging power, time to full or to the reserve, mode, reserve and capacity
 - Today: produced, consumed, imported, exported, charged and discharged energy, self-consumption and self-sufficiency (worked out from the others), self-sufficiency in the header
 - Last 7 days: production and consumption bars per day, with the week's totals; tap a day for its own figures (tap again for the totals), from the recorder's statistics of the daily energy sensors
+- Plug-and-play solar: balcony kits and batteries (Hoymiles, EcoFlow, Anker SOLIX, Zendure, Marstek, Beem) are systems like any other; their panels hang on the balcony of the header's house, and their switches and selects (zero feed-in, grid charging, work mode…) appear in the options
+- Forecast: today's production against the forecast of [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar/), [Solcast](https://github.com/BJReplay/ha-solcast-solar) or [Open-Meteo Solar Forecast](https://github.com/rany2/ha-open-meteo-solar-forecast) ("18.4 of 24.6 kWh"), with a mark for what was expected by now and the gap, what is still to come and tomorrow's forecast; the mini card shows "18.4 / 24.6 kWh forecast" in its subtitle
+- Savings: today's self-consumed solar valued at your electricity price and the export at your feed-in tariff (EDF OA in France), this month and this year from the recorder's monthly statistics, and the payback of the installation; with an EDF Tempo colour sensor, the day's Tempo price, and a banner on red days
 - Options: the integration's switches (charge from the grid, off-grid operation…) as toggles that ask for a confirmation, and its selects (storage or work mode) with their value
 - Status chip: producing, not producing, battery charging or discharging, grid outage, inverter error
 - Header icon of a solar panel with the brand logo as a badge, opening the brand's site, in the brand's color, readable in the light and dark themes
@@ -82,7 +99,17 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/solax.png" alt="" width="16"> [SolaX](https://www.home-assistant.io/integrations/solax/) (core) | SolaX | Power and battery level sensors, read by their name |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/goodwe.png" alt="" width="16"> [GoodWe](https://www.home-assistant.io/integrations/goodwe/) (core) | GoodWe | PV, house consumption, active (grid) and battery power, battery level, PV generation today, work mode |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="" width="16"> [Fox ESS Modbus](https://github.com/nathanmarlor/foxess_modbus) (custom) | Fox ESS H1, H3, KH, AC1, AIO… | PV power, load, grid consumption and feed-in, battery charge and discharge power, battery level, solar, load, grid and battery energy today, minimum level on grid, work mode, inverter state, the power of each PV string (`show_strings`) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/hoymiles.png" alt="" width="16"> [Hoymiles Wi-Fi](https://github.com/suaveolent/ha-hoymiles-wifi) (custom) | Hoymiles HMS-W micro-inverters, MS-A2 battery | AC power, meter power, battery level, energy today, work mode, the DC power of each panel input (`show_strings`) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/ecoflow.png" alt="" width="16"> [EcoFlow Cloud](https://github.com/tolwi/hassio-ecoflow-cloud) (custom) | EcoFlow PowerStream, Delta, River | Solar input power (sum of the inputs on a PowerStream), battery power and level |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/anker.png" alt="" width="16"> [Anker Solix](https://github.com/thomluther/ha-anker-solix) (custom) | Anker SOLIX Solarbank, smart meter | Solar, home, grid and battery power, battery level and energy, solar, home, grid and battery energy today, its switches and selects |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/zendure.png" alt="" width="16"> [Zendure](https://github.com/Zendure/Zendure-HA) (custom) | Zendure SolarFlow, Hyper | Solar input, battery charge and discharge power, level, available and total energy, the power of each solar input (`show_strings`) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/marstek.png" alt="" width="16"> [Marstek Local API](https://github.com/jaapp/ha-marstek-local-api) (custom) | Marstek Venus, Jupiter | Solar, grid (CT) and battery power, level, available and rated capacity, operating mode |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/beem.png" alt="" width="16"> [Beem Energy](https://github.com/CharlesP44/Beem_Energy) (custom) | Beem On, Beem Battery | Solar, grid and battery power, battery level |
 | Any other | — | Power sensors read by their name (solar / PV, grid / meter, battery / storage, load / consumption), battery level by its device class, or every role set by hand with `entities` |
+
+Hoymiles micro-inverters read through **OpenDTU** or **AhoyDTU** come in over MQTT, whose entities carry no role: add them with `solar_sources` (a power sensor) or `entities`.
+
+The forecast reads [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar/) (core), [Solcast PV Forecast](https://github.com/BJReplay/ha-solcast-solar) (custom) or [Open-Meteo Solar Forecast](https://github.com/rany2/ha-open-meteo-solar-forecast) (custom); the savings' Tempo colour any sensor whose state is the day's colour (`Bleu`/`Blue`, `Blanc`/`White`, `Rouge`/`Red`), such as [RTE Tempo](https://github.com/hekmon/rtetempo).
 
 Details in [Integrations](#integrations).
 
@@ -139,7 +166,7 @@ type: custom:energy-card
 type: custom:energy-mini-card
 ```
 
-Without `integration`, the cards show the most complete supported integration found (production, grid, home and battery), the first by name between equals.
+Without `integration`, the cards show the most complete supported integration found (production, grid, home and battery), the first by name between equals — a roof system before a balcony kit.
 
 ### Full options
 
@@ -162,6 +189,17 @@ entities:                     # optional, sets or replaces any role
   home: sensor.house_power
 invert_grid: false            # true: the grid sensor is positive when exporting
 invert_battery: false         # true: the battery sensor is positive when charging
+show_forecast: true
+forecast: sensor.energy_production_today   # optional, defaults to the forecast found
+show_savings: true            # shown once a price is set
+price_buy: 0.2516             # €/kWh, or a sensor
+price_sell: 0.04              # feed-in tariff (EDF OA), or a sensor
+tempo: sensor.rte_tempo_today # optional, EDF Tempo colour of the day
+tempo_prices:                 # YAML only: price of each Tempo colour
+  blue: 0.1296
+  white: 0.1609
+  red: 0.7562
+system_cost: 9800             # optional, for the payback
 language: en                  # optional, defaults to the Home Assistant language
 ```
 
@@ -214,7 +252,7 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 
 | Option | Card | Default | Description |
 |---|---|---|---|
-| `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `apsystems_ecu_reader`, `apsystems_modbus`, `solax`, `goodwe`, `foxess_modbus`, or any other domain with power sensors) |
+| `integration` | both | First supported integration | Integration domain to display (`enphase_envoy`, `solaredge`, `fronius`, `huawei_solar`, `sma`, `powerwall`, `growatt_server`, `apsystems`, `apsystems_ecu_reader`, `apsystems_modbus`, `solax`, `goodwe`, `foxess_modbus`, `hoymiles_wifi`, `ecoflow_cloud`, `anker_solix`, `zendure_ha`, `marstek_local_api`, `beem_energy`, or any other domain with power sensors) |
 | `solar_sources` | both | — | Other production whose power adds to this system's: the sun shows the sum, the home and today's consumption come from the balance at the grid meter (the main inverter's own load reading misses what the others produce), and *Production by source* lists each one. Each entry is either another integration — a domain or `{integration, name}`, with an optional `power` sensor read instead of its real-time production (a CT clamp) and `energy` for its energy-today — or a single power sensor — an entity id or `{entity, name, energy}` (with an optional energy-today sensor) — for a second inverter measured by a clamp of the main one, like a Fox ESS CT2 meter |
 | `title` | both | Brand name | Card title |
 | `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
@@ -227,10 +265,18 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | `show_strings` | both | `false` | Under each source, the power of each panel input: PV strings of an inverter, channels of micro-inverters (APsystems ECU Reader and Modbus, Fox ESS Modbus, Huawei Solar, GoodWe) |
 | `show_battery` | both | `true` | Battery section |
 | `show_today` | both | `true` | Today's energy |
+| `show_forecast` | both | `true` | Forecast section: today's production against the forecast, the gap to what was expected by now, what is still to come and tomorrow; on the compact mini card, "x / y kWh forecast" in the subtitle |
+| `forecast` | both | Auto | The forecast to read: a sensor of a Forecast.Solar, Solcast or Open-Meteo Solar Forecast device (its device gives the rest), or `false` to ignore the forecast; by default the first found |
+| `show_savings` | both | `true` | Savings section, shown once `price_buy` or `price_sell` is set: the self-consumed solar of today and the export valued, this month, today and this year (from the recorder's monthly statistics, at the current prices), the payback; a banner on EDF Tempo red days |
+| `price_buy` | both | — | Electricity price per kWh: a number or a sensor |
+| `price_sell` | both | — | Feed-in tariff per kWh (EDF OA…): a number or a sensor |
+| `tempo` | both | — | EDF Tempo colour sensor: the day's price from `tempo_prices`, and a banner on red days |
+| `tempo_prices` | both | — | **YAML only**: `{blue, white, red}` price per kWh of each Tempo colour |
+| `system_cost` | both | — | Cost of the installation, for the payback in years |
 | `show_week` | both | `true` | Production and consumption of each of the last 7 days (bars named by their short day, a day's figures on hover or when tapped) and their totals, from the daily change of the *today* energy sensors in the recorder's statistics (one query an hour) |
 | `show_options` | both | `true` | Options: the integration's switches and selects |
 | `show_controls` | both | `true` | Toggles of the switches; `false` shows their state only |
-| `collapsed` | both | `[options]` | Sections folded by default, among `sources`, `battery`, `today`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
+| `collapsed` | both | `[options]` | Sections folded by default, among `sources`, `battery`, `forecast`, `today`, `savings`, `week` and `options` (`[]` to unfold everything). Click a section title (or Tab to it and press Enter or Space) to fold or unfold it |
 | `entities` | both | — | Entities set by hand, by role: `solar`, `home`, `grid` (+ import, − export), `grid_import`, `grid_export`, `battery` (+ discharge, − charge), `battery_charge`, `battery_discharge`, `soc`, `solar_today`, `home_today`, `import_today`, `export_today`, `charge_today`, `discharge_today`, `battery_energy`, `battery_capacity`, `reserve`, `mode`, `status`, `error`, `grid_status` |
 | `invert_grid` | both | `false` | The grid sensor is positive when exporting |
 | `invert_battery` | both | `false` | The battery sensor is positive when charging |
@@ -279,6 +325,23 @@ During a grid outage, the Powerwall and the last sun keep the home running, the 
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-huawei-light.png" alt="huawei mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-huawei.png" alt="huawei mini card dark" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-powerwall.png" alt="powerwall mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-powerwall-dark.png" alt="powerwall mini card dark" width="400"> |
 
+### Forecast and savings
+
+Today's production against the forecast, then what the panels saved and earned; on an EDF Tempo red day, a banner:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-savings.png" alt="forecast and savings" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-savings-dark.png" alt="forecast and savings dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-red-day-light.png" alt="tempo red day" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-red-day.png" alt="tempo red day dark" width="400"> |
+
+### Plug-and-play solar
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-anker.png" alt="anker solix card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-anker-dark.png" alt="anker solix card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-ecoflow-light.png" alt="ecoflow card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-ecoflow.png" alt="ecoflow card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-anker.png" alt="anker solix mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/mini-card-anker-dark.png" alt="anker solix mini card dark" width="400"> |
+
 ### Mini card detail button
 
 The detail button at the top right switches the mini card to the full card's content; a click anywhere outside brings the compact view back:
@@ -307,7 +370,7 @@ The full card at its minimum width (9 of 12 columns of a narrow Sections view) a
 
 ### Integrations
 
-The cards group the entities of an integration (its domain), whatever the device they belong to: an Enphase gateway and its batteries, a Huawei inverter, its battery and its meter make one system. Each entity gets a role (solar, home, grid, battery, battery level, today's energy, reserve, mode…) from its `translation_key`, mapped per integration; integrations without translation keys (GoodWe, APsystems ECU Reader, Fox ESS Modbus) are read by the end of their entity ids. When a hub and the devices behind it share a key (an APsystems ECU and its inverters), the hub's entity wins. Power sensors the mapping leaves out are read by their name (`pv`, `solar`, `grid`, `meter`, `battery`, `storage`, `load`, `consumption`…), and a battery level by its `battery` device class. `entities` sets or replaces any role.
+The cards group the entities of an integration (its domain), whatever the device they belong to: an Enphase gateway and its batteries, a Huawei inverter, its battery and its meter make one system. Each entity gets a role (solar, home, grid, battery, battery level, today's energy, reserve, mode…) from its `translation_key`, mapped per integration; integrations without translation keys (GoodWe, APsystems ECU Reader, Fox ESS Modbus, EcoFlow Cloud) are read by the end of their entity ids. When a hub and the devices behind it share a key (an APsystems ECU and its inverters), the hub's entity wins. Power sensors the mapping leaves out are read by their name (`pv`, `solar`, `grid`, `meter`, `battery`, `storage`, `load`, `consumption`…), and a battery level by its `battery` device class. `entities` sets or replaces any role.
 
 ### Signs and units
 
