@@ -266,7 +266,7 @@ A card can also be built from `entities` alone, without `integration` (a meter a
 | `show_battery` | both | `true` | Battery section |
 | `show_today` | both | `true` | Today's energy |
 | `show_forecast` | both | `true` | Forecast section: today's production against the forecast, the gap to what was expected by now, what is still to come and tomorrow; on the compact mini card, "x / y kWh forecast" in the subtitle |
-| `forecast` | both | Auto | The forecast to read: a sensor of a Forecast.Solar, Solcast or Open-Meteo Solar Forecast device (its device gives the rest), or `false` to ignore the forecast; by default the first found |
+| `forecast` | both | Auto | The forecast to read: a sensor of a Forecast.Solar, Solcast or Open-Meteo Solar Forecast device (its device gives the rest), a list of them (their devices add up), or `false` to ignore the forecast; by default the first forecast integration found, all its devices added up (the planes of Forecast.Solar), and none for a plug-and-play balcony kit |
 | `show_savings` | both | `true` | Savings section, shown once `price_buy` or `price_sell` is set: the self-consumed solar of today (never more than the home consumed) and the export valued, this month and this year (from the recorder's monthly statistics; past days at `price_buy`, or at the average Tempo price), the payback over the last 12 months once 90 days of statistics are in; a banner on EDF Tempo red days |
 | `price_buy` | both | — | Electricity price per kWh: a number or a sensor |
 | `price_sell` | both | — | Feed-in tariff per kWh (EDF OA…): a number or a sensor |

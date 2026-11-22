@@ -2732,23 +2732,40 @@ const FORECAST_ROLES = [
   ["tomorrow", /(energy_production_tomorrow|forecast_tomorrow|total_kwh_forecast_tomorrow)\b/],
 ];
 
-// The forecast's sensors { today, remaining, tomorrow }: those of the device of `forecast` (any sensor of the forecast
-// integration), else of every forecast integration of the home; null without today's forecast, or with `forecast:
-// false`.
-const forecastOf = (hass, config) => {
-  if (config.forecast === false || !hass?.entities) return null;
+// The forecast's sensors { today, remaining, tomorrow }, each a list whose values add up: one sensor per device of the
+// forecast integration, so that the planes of Forecast.Solar (one entry, one device each) are all counted. `forecast`
+// sets them (any sensor of a device, or a list of them); without it, the first forecast integration of the home in
+// FORECAST_PLATFORMS order, never two of them (they would forecast the same panels twice), and none for a balcony kit
+// (the home's forecast is that of its roof). Null without today's forecast, or with `forecast: false`.
+const forecastOf = (hass, config, sys) => {
+  const f = config.forecast;
+  if (f === false || !hass?.entities) return null;
   const reg = hass.entities;
-  const dev = typeof config.forecast === "string" ? reg[config.forecast]?.device_id : null;
-  const pool = Object.keys(reg).filter((id) => id.startsWith("sensor.") && (dev ? reg[id].device_id === dev : FORECAST_PLATFORMS.includes(reg[id].platform)));
-  const out = {};
-  for (const id of typeof config.forecast === "string" ? [config.forecast, ...pool] : pool) {
+  const sensors = Object.keys(reg).filter((id) => id.startsWith("sensor."));
+  let pool;
+  if (typeof f === "string" || Array.isArray(f)) {
+    const set = (Array.isArray(f) ? f : [f]).filter((id) => typeof id === "string");
+    const devs = new Set(set.map((id) => reg[id]?.device_id).filter(Boolean));
+    pool = [...set, ...sensors.filter((id) => devs.has(reg[id].device_id))];
+  } else {
+    if (sys && BRANDS[sys.brand]?.balcony) return null;
+    const platform = FORECAST_PLATFORMS.find((pl) => sensors.some((id) => reg[id].platform === pl));
+    pool = platform ? sensors.filter((id) => reg[id].platform === platform) : [];
+  }
+  const out = { today: [], remaining: [], tomorrow: [] };
+  const seen = new Set();
+  for (const id of pool) {
+    if (seen.has(id)) continue;
+    seen.add(id);
     const key = `${reg[id]?.translation_key || ""} ${id}`;
     const role = FORECAST_ROLES.find(([, re]) => re.test(key))?.[0];
-    if (role && !out[role]) out[role] = id;
+    const dev = reg[id]?.device_id || id;
+    // One sensor of each role per device.
+    if (role && !out[role].some((x) => (reg[x]?.device_id || x) === dev)) out[role].push(id);
   }
-  return out.today ? out : null;
+  return out.today.length ? out : null;
 };
-const forecastIds = (hass, config) => Object.values(forecastOf(hass, config) || {});
+const forecastIds = (hass, config, sys) => Object.values(forecastOf(hass, config, sys) || {}).flat();
 
 // A price: a number, or the id of a sensor or input_number holding it.
 const isEntityId = (v) => typeof v === "string" && /^[a-z_]+\.\w+$/.test(v);
@@ -3320,7 +3337,7 @@ class EnergyBase extends HTMLElement {
     if (!sys) return null;
     const extra = sys.extra.flatMap((x) => [x.solar, x.solar_today, ...(this._config.show_strings ? x.strings : [])]);
     const strings = this._config.show_strings || !sys.roles.solar ? sys.strings : [];
-    const ids = [...Object.values(sys.roles), ...extra, ...strings, ...sys.switches, ...sys.selects, ...forecastIds(h, this._config), ...priceIds(this._config)];
+    const ids = [...Object.values(sys.roles), ...extra, ...strings, ...sys.switches, ...sys.selects, ...forecastIds(h, this._config, sys), ...priceIds(this._config)];
     return [h.entities, h.devices, h.language, h.locale, h.themes?.darkMode, ...ids.map((id) => h.states[id])];
   }
 
@@ -4136,20 +4153,25 @@ class EnergyCard extends EnergyBase {
     return `<div>${title}<div class="options">${rows.join("")}</div></div>`;
   }
 
+  // Sum of the energy (kWh) of some sensors, null when none has a value.
+  _kwhSum(ids) {
+    return sumOf((ids || []).map((id) => kwh(this._s(id))));
+  }
+
   // Forecast: today's production against the forecast (Forecast.Solar, Solcast, Open-Meteo), with the mark of what the
   // forecast expected by now (today's forecast less what is still to come) and the gap to it; the rest of today and
   // tomorrow in two tiles.
   _forecastSection() {
-    const fc = forecastOf(this._hass, this._config);
+    const fc = forecastOf(this._hass, this._config, this._sys);
     if (!fc) return "";
-    const total = kwh(this._s(fc.today));
+    const total = this._kwhSum(fc.today);
     if (total === null) return "";
     const L = this._locale();
     const title = this._sectionTitle("forecast", ICONS.forecast, this._t("forecast"));
     if (this._isCollapsed("forecast")) return `<div>${title}</div>`;
     const produced = this._today().produced;
-    const remaining = kwh(this._s(fc.remaining));
-    const tomorrow = kwh(this._s(fc.tomorrow));
+    const remaining = this._kwhSum(fc.remaining);
+    const tomorrow = this._kwhSum(fc.tomorrow);
     const expected = remaining === null ? null : Math.max(0, total - remaining);
     const pct = (v) => clamp((v / Math.max(total, produced ?? 0, 0.001)) * 100, 0, 100);
     let gap = "";
@@ -4160,13 +4182,13 @@ class EnergyCard extends EnergyBase {
     }
     const big =
       produced === null
-        ? `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today)}">${esc(fmtEnergy(total, L))}</span>`
-        : `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today)}">${esc(this._t("forecast_of", { x: fmtEnergy(produced, L).replace(/ kWh$/, ""), y: fmtEnergy(total, L) }))}</span>`;
+        ? `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today[0])}">${esc(fmtEnergy(total, L))}</span>`
+        : `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today[0])}">${esc(this._t("forecast_of", { x: fmtEnergy(produced, L).replace(/ kWh$/, ""), y: fmtEnergy(total, L) }))}</span>`;
     const bar = `<div class="bar"><div style="width:${produced === null ? 0 : pct(produced)}%"></div>${expected === null ? "" : `<span class="mark" style="left:calc(${pct(expected)}% - 1px)" title="${esc(this._t("expected_now", { v: fmtEnergy(expected, L) }))}"></span>`}</div>`;
     const note = expected === null ? "" : `<div class="fc-note">${esc(this._t("expected_now", { v: fmtEnergy(expected, L) }))}</div>`;
     const tile = (id, icon, key, value) =>
       value === null ? "" : `<div class="tile clickable" role="button" tabindex="0" data-entity="${esc(id)}" style="--c:var(--ec-solar)"><div class="k">${svgIcon(icon)}<span>${esc(this._t(key))}</span></div><div class="v">${esc(fmtEnergy(value, L))}</div></div>`;
-    const tiles = [tile(fc.remaining, ICONS.clock, "to_come", remaining), tile(fc.tomorrow, ICONS.calendar, "tomorrow", tomorrow)].join("");
+    const tiles = [tile(fc.remaining[0], ICONS.clock, "to_come", remaining), tile(fc.tomorrow[0], ICONS.calendar, "tomorrow", tomorrow)].join("");
     return `<div>${title}<div class="fc"><div class="fc-top">${big}${gap}</div>${bar}${note}${tiles ? `<div class="tiles">${tiles}</div>` : ""}</div></div>`;
   }
 
@@ -4520,8 +4542,8 @@ class EnergyMiniCard extends EnergyCard {
   // The compact view's subtitle: today's production against the forecast ("12.4 / 18.6 kWh forecast").
   _forecastChip() {
     if (this._config.show_forecast === false) return "";
-    const fc = forecastOf(this._hass, this._config);
-    const total = fc ? kwh(this._s(fc.today)) : null;
+    const fc = forecastOf(this._hass, this._config, this._sys);
+    const total = fc ? this._kwhSum(fc.today) : null;
     if (total === null) return "";
     const L = this._locale();
     const produced = this._today().produced;

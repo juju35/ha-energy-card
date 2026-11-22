@@ -84,9 +84,43 @@ test("the balcony kit's panels hang on the balcony, not on the roof", () => {
 
 test("forecast: the solar forecast integrations are found, and can be set or turned off", () => {
   const hass = makeHass();
-  assert.deepEqual(plain(ec.forecastOf(hass, {})), { today: "sensor.prevision_production_jour", remaining: "sensor.prevision_production_reste", tomorrow: "sensor.prevision_production_demain" });
+  assert.deepEqual(plain(ec.forecastOf(hass, {})), {
+    today: ["sensor.prevision_production_jour"],
+    remaining: ["sensor.prevision_production_reste"],
+    tomorrow: ["sensor.prevision_production_demain"],
+  });
   assert.equal(ec.forecastOf(hass, { forecast: false }), null);
-  assert.equal(ec.forecastOf(hass, { forecast: "sensor.prevision_production_jour" }).today, "sensor.prevision_production_jour");
+  assert.deepEqual(plain(ec.forecastOf(hass, { forecast: "sensor.prevision_production_jour" }).today), ["sensor.prevision_production_jour"]);
+});
+
+// A second Forecast.Solar plane: its own entry, its own device.
+const twoPlanes = () => {
+  const ents = { ...entities };
+  const st = { ...states };
+  const add = (id, key, v) => {
+    ents[id] = { entity_id: id, device_id: "forecast_west", platform: "forecast_solar", translation_key: key };
+    st[id] = { entity_id: id, state: String(v), attributes: { unit_of_measurement: "kWh", device_class: "energy" } };
+  };
+  add("sensor.prevision_ouest_jour", "energy_production_today", 5.4);
+  add("sensor.prevision_ouest_reste", "energy_production_today_remaining", 1.1);
+  add("sensor.prevision_ouest_demain", "energy_production_tomorrow", 6.7);
+  return { entities: ents, devices, states: st, language: "en", callService() {} };
+};
+
+test("forecast: the planes of Forecast.Solar add up", () => {
+  const fc = plain(ec.forecastOf(twoPlanes(), {}));
+  assert.deepEqual(fc.today, ["sensor.prevision_production_jour", "sensor.prevision_ouest_jour"]);
+  const html = section(newCard(twoPlanes()).shadowRoot.innerHTML, "forecast");
+  // 24.6 + 5.4 = 30 kWh forecast, 3.9 + 1.1 = 5 kWh still to come.
+  assert.match(html, /of 30\.0 kWh/);
+  assert.match(html, /Still to come[\s\S]*5\.0 kWh/);
+});
+
+test("forecast: none by default for a balcony kit, the home's forecast being its roof's", () => {
+  const { sys } = ec.findSystem(makeHass(), { integration: "anker_solix" });
+  assert.equal(ec.forecastOf(makeHass(), {}, sys), null);
+  assert.doesNotMatch(newCard(makeHass(), { integration: "anker_solix" }).shadowRoot.innerHTML, /data-section="forecast"/);
+  assert.ok(ec.forecastOf(makeHass(), { forecast: "sensor.prevision_production_jour" }, sys));
 });
 
 test("forecast section: production of the forecast, the gap to what was expected by now, still to come and tomorrow", () => {
