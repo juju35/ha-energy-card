@@ -259,10 +259,10 @@ const KEYS = {
   ],
 };
 // Plug-and-play solar. Hoymiles (HMS micro-inverters through their DTU, MS-A2 batteries): the DTU's own total comes
-// first (its inverters have the same keys, see the via_device preference in resolve).
+// first (its inverters have the same keys, see the via_device preference in resolve). Its phase_total_power is the
+// inverters' AC output, not a grid meter: no grid role.
 KEYS.hoymiles_wifi = [
   ["ac_active_power", "solar"],
-  ["phase_total_power", "grid"],
   ["state_of_charge", "soc"],
   ["ac_daily_energy", "solar_today"],
   ["working_mode", "mode"],
@@ -306,13 +306,13 @@ KEYS.zendure_ha = [
   ["available_kwh", "battery_energy"],
   ["total_kwh", "battery_capacity"],
 ];
-// Marstek Venus (local API): the system's totals when several batteries, else the battery's own; its CT meter gives the
-// grid (+ import).
+// Marstek Venus (local API): the system's totals when several batteries, else the battery's own. The grid is its
+// documented grid_power (+ import); the CT meter's ct_total_power has no documented sign, so it is not read.
 KEYS.marstek_local_api = [
   ["system_total_solar_power", "solar"],
+  ["pv_power_es", "solar"],
   ["pv_power", "solar"],
-  ["system_total_grid_power", "grid"],
-  ["ct_total_power", "grid"],
+  ["grid_power", "grid"],
   ["battery_power_out", "battery_discharge"],
   ["battery_power_in", "battery_charge"],
   ["system_average_soc", "soc"],
@@ -321,12 +321,10 @@ KEYS.marstek_local_api = [
   ["battery_rated_capacity", "battery_capacity"],
   ["operating_mode", "mode"],
 ];
-// Beem (Beem On / Beem Battery): no translation keys on its sensors, entity ids <device>_<name>; its battery power is
-// positive while charging.
+// Beem (Beem On / Beem Battery): no translation keys on its sensors, entity ids <device>_<name>. The sign of its grid
+// and battery powers is not documented: only its production and battery level are read (`entities` sets the rest).
 KEYS.beem_energy = [
   ["solar_power", "solar"],
-  ["grid_power", "grid"],
-  ["battery_power", "battery"],
   ["soc", "soc"],
 ];
 KEYS.solaredge_modbus = KEYS.solaredge;
@@ -351,7 +349,7 @@ const isString = (e, domain) => {
 // Sign of the integration's signed power sensors, when it is not the cards' own (grid + import, battery + discharge):
 // Huawei Solar's power meter is positive when exporting and its battery positive when charging; GoodWe's active power
 // is positive when exporting; Anker SOLIX's and Beem's batteries are positive when charging.
-const SIGNS = { huawei_solar: { grid: -1, battery: -1 }, goodwe: { grid: -1 }, anker_solix: { battery: -1 }, beem_energy: { battery: -1 } };
+const SIGNS = { huawei_solar: { grid: -1, battery: -1 }, goodwe: { grid: -1 }, anker_solix: { battery: -1 } };
 
 // Unmapped power sensors of an unknown integration: their role guessed from the entity id and name.
 const GUESSES = [

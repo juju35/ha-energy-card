@@ -238,3 +238,66 @@ test("mini card: the forecast chip in the compact subtitle", () => {
   const mini = newCard(makeHass(), {}, ec.EnergyMiniCard).shadowRoot.innerHTML;
   assert.match(mini, /18\.4 \/ 24\.6 kWh forecast/);
 });
+
+// One integration alone, with its real translation keys (null: matched on the entity id).
+const brandHass = (platform, sensors) => {
+  const ents = {};
+  const st = {};
+  const devs = { dev: { id: "dev", name: "Kit", model: "", manufacturer: "", name_by_user: null } };
+  for (const [id, key, state, attrs] of sensors) {
+    ents[id] = { entity_id: id, device_id: "dev", platform, translation_key: key, entity_category: null };
+    st[id] = { entity_id: id, state: String(state), attributes: attrs };
+  }
+  return { entities: ents, devices: devs, states: st, language: "en", callService() {} };
+};
+const PW = { device_class: "power", unit_of_measurement: "W" };
+const LVL = { device_class: "battery", unit_of_measurement: "%" };
+
+test("Hoymiles: the DTU's phase total is its inverters' output, never the grid", () => {
+  const hass = brandHass("hoymiles_wifi", [
+    ["sensor.dtu_ac_power", "ac_active_power", 420, PW],
+    ["sensor.dtu_phase_total_power", "phase_total_power", 415, PW],
+  ]);
+  const { sys } = ec.findSystem(hass, { integration: "hoymiles_wifi" });
+  assert.equal(sys.roles.solar, "sensor.dtu_ac_power");
+  assert.equal(sys.roles.grid, undefined);
+});
+
+test("Marstek: the grid is the documented grid_power (+ import), not the CT total", () => {
+  const hass = brandHass("marstek_local_api", [
+    ["sensor.venus_pv_power", "pv_power", 300, PW],
+    ["sensor.venus_grid_power", "grid_power", 120, PW],
+    ["sensor.venus_ct_total_power", "ct_total_power", -80, PW],
+    ["sensor.venus_battery_soc", "battery_soc", 55, LVL],
+  ]);
+  const { sys } = ec.findSystem(hass, { integration: "marstek_local_api" });
+  assert.equal(sys.roles.grid, "sensor.venus_grid_power");
+  assert.equal(sys.roles.solar, "sensor.venus_pv_power");
+  assert.equal(sys.roles.soc, "sensor.venus_battery_soc");
+});
+
+test("Beem: production and level only, its unsigned grid and battery left to entities", () => {
+  const hass = brandHass("beem_energy", [
+    ["sensor.beem_solar_power", null, 350, PW],
+    ["sensor.beem_soc", null, 40, LVL],
+  ]);
+  const { sys } = ec.findSystem(hass, { integration: "beem_energy" });
+  assert.equal(sys.roles.solar, "sensor.beem_solar_power");
+  assert.equal(sys.roles.soc, "sensor.beem_soc");
+  assert.equal(sys.roles.grid, undefined);
+  assert.equal(sys.roles.battery, undefined);
+});
+
+test("Zendure: charge and discharge of the pack by translation key", () => {
+  const hass = brandHass("zendure_ha", [
+    ["sensor.hyper_solar_input_power", "solar_input_power", 500, PW],
+    ["sensor.hyper_output_pack_power", "output_pack_power", 200, PW],
+    ["sensor.hyper_pack_input_power", "pack_input_power", 0, PW],
+    ["sensor.hyper_electric_level", "electric_level", 61, LVL],
+  ]);
+  const { sys } = ec.findSystem(hass, { integration: "zendure_ha" });
+  assert.equal(sys.roles.battery_charge, "sensor.hyper_output_pack_power");
+  assert.equal(sys.roles.battery_discharge, "sensor.hyper_pack_input_power");
+  const p = plain(ec.powersOf(hass, sys, {}));
+  assert.equal(p.battery, -200);
+});
