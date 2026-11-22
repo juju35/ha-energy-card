@@ -493,7 +493,7 @@ const STRINGS = {
     sold: "Sold",
     this_month: "This month",
     today_value: "Today {v}",
-    year_value: "This year {v}",
+    this_year: "This year",
     payback: "Payback ≈ {years} years",
     red_day: "Red day: every self-consumed kWh saves {price}",
     price_buy: "Electricity price (per kWh)",
@@ -586,7 +586,7 @@ const STRINGS = {
     sold: "Revendu",
     this_month: "Ce mois-ci",
     today_value: "Aujourd'hui {v}",
-    year_value: "Cette année {v}",
+    this_year: "Cette année",
     payback: "Amorti en ≈ {years} ans",
     red_day: "Jour rouge : chaque kWh autoconsommé économise {price}",
     price_buy: "Prix de l'électricité (par kWh)",
@@ -679,7 +679,7 @@ const STRINGS = {
     sold: "Eingespeist",
     this_month: "Diesen Monat",
     today_value: "Heute {v}",
-    year_value: "Dieses Jahr {v}",
+    this_year: "Dieses Jahr",
     payback: "Amortisiert in ≈ {years} Jahren",
     red_day: "Roter Tag: jede selbst verbrauchte kWh spart {price}",
     price_buy: "Strompreis (pro kWh)",
@@ -772,7 +772,7 @@ const STRINGS = {
     sold: "Vendido",
     this_month: "Este mes",
     today_value: "Hoy {v}",
-    year_value: "Este año {v}",
+    this_year: "Este año",
     payback: "Amortizado en ≈ {years} años",
     red_day: "Día rojo: cada kWh autoconsumido ahorra {price}",
     price_buy: "Precio de la electricidad (por kWh)",
@@ -865,7 +865,7 @@ const STRINGS = {
     sold: "Продато",
     this_month: "Овај месец",
     today_value: "Данас {v}",
-    year_value: "Ове године {v}",
+    this_year: "Ове године",
     payback: "Исплата за ≈ {years} год.",
     red_day: "Црвени дан: сваки сопствено потрошен kWh штеди {price}",
     price_buy: "Цена струје (по kWh)",
@@ -958,7 +958,7 @@ const STRINGS = {
     sold: "Prodato",
     this_month: "Ovaj mesec",
     today_value: "Danas {v}",
-    year_value: "Ove godine {v}",
+    this_year: "Ove godine",
     payback: "Isplata za ≈ {years} god.",
     red_day: "Crveni dan: svaki sopstveno potrošen kWh štedi {price}",
     price_buy: "Cena struje (po kWh)",
@@ -1051,7 +1051,7 @@ const STRINGS = {
     sold: "Venduto",
     this_month: "Questo mese",
     today_value: "Oggi {v}",
-    year_value: "Quest'anno {v}",
+    this_year: "Quest'anno",
     payback: "Ammortizzato in ≈ {years} anni",
     red_day: "Giorno rosso: ogni kWh autoconsumato fa risparmiare {price}",
     price_buy: "Prezzo dell'elettricità (per kWh)",
@@ -1144,7 +1144,7 @@ const STRINGS = {
     sold: "Teruggeleverd",
     this_month: "Deze maand",
     today_value: "Vandaag {v}",
-    year_value: "Dit jaar {v}",
+    this_year: "Dit jaar",
     payback: "Terugverdiend in ≈ {years} jaar",
     red_day: "Rode dag: elke zelf verbruikte kWh bespaart {price}",
     price_buy: "Stroomprijs (per kWh)",
@@ -1237,7 +1237,7 @@ const STRINGS = {
     sold: "Vendido",
     this_month: "Este mês",
     today_value: "Hoje {v}",
-    year_value: "Este ano {v}",
+    this_year: "Este ano",
     payback: "Amortizado em ≈ {years} anos",
     red_day: "Dia vermelho: cada kWh autoconsumido poupa {price}",
     price_buy: "Preço da eletricidade (por kWh)",
@@ -1330,7 +1330,7 @@ const STRINGS = {
     sold: "Sprzedane",
     this_month: "Ten miesiąc",
     today_value: "Dziś {v}",
-    year_value: "W tym roku {v}",
+    this_year: "W tym roku",
     payback: "Zwrot za ≈ {years} lat",
     red_day: "Czerwony dzień: każda zużyta na miejscu kWh oszczędza {price}",
     price_buy: "Cena prądu (za kWh)",
@@ -1423,7 +1423,7 @@ const STRINGS = {
     sold: "Vândut",
     this_month: "Luna aceasta",
     today_value: "Azi {v}",
-    year_value: "Anul acesta {v}",
+    this_year: "Anul acesta",
     payback: "Amortizat în ≈ {years} ani",
     red_day: "Zi roșie: fiecare kWh autoconsumat economisește {price}",
     price_buy: "Prețul electricității (pe kWh)",
@@ -1516,7 +1516,7 @@ const STRINGS = {
     sold: "Solgt",
     this_month: "Denne måned",
     today_value: "I dag {v}",
-    year_value: "I år {v}",
+    this_year: "I år",
     payback: "Tilbagebetalt om ≈ {years} år",
     red_day: "Rød dag: hver kWh brugt selv sparer {price}",
     price_buy: "Elpris (pr. kWh)",
@@ -1609,7 +1609,7 @@ const STRINGS = {
     sold: "Sålt",
     this_month: "Denna månad",
     today_value: "I dag {v}",
-    year_value: "I år {v}",
+    this_year: "I år",
     payback: "Återbetald om ≈ {years} år",
     red_day: "Röd dag: varje egenförbrukad kWh sparar {price}",
     price_buy: "Elpris (per kWh)",
@@ -1702,7 +1702,7 @@ const STRINGS = {
     sold: "Продадено",
     this_month: "Този месец",
     today_value: "Днес {v}",
-    year_value: "Тази година {v}",
+    this_year: "Тази година",
     payback: "Изплащане за ≈ {years} г.",
     red_day: "Червен ден: всеки собствено потребен kWh спестява {price}",
     price_buy: "Цена на електроенергията (за kWh)",
@@ -1795,7 +1795,7 @@ const STRINGS = {
     sold: "Продано",
     this_month: "Этот месяц",
     today_value: "Сегодня {v}",
-    year_value: "В этом году {v}",
+    this_year: "В этом году",
     payback: "Окупится за ≈ {years} лет",
     red_day: "Красный день: каждый собственный кВт·ч экономит {price}",
     price_buy: "Цена электроэнергии (за кВт·ч)",
@@ -1888,7 +1888,7 @@ const STRINGS = {
     sold: "Продано",
     this_month: "Цей місяць",
     today_value: "Сьогодні {v}",
-    year_value: "Цього року {v}",
+    this_year: "Цього року",
     payback: "Окупиться за ≈ {years} р.",
     red_day: "Червоний день: кожна власна кВт·год заощаджує {price}",
     price_buy: "Ціна електроенергії (за кВт·год)",
@@ -1981,7 +1981,7 @@ const STRINGS = {
     sold: "Eladott",
     this_month: "Ebben a hónapban",
     today_value: "Ma {v}",
-    year_value: "Idén {v}",
+    this_year: "Idén",
     payback: "Megtérülés ≈ {years} év",
     red_day: "Piros nap: minden saját fogyasztású kWh {price} megtakarítás",
     price_buy: "Áramár (kWh-nként)",
@@ -2074,7 +2074,7 @@ const STRINGS = {
     sold: "Predané",
     this_month: "Tento mesiac",
     today_value: "Dnes {v}",
-    year_value: "Tento rok {v}",
+    this_year: "Tento rok",
     payback: "Návratnosť ≈ {years} rokov",
     red_day: "Červený deň: každá vlastne spotrebovaná kWh ušetrí {price}",
     price_buy: "Cena elektriny (za kWh)",
@@ -2167,7 +2167,7 @@ const STRINGS = {
     sold: "Prodáno",
     this_month: "Tento měsíc",
     today_value: "Dnes {v}",
-    year_value: "Letos {v}",
+    this_year: "Letos",
     payback: "Návratnost ≈ {years} let",
     red_day: "Červený den: každá vlastně spotřebovaná kWh ušetří {price}",
     price_buy: "Cena elektřiny (za kWh)",
@@ -2260,7 +2260,7 @@ const STRINGS = {
     sold: "Prodano",
     this_month: "Ta mesec",
     today_value: "Danes {v}",
-    year_value: "Letos {v}",
+    this_year: "Letos",
     payback: "Povrnitev v ≈ {years} letih",
     red_day: "Rdeči dan: vsaka lastno porabljena kWh prihrani {price}",
     price_buy: "Cena elektrike (na kWh)",
@@ -2353,7 +2353,7 @@ const STRINGS = {
     sold: "Pārdots",
     this_month: "Šomēnes",
     today_value: "Šodien {v}",
-    year_value: "Šogad {v}",
+    this_year: "Šogad",
     payback: "Atmaksāsies ≈ {years} gados",
     red_day: "Sarkanā diena: katra pašpatērētā kWh ietaupa {price}",
     price_buy: "Elektrības cena (par kWh)",
@@ -2446,7 +2446,7 @@ const STRINGS = {
     sold: "Πωλήθηκε",
     this_month: "Αυτόν τον μήνα",
     today_value: "Σήμερα {v}",
-    year_value: "Φέτος {v}",
+    this_year: "Φέτος",
     payback: "Απόσβεση σε ≈ {years} έτη",
     red_day: "Κόκκινη ημέρα: κάθε ιδιοκαταναλωμένη kWh εξοικονομεί {price}",
     price_buy: "Τιμή ρεύματος (ανά kWh)",
@@ -2754,6 +2754,21 @@ const forecastIds = (hass, config) => Object.values(forecastOf(hass, config) || 
 const isEntityId = (v) => typeof v === "string" && /^[a-z_]+\.\w+$/.test(v);
 const priceIds = (config) => [config.price_buy, config.price_sell, config.tempo].filter(isEntityId);
 const priceOf = (hass, v) => (typeof v === "number" ? v : isEntityId(v) ? num(hass.states[v]) : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : null);
+
+// Days of each EDF Tempo colour in a year, to average its prices over past days.
+const TEMPO_DAYS = [
+  ["blue", 300],
+  ["white", 43],
+  ["red", 22],
+];
+
+// The solar energy used at home (kWh): the production less the export, and never more than the home consumed when
+// it is known (without an export sensor, the production alone would count as self-consumed). Null without production.
+const selfConsumed = (produced, exported, consumed) => {
+  if (produced === null || produced === undefined) return null;
+  const s = Math.max(0, produced - (exported ?? 0));
+  return consumed === null || consumed === undefined ? s : Math.min(s, Math.max(0, consumed));
+};
 
 // The colour of an EDF Tempo day from a sensor's state (English or French, any case): blue, white, red, or null.
 const tempoColor = (st) => {
@@ -4164,6 +4179,24 @@ class EnergyCard extends EnergyBase {
     return tp ?? priceOf(this._hass, c.price_buy);
   }
 
+  // The price of a kWh bought over past days, for the month, the year and the payback: `price_buy`, else the Tempo
+  // prices weighted by the number of days of each colour in a year (300 blue, 43 white, 22 red); never the price of
+  // today's colour alone, which a red day would apply to the whole year.
+  _historyPrice() {
+    const c = this._config;
+    const base = priceOf(this._hass, c.price_buy);
+    if (base !== null || !c.tempo_prices || typeof c.tempo_prices !== "object") return base;
+    let sum = 0;
+    let days = 0;
+    for (const [color, n] of TEMPO_DAYS) {
+      const v = priceOf(this._hass, c.tempo_prices[color]);
+      if (v === null) continue;
+      sum += v * n;
+      days += n;
+    }
+    return days ? sum / days : null;
+  }
+
   _money(v) {
     const cur = this._hass.config?.currency || "EUR";
     try {
@@ -4173,23 +4206,24 @@ class EnergyCard extends EnergyBase {
     }
   }
 
-  // The month's and the year's production and export, from the monthly change of the "today" energy sensors in the
-  // recorder's statistics: one query, again every hour; rendered again when it comes.
+  // The production, export and home consumption of the last 12 months, from the monthly change of the "today" energy
+  // sensors in the recorder's statistics: one query, again every hour; rendered again when it comes.
   _fetchYear() {
-    const ids = [this._sys.roles.solar_today, this._sys.roles.export_today].filter(Boolean);
+    const r = this._sys.roles;
+    const ids = [r.solar_today, r.export_today, r.home_today].filter(Boolean);
     const key = ids.join(",");
-    if (!ids[0] || !this._hass.callWS || this._yearBusy) return;
+    if (!r.solar_today || !this._hass.callWS || this._yearBusy) return;
     if (this._yearKey === key && Date.now() - (this._yearAt || 0) < 3600000) return;
     this._yearBusy = true;
     this._yearKey = key;
     this._yearAt = Date.now();
     const tz = this._tz();
     const now = wall(Date.now(), tz);
-    const start = midnightOf(tz, now.y, 1, 1);
+    const start = midnightOf(tz, now.y, now.mo - 11, 1);
     this._hass
       .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "month", types: ["change"], start_time: new Date(start).toISOString(), units: { energy: "kWh" } })
       .then((x) => {
-        this._year = { tz, month: now.mo, rows: x || {} };
+        this._year = { tz, year: now.y, month: now.mo, rows: x || {} };
       })
       .catch(() => {
         this._yearAt = Date.now() - 3600000 + 300000;
@@ -4201,27 +4235,35 @@ class EnergyCard extends EnergyBase {
       });
   }
 
-  // Produced and exported this month and this year (kWh), null where unknown.
+  // Produced, exported and consumed (kWh) this month, this calendar year and over the last 12 months, null where
+  // unknown; `since`: the start of the first month the production has statistics for.
   _yearTotals() {
     if (!this._year) return null;
-    const of = (id) => {
-      let month = null;
-      let year = null;
-      for (const r of this._year.rows[id] || []) {
+    const { rows, tz, year: thisYear, month: thisMonth } = this._year;
+    let since = null;
+    const of = (id, first) => {
+      const out = { month: null, year: null, rolling: null };
+      for (const r of rows[id] || []) {
         const v = Number(r.change);
         if (!Number.isFinite(v)) continue;
-        year = (year ?? 0) + Math.max(0, v);
         const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
-        if (wall(t + 43200000, this._year.tz).mo === this._year.month) month = (month ?? 0) + Math.max(0, v);
+        const w = wall(t + 43200000, tz);
+        const add = Math.max(0, v);
+        out.rolling = (out.rolling ?? 0) + add;
+        if (w.y === thisYear) out.year = (out.year ?? 0) + add;
+        if (w.y === thisYear && w.mo === thisMonth) out.month = (out.month ?? 0) + add;
+        if (first && (since === null || t < since)) since = t;
       }
-      return { month, year };
+      return out;
     };
-    return { produced: of(this._sys.roles.solar_today), exported: of(this._sys.roles.export_today) };
+    const r = this._sys.roles;
+    const none = { month: null, year: null, rolling: null };
+    return { produced: of(r.solar_today, true), exported: r.export_today ? of(r.export_today) : none, consumed: r.home_today ? of(r.home_today) : none, since };
   }
 
-  // Savings: what the energy self-consumed saved (at the price of a kWh bought, Tempo's colour of the day when set)
-  // and what the exported energy earned (feed-in tariff), today, this month and this year, and the payback of the
-  // system; on an EDF Tempo red day, a banner.
+  // Savings: what the energy self-consumed saved (at the price of a kWh bought: Tempo's colour of the day for today,
+  // `price_buy` or the year's average Tempo price before) and what the exported energy earned (feed-in tariff), today,
+  // this month and this year, and the payback of the system over the last 12 months; on an EDF Tempo red day, a banner.
   _savingsSection() {
     const c = this._config;
     const buy = this._buyPrice();
@@ -4232,37 +4274,38 @@ class EnergyCard extends EnergyBase {
     const title = this._sectionTitle("savings", ICONS.savings, this._t("savings"));
     if (this._isCollapsed("savings")) return `<div>${title}</div>`;
     const d = this._today();
-    const value = (produced, exported) => {
-      if (produced === null) return null;
-      const self = Math.max(0, produced - (exported ?? 0));
-      return self * (buy ?? 0) + (exported ?? 0) * (sell ?? 0);
+    const past = this._historyPrice() ?? buy;
+    const value = (produced, exported, consumed, price) => {
+      const s = selfConsumed(produced, exported, consumed);
+      return s === null ? null : s * (price ?? 0) + (exported ?? 0) * (sell ?? 0);
     };
-    const selfToday = d.produced === null ? null : Math.max(0, d.produced - (d.exported ?? 0));
+    const selfToday = selfConsumed(d.produced, d.exported, d.consumed);
     const tiles = [];
     const tile = (role, icon, color, key, v, sub) => {
-      if (v === null) return;
+      if (v === null) return false;
       const id = role && this._sys.roles[role];
       const attrs = id ? ` clickable" role="button" tabindex="0" data-entity="${esc(id)}` : "";
       tiles.push(`<div class="tile${attrs}" style="--c:${color}"><div class="k">${svgIcon(icon)}<span>${esc(this._t(key))}</span></div><div class="v">${esc(this._money(v))}</div>${sub ? `<div class="s">${esc(sub)}</div>` : ""}</div>`);
+      return true;
     };
-    if (buy !== null) tile("solar_today", ICONS.home, "var(--ec-solar)", "self_consumed", selfToday === null ? null : selfToday * buy, selfToday === null ? "" : `${fmtEnergy(selfToday, L)} × ${this._money(buy)}`);
-    if (sell !== null) tile("export_today", ICONS.up, "var(--ec-export)", "sold", d.exported === null ? null : d.exported * sell, d.exported === null ? "" : `${fmtEnergy(d.exported, L)} × ${this._money(sell)}`);
+    const selfTile = buy !== null && tile("solar_today", ICONS.home, "var(--ec-solar)", "self_consumed", selfToday === null ? null : selfToday * buy, selfToday === null ? "" : `${fmtEnergy(selfToday, L)} × ${this._money(buy)}`);
+    const soldTile = sell !== null && tile("export_today", ICONS.up, "var(--ec-export)", "sold", d.exported === null ? null : d.exported * sell, d.exported === null ? "" : `${fmtEnergy(d.exported, L)} × ${this._money(sell)}`);
     const y = this._yearTotals();
-    const month = y ? value(y.produced.month, y.exported.month) : null;
-    const year = y ? value(y.produced.year, y.exported.year) : null;
-    tile(null, ICONS.calendar, "var(--ec-ok)", "this_month", month);
+    const at = (k) => (y ? value(y.produced[k], y.exported[k], y.consumed[k], past) : null);
+    tile(null, ICONS.calendar, "var(--ec-ok)", "this_month", at("month"));
+    tile(null, ICONS.calendar, "var(--ec-ok)", "this_year", at("year"));
     const tags = [];
-    const today = value(d.produced, d.exported);
-    if (today !== null) tags.push(this._t("today_value", { v: this._money(today) }));
-    if (year !== null) tags.push(this._t("year_value", { v: this._money(year) }));
+    // Today's total, only when it is not one of the tiles already (self-consumed and sold both shown).
+    const today = value(d.produced, d.exported, d.consumed, buy);
+    if (today !== null && selfTile && soldTile) tags.push(this._t("today_value", { v: this._money(today) }));
     const cost = priceOf(this._hass, c.system_cost);
-    if (cost && year) {
-      // The year so far, brought to a whole year, pays the system back in…
-      const tz = this._tz();
-      const now = wall(Date.now(), tz);
-      const days = Math.max(1, (Date.now() - midnightOf(tz, now.y, 1, 1)) / 86400000);
-      const perYear = (year / days) * 365;
-      if (perYear > 0) tags.push(this._t("payback", { years: fmtNum(cost / perYear, 1, L) }));
+    const rolling = at("rolling");
+    if (cost && rolling && y.since !== null) {
+      // The last 12 months brought to a whole year pay the system back in… — once 90 days of data are in, so that a
+      // first winter (or summer) does not stand for the year.
+      const days = Math.min(365, (Date.now() - y.since) / 86400000);
+      const perYear = (rolling / days) * 365;
+      if (days >= 90 && perYear > 0) tags.push(this._t("payback", { years: fmtNum(cost / perYear, 1, L) }));
     }
     const red = c.tempo && tempoColor(this._s(c.tempo)) === "red" && buy !== null;
     const banner = red ? `<div class="alert-line red-day clickable" role="button" tabindex="0" data-entity="${esc(c.tempo)}">${svgIcon(ICONS.alert)}<span>${esc(this._t("red_day", { price: this._money(buy) }))}</span></div>` : "";

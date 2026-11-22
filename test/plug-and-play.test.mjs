@@ -105,31 +105,78 @@ test("forecast section: production of the forecast, the gap to what was expected
   assert.doesNotMatch(newCard(makeHass(), { forecast: false }).shadowRoot.innerHTML, /data-section="forecast"/);
 });
 
-test("savings: hidden without a price; self-consumption and export valued, year from monthly statistics, payback", async () => {
-  assert.doesNotMatch(newCard(makeHass()).shadowRoot.innerHTML, /data-section="savings"/);
-  const hass = makeHass();
+// Monthly statistics of the last 12 months (`months` back, this month included) for production and export.
+const yearStats = (hass, months, perMonth = { prod: 400, exp: 100 }) => {
   const calls = [];
   hass.callWS = (msg) => {
     calls.push(msg);
     if (msg.period !== "month") return Promise.resolve({});
     const [prod, exp] = msg.statistic_ids;
     const now = new Date();
-    const row = (m, change) => ({ start: new Date(now.getFullYear(), m, 1).getTime(), change });
-    const months = Array.from({ length: now.getMonth() + 1 }, (_, m) => m);
-    return Promise.resolve({ [prod]: months.map((m) => row(m, 400)), [exp]: months.map((m) => row(m, 100)) });
+    const row = (back, change) => ({ start: new Date(now.getFullYear(), now.getMonth() - back, 1).getTime(), change });
+    const list = Array.from({ length: months }, (_, i) => months - 1 - i);
+    return Promise.resolve({ [prod]: list.map((b) => row(b, perMonth.prod)), [exp]: list.map((b) => row(b, perMonth.exp)) });
   };
+  return calls;
+};
+
+test("savings: hidden without a price; self-consumption and export valued, month and year from monthly statistics, payback", async () => {
+  assert.doesNotMatch(newCard(makeHass()).shadowRoot.innerHTML, /data-section="savings"/);
+  const hass = makeHass();
+  const calls = yearStats(hass, 12);
   const card = newCard(hass, { integration: "anker_solix", price_buy: 0.25, price_sell: 0.04, system_cost: 1000 });
   await new Promise((r) => setTimeout(r, 10));
   const month = calls.find((c) => c.period === "month");
   assert.ok(month, "monthly statistics queried");
   assert.deepEqual(plain(month.types), ["change"]);
+  // The last 12 months: the payback is worked out over a whole year, not the calendar year so far.
+  assert.ok(month.statistic_ids.includes("sensor.solarbank_production_jour"));
   const sv = section(card.shadowRoot.innerHTML, "savings");
   assert.match(sv, /Self-consumed/);
   assert.match(sv, /Sold/);
   assert.match(sv, /This month/);
+  // The year is a tile, like the month.
+  assert.match(sv, /This year<\/span><\/div><div class="v">/);
   // This month: 300 kWh self-consumed × 0.25 + 100 kWh × 0.04 = €79.00.
   assert.match(sv, /79\.00/);
-  assert.match(sv, /payback|Payback/i);
+  // Self-consumed and sold both shown: today's total is a tag of its own.
+  assert.match(sv, /Today €/);
+  assert.match(sv, /Payback/);
+});
+
+test("savings: self-consumption never exceeds what the home consumed", () => {
+  assert.equal(ec.selfConsumed(18.4, null, 9.2), 9.2);
+  assert.ok(Math.abs(ec.selfConsumed(18.4, 10, 12) - 8.4) < 1e-9);
+  assert.equal(ec.selfConsumed(5, null, null), 5);
+  assert.equal(ec.selfConsumed(null, 1, 2), null);
+});
+
+test("savings: no today tag that only repeats the self-consumed tile", () => {
+  const sv = section(newCard(makeHass(), { integration: "anker_solix", price_buy: 0.25 }).shadowRoot.innerHTML, "savings");
+  assert.match(sv, /Self-consumed/);
+  assert.doesNotMatch(sv, /Today €/);
+});
+
+test("savings: no payback before 90 days of statistics", async () => {
+  const hass = makeHass();
+  yearStats(hass, 2);
+  const card = newCard(hass, { integration: "anker_solix", price_buy: 0.25, system_cost: 1000 });
+  await new Promise((r) => setTimeout(r, 10));
+  assert.doesNotMatch(section(card.shadowRoot.innerHTML, "savings"), /Payback/);
+});
+
+test("savings: past days are valued at the base price, not at today's Tempo colour", async () => {
+  const hass = makeHass(withOverrides(redDay));
+  yearStats(hass, 12, { prod: 100, exp: 0 });
+  const card = newCard(hass, { integration: "anker_solix", tempo: "sensor.tempo_couleur", tempo_prices: { blue: 0.13, white: 0.16, red: 0.76 } });
+  await new Promise((r) => setTimeout(r, 10));
+  const sv = section(card.shadowRoot.innerHTML, "savings");
+  // Today at the red price; this month's 100 kWh at the year's average Tempo price (≈ €0.1715): €17.15, not €76.00.
+  assert.match(sv, /× €0\.76/);
+  assert.match(sv, /17\.15/);
+  assert.doesNotMatch(sv, /76\.00/);
+  const flat = newCard(makeHass(withOverrides(redDay)), { integration: "anker_solix", price_buy: 0.2, tempo: "sensor.tempo_couleur", tempo_prices: { red: 0.76 } });
+  assert.equal(flat._historyPrice(), 0.2);
 });
 
 test("savings: the EDF Tempo colour sets the price, a red day shows a banner", () => {
