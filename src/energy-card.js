@@ -4767,7 +4767,7 @@ for (const card of [
   },
 ]) {
   if (!window.customCards.some((c) => c.type === card.type))
-    window.customCards.push({ ...card, preview: true, documentationURL: "https://github.com/juju35/ha-energy-card" });
+    window.customCards.push({ ...card, preview: false, documentationURL: "https://github.com/juju35/ha-energy-card" });
 }
 
 console.info(`%c ENERGY-CARD %c v${VERSION} `, "color: white; background: #a35f00; font-weight: 700;", "color: #a35f00; background: white; font-weight: 700;");
