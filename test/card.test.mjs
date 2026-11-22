@@ -32,8 +32,10 @@ const powers = (integration, overrides, config = {}) => {
 test("the known integrations are listed as systems, sorted by name, other integrations are not", () => {
   const m = ec.resolve(makeHass());
   assert.deepEqual(plain(m.systems.map((s) => [s.platform, s.name])), [
+    ["anker_solix", "Anker SOLIX"],
     ["apsystems_ecu_reader", "APsystems"],
     ["apsystems_modbus", "APsystems"],
+    ["ecoflow_cloud", "EcoFlow"],
     ["enphase_envoy", "Enphase"],
     ["foxess_modbus", "Fox ESS"],
     ["fronius", "Fronius"],
@@ -297,7 +299,9 @@ test("the subtitle tells the live power only on the compact mini card, today's p
   assert.match(full, /^[\d.]+ kWh produced today/);
   assert.doesNotMatch(full, / kW( |$)/, "no live power: the diagram shows it");
   const mini = newCard(makeHass(), {}, ec.EnergyMiniCard);
-  assert.match(sub(mini.shadowRoot.innerHTML), /^[\d.]+ kW$/);
+  // With a solar forecast, the compact view adds today's production against it.
+  assert.match(sub(mini.shadowRoot.innerHTML), /^[\d.]+ kW · [\d.]+ \/ [\d.]+ kWh forecast$/);
+  assert.match(sub(newCard(makeHass(), { show_forecast: false }, ec.EnergyMiniCard).shadowRoot.innerHTML), /^[\d.]+ kW$/);
   click(mini, { action: "zoom" });
   assert.equal(sub(mini.shadowRoot.innerHTML), full);
   // The classic header keeps its subtitle (no power in it).
@@ -309,7 +313,7 @@ test("the editor offers the systems found and keeps the YAML minimal", () => {
   ed.setConfig({ type: "custom:energy-card" });
   ed.hass = makeHass();
   const form = ed._form;
-  assert.deepEqual(plain(form.schema[0].selector.select.options.map((o) => o.value)), ["apsystems_ecu_reader", "apsystems_modbus", "enphase_envoy", "foxess_modbus", "fronius", "huawei_solar", "solaredge", "powerwall"]);
+  assert.deepEqual(plain(form.schema[0].selector.select.options.map((o) => o.value)), ["anker_solix", "apsystems_ecu_reader", "apsystems_modbus", "ecoflow_cloud", "enphase_envoy", "foxess_modbus", "fronius", "huawei_solar", "solaredge", "powerwall"]);
   assert.equal(form.data.integration, "enphase_envoy");
   const changes = [];
   ed.dispatchEvent = (ev) => changes.push(ev.detail.config);
@@ -340,7 +344,7 @@ test("the mini card editor offers the full card's options its detail view uses",
   assert.ok(miniNames.includes("zoom"));
   for (const n of ["show_flow", "show_week", "collapsed", "invert_grid", "invert_battery", "solar"]) assert.ok(miniNames.includes(n), n);
   const collapsed = plain(full._form.schema).find((s) => s.name === "collapsed");
-  assert.deepEqual(collapsed.selector.select.options.map((o) => o.value), ["sources", "battery", "today", "week", "options"]);
+  assert.deepEqual(collapsed.selector.select.options.map((o) => o.value), ["sources", "battery", "forecast", "today", "savings", "week", "options"]);
   assert.equal(mini._form.data.zoom, true);
 });
 

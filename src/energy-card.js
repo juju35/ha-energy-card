@@ -21,6 +21,12 @@ const IMG_LOGO_APSYSTEMS = "__IMG_LOGO_APSYSTEMS__";
 const IMG_LOGO_SOLAX = "__IMG_LOGO_SOLAX__";
 const IMG_LOGO_GOODWE = "__IMG_LOGO_GOODWE__";
 const IMG_LOGO_FOXESS = "__IMG_LOGO_FOXESS__";
+const IMG_LOGO_HOYMILES = "__IMG_LOGO_HOYMILES__";
+const IMG_LOGO_ECOFLOW = "__IMG_LOGO_ECOFLOW__";
+const IMG_LOGO_ANKER = "__IMG_LOGO_ANKER__";
+const IMG_LOGO_ZENDURE = "__IMG_LOGO_ZENDURE__";
+const IMG_LOGO_MARSTEK = "__IMG_LOGO_MARSTEK__";
+const IMG_LOGO_BEEM = "__IMG_LOGO_BEEM__";
 
 // ---------------------------------------------------------------------------
 // Brands and integrations
@@ -40,6 +46,13 @@ const BRANDS = {
   solax: { logo: IMG_LOGO_SOLAX, name: "SolaX", site: "https://www.solaxpower.com", accent: ["#0060a8", "#4ea8f0"] },
   goodwe: { logo: IMG_LOGO_GOODWE, name: "GoodWe", site: "https://www.goodwe.com", accent: ["#b3141a", "#ff7a7f"] },
   foxess: { logo: IMG_LOGO_FOXESS, name: "Fox ESS", site: "https://www.fox-ess.com", accent: ["#00796b", "#4fc3b7"] },
+  // Plug-and-play solar: balcony panels on micro-inverters, balcony batteries.
+  hoymiles: { logo: IMG_LOGO_HOYMILES, name: "Hoymiles", site: "https://www.hoymiles.com", accent: ["#00796b", "#4fc3b7"], balcony: true },
+  ecoflow: { logo: IMG_LOGO_ECOFLOW, name: "EcoFlow", site: "https://www.ecoflow.com", accent: ["#2f5d73", "#7fc4e0"], balcony: true },
+  anker: { logo: IMG_LOGO_ANKER, name: "Anker SOLIX", site: "https://www.ankersolix.com", accent: ["#0064c8", "#5fa8ff"], balcony: true },
+  zendure: { logo: IMG_LOGO_ZENDURE, name: "Zendure", site: "https://zendure.com", accent: ["#0d7a4f", "#4fd19a"], balcony: true },
+  marstek: { logo: IMG_LOGO_MARSTEK, name: "Marstek", site: "https://www.marstekenergy.com", accent: ["#3a3f44", "#c9ced3"], balcony: true },
+  beem: { logo: IMG_LOGO_BEEM, name: "Beem", site: "https://beem.energy", accent: ["#c24d00", "#ff9a4d"], balcony: true },
   generic: { logo: null, name: "", site: "", accent: ["#a35f00", "#ffb74d"] },
 };
 
@@ -59,6 +72,12 @@ const PLATFORMS = {
   solax: "solax",
   goodwe: "goodwe",
   foxess_modbus: "foxess",
+  hoymiles_wifi: "hoymiles",
+  ecoflow_cloud: "ecoflow",
+  anker_solix: "anker",
+  zendure_ha: "zendure",
+  marstek_local_api: "marstek",
+  beem_energy: "beem",
 };
 const brandOf = (platform) => PLATFORMS[platform] || "generic";
 
@@ -239,6 +258,75 @@ const KEYS = {
     ["work_mode", "status"],
   ],
 };
+// Plug-and-play solar. Hoymiles (HMS micro-inverters through their DTU, MS-A2 batteries): the DTU's own total comes
+// first (its inverters have the same keys, see the via_device preference in resolve). Its phase_total_power is the
+// inverters' AC output, not a grid meter: no grid role.
+KEYS.hoymiles_wifi = [
+  ["ac_active_power", "solar"],
+  ["state_of_charge", "soc"],
+  ["ac_daily_energy", "solar_today"],
+  ["working_mode", "mode"],
+];
+// EcoFlow Cloud (PowerStream, Delta, River…): no translation keys, entity ids <device>_<name>. Its solar is the sum
+// of its inputs (Solar 1 Watts, Solar 2 Watts…, see STRING_KEYS); the PowerStream's battery input is positive while
+// the battery discharges into the inverter.
+KEYS.ecoflow_cloud = [
+  ["battery_input_watts", "battery"],
+  ["battery_charge", "soc"],
+  ["main_battery_level", "soc"],
+  ["battery_level", "soc"],
+  ["solar_in_power", "solar"],
+];
+// Anker SOLIX (Solarbank, smart meter, site totals): the site's totals first, then the Solarbank's own; its battery
+// power is positive while charging.
+KEYS.anker_solix = [
+  ["solar_power_total", "solar"],
+  ["solarbank_input_power", "solar"],
+  ["home_load_power", "home"],
+  ["grid_power_signed", "grid"],
+  ["battery_power_signed_total", "battery"],
+  ["battery_power_signed", "battery"],
+  ["state_of_charge_total", "soc"],
+  ["solarbank_state_of_charge", "soc"],
+  ["state_of_charge", "soc"],
+  ["daily_solar_production", "solar_today"],
+  ["daily_home_usage", "home_today"],
+  ["daily_grid_import", "import_today"],
+  ["daily_export_energy", "export_today"],
+  ["daily_charge_energy", "charge_today"],
+  ["daily_discharge_energy", "discharge_today"],
+  ["battery_energy", "battery_energy"],
+];
+// Zendure (SolarFlow, Hyper, AIO): translation keys are its property names in snake case.
+KEYS.zendure_ha = [
+  ["solar_input_power", "solar"],
+  ["output_pack_power", "battery_charge"],
+  ["pack_input_power", "battery_discharge"],
+  ["electric_level", "soc"],
+  ["available_kwh", "battery_energy"],
+  ["total_kwh", "battery_capacity"],
+];
+// Marstek Venus (local API): the system's totals when several batteries, else the battery's own. The grid is its
+// documented grid_power (+ import); the CT meter's ct_total_power has no documented sign, so it is not read.
+KEYS.marstek_local_api = [
+  ["system_total_solar_power", "solar"],
+  ["pv_power_es", "solar"],
+  ["pv_power", "solar"],
+  ["grid_power", "grid"],
+  ["battery_power_out", "battery_discharge"],
+  ["battery_power_in", "battery_charge"],
+  ["system_average_soc", "soc"],
+  ["battery_soc", "soc"],
+  ["battery_available_capacity", "battery_energy"],
+  ["battery_rated_capacity", "battery_capacity"],
+  ["operating_mode", "mode"],
+];
+// Beem (Beem On / Beem Battery): no translation keys on its sensors, entity ids <device>_<name>. The sign of its grid
+// and battery powers is not documented: only its production and battery level are read (`entities` sets the rest).
+KEYS.beem_energy = [
+  ["solar_power", "solar"],
+  ["soc", "soc"],
+];
 KEYS.solaredge_modbus = KEYS.solaredge;
 
 // Power of each panel input (string, micro-inverter channel), shown with `show_strings`: matched on the translation
@@ -249,6 +337,9 @@ const STRING_KEYS = {
   foxess_modbus: /(^|_)pv\d+_power$/,
   huawei_solar: /^pv_\d+_power$|_pv_\d+_power$/,
   goodwe: /_ppv\d+$/,
+  hoymiles_wifi: /^port_dc_power$/,
+  ecoflow_cloud: /_solar_\d_watts$/,
+  zendure_ha: /^solar_power\d$/,
 };
 const isString = (e, domain) => {
   const re = STRING_KEYS[e.platform];
@@ -257,8 +348,8 @@ const isString = (e, domain) => {
 
 // Sign of the integration's signed power sensors, when it is not the cards' own (grid + import, battery + discharge):
 // Huawei Solar's power meter is positive when exporting and its battery positive when charging; GoodWe's active power
-// is positive when exporting.
-const SIGNS = { huawei_solar: { grid: -1, battery: -1 }, goodwe: { grid: -1 } };
+// is positive when exporting; Anker SOLIX's and Beem's batteries are positive when charging.
+const SIGNS = { huawei_solar: { grid: -1, battery: -1 }, goodwe: { grid: -1 }, anker_solix: { battery: -1 } };
 
 // Unmapped power sensors of an unknown integration: their role guessed from the entity id and name.
 const GUESSES = [
@@ -307,6 +398,11 @@ const ICONS = {
   expand: "M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z",
   collapse: "M19.5,3.09L15,7.59V4H13V11H20V9H16.41L20.91,4.5L19.5,3.09M4,13V15H7.59L3.09,19.5L4.5,20.91L9,16.41V20H11V13H4Z",
   capacity: "M3,3H21V21H3V3M5,5V19H19V5H5M7,13H17V17H7V13Z",
+  // mdi:sun-clock (forecast) and mdi:piggy-bank-outline (savings)
+  forecast:
+    "M18.1 9.3L19.6 6L15.5 5.6C16.1 6.1 16.6 6.7 17 7.5C17.3 8.1 17.5 8.6 17.7 9.2C17.2 9.1 16.6 9 16 9H15.6C14.8 7.2 13.1 6 11 6C8.2 6 6 8.2 6 11C6 13.1 7.2 14.8 9 15.6V16C9 19.9 12.1 23 16 23S23 19.9 23 16C23 12.9 20.9 10.2 18.1 9.3M16 21C13.2 21 11 18.8 11 16S13.2 11 16 11 21 13.2 21 16 18.8 21 16 21M16.5 16.2L19.4 17.9L18.6 19.1L15 17V12H16.5V16.2M11 4C10.2 4 9.4 4.2 8.6 4.4L11 1L13.4 4.4C12.6 4.2 11.8 4 11 4M4.9 14.5C5.3 15.2 5.9 15.9 6.5 16.4L2.4 16L4.2 12.2C4.3 13 4.5 13.8 4.9 14.5M4.1 9.8L2.3 6L6.5 5.7C5.9 6.2 5.4 6.8 4.9 7.5C4.5 8.2 4.2 9 4.1 9.8Z",
+  savings:
+    "M15 10C15 9.45 15.45 9 16 9S17 9.45 17 10 16.55 11 16 11 15 10.55 15 10M8 9H13V7H8V9M22 7.5V14.5L19.18 15.44L17.5 21H12V19H10V21H4.5C4.5 21 2 12.54 2 9.5S4.46 4 7.5 4H12.5C13.41 2.79 14.86 2 16.5 2C17.33 2 18 2.67 18 3.5C18 3.71 17.96 3.9 17.88 4.08C17.74 4.42 17.62 4.81 17.56 5.23L19.83 7.5H22M20 9.5H19L15.5 6C15.5 5.35 15.59 4.71 15.76 4.09C14.79 4.34 14 5.06 13.67 6H7.5C5.57 6 4 7.57 4 9.5C4 11.38 5.22 16.15 6 19H8V17H14V19H16L17.56 13.85L20 13.03V9.5Z",
 };
 
 const STRINGS = {
@@ -380,6 +476,26 @@ const STRINGS = {
     show_sources: "Production by source",
     show_strings: "Power of each panel input",
     solar_sources: "Other solar integrations (added to the production)",
+    forecast: "Forecast",
+    show_forecast: "Forecast (production against the forecast)",
+    forecast_of: "{x} of {y}",
+    expected_now: "expected by now: {v}",
+    ahead: "{pct}% ahead",
+    behind: "{pct}% behind",
+    to_come: "Still to come",
+    tomorrow: "Tomorrow",
+    forecast_chip: "{x} / {y} forecast",
+    savings: "Savings",
+    show_savings: "Savings (self-consumption and feed-in)",
+    self_consumed: "Self-consumed",
+    sold: "Sold",
+    this_month: "This month",
+    today_value: "Today {v}",
+    this_year: "This year",
+    payback: "Payback ≈ {years} years",
+    red_day: "Red day: every self-consumed kWh saves {price}",
+    tempo: "Tempo colour sensor",
+    system_cost: "System cost (for the payback)",
   },
   fr: {
     solar: "Solaire",
@@ -451,6 +567,26 @@ const STRINGS = {
     show_sources: "Production par source",
     show_strings: "Puissance de chaque entrée de panneaux",
     solar_sources: "Autres intégrations solaires (ajoutées à la production)",
+    forecast: "Prévision",
+    show_forecast: "Prévision (production face à la prévision)",
+    forecast_of: "{x} sur {y}",
+    expected_now: "attendu à cette heure : {v}",
+    ahead: "{pct} % d'avance",
+    behind: "{pct} % de retard",
+    to_come: "Reste à venir",
+    tomorrow: "Demain",
+    forecast_chip: "{x} / {y} prévus",
+    savings: "Économies",
+    show_savings: "Économies (autoconsommation et revente)",
+    self_consumed: "Autoconsommé",
+    sold: "Revendu",
+    this_month: "Ce mois-ci",
+    today_value: "Aujourd'hui {v}",
+    this_year: "Cette année",
+    payback: "Amorti en ≈ {years} ans",
+    red_day: "Jour rouge : chaque kWh autoconsommé économise {price}",
+    tempo: "Capteur de couleur Tempo",
+    system_cost: "Coût de l'installation (pour l'amortissement)",
   },
   de: {
     solar: "Solar",
@@ -522,6 +658,26 @@ const STRINGS = {
     show_sources: "Erzeugung nach Quelle",
     show_strings: "Leistung jedes Moduleingangs",
     solar_sources: "Weitere Solar-Integrationen (zur Erzeugung addiert)",
+    forecast: "Prognose",
+    show_forecast: "Prognose (Erzeugung gegenüber der Prognose)",
+    forecast_of: "{x} von {y}",
+    expected_now: "bis jetzt erwartet: {v}",
+    ahead: "{pct} % voraus",
+    behind: "{pct} % zurück",
+    to_come: "Noch zu erwarten",
+    tomorrow: "Morgen",
+    forecast_chip: "{x} / {y} Prognose",
+    savings: "Ersparnis",
+    show_savings: "Ersparnis (Eigenverbrauch und Einspeisung)",
+    self_consumed: "Eigenverbrauch",
+    sold: "Eingespeist",
+    this_month: "Diesen Monat",
+    today_value: "Heute {v}",
+    this_year: "Dieses Jahr",
+    payback: "Amortisiert in ≈ {years} Jahren",
+    red_day: "Roter Tag: jede selbst verbrauchte kWh spart {price}",
+    tempo: "Tempo-Farbsensor",
+    system_cost: "Anlagenkosten (für die Amortisation)",
   },
   es: {
     solar: "Solar",
@@ -593,6 +749,26 @@ const STRINGS = {
     show_sources: "Producción por fuente",
     show_strings: "Potencia de cada entrada de paneles",
     solar_sources: "Otras integraciones solares (sumadas a la producción)",
+    forecast: "Previsión",
+    show_forecast: "Previsión (producción frente a la previsión)",
+    forecast_of: "{x} de {y}",
+    expected_now: "esperado a esta hora: {v}",
+    ahead: "{pct} % por delante",
+    behind: "{pct} % por detrás",
+    to_come: "Por venir",
+    tomorrow: "Mañana",
+    forecast_chip: "{x} / {y} previstos",
+    savings: "Ahorro",
+    show_savings: "Ahorro (autoconsumo y venta)",
+    self_consumed: "Autoconsumido",
+    sold: "Vendido",
+    this_month: "Este mes",
+    today_value: "Hoy {v}",
+    this_year: "Este año",
+    payback: "Amortizado en ≈ {years} años",
+    red_day: "Día rojo: cada kWh autoconsumido ahorra {price}",
+    tempo: "Sensor de color Tempo",
+    system_cost: "Coste de la instalación (para la amortización)",
   },
   sr: {
     solar: "Соларно",
@@ -664,6 +840,26 @@ const STRINGS = {
     show_sources: "Производња по извору",
     show_strings: "Снага сваког улаза панела",
     solar_sources: "Друге соларне интеграције (додате производњи)",
+    forecast: "Прогноза",
+    show_forecast: "Прогноза (производња у односу на прогнозу)",
+    forecast_of: "{x} од {y}",
+    expected_now: "очекивано до сада: {v}",
+    ahead: "{pct} % испред",
+    behind: "{pct} % иза",
+    to_come: "Још долази",
+    tomorrow: "Сутра",
+    forecast_chip: "{x} / {y} прогноза",
+    savings: "Уштеда",
+    show_savings: "Уштеда (сопствена потрошња и предаја у мрежу)",
+    self_consumed: "Сопствена потрошња",
+    sold: "Продато",
+    this_month: "Овај месец",
+    today_value: "Данас {v}",
+    this_year: "Ове године",
+    payback: "Исплата за ≈ {years} год.",
+    red_day: "Црвени дан: сваки сопствено потрошен kWh штеди {price}",
+    tempo: "Сензор Tempo боје",
+    system_cost: "Цена система (за исплату)",
   },
   "sr-Latn": {
     solar: "Solarno",
@@ -735,6 +931,26 @@ const STRINGS = {
     show_sources: "Proizvodnja po izvoru",
     show_strings: "Snaga svakog ulaza panela",
     solar_sources: "Druge solarne integracije (dodate proizvodnji)",
+    forecast: "Prognoza",
+    show_forecast: "Prognoza (proizvodnja u odnosu na prognozu)",
+    forecast_of: "{x} od {y}",
+    expected_now: "očekivano do sada: {v}",
+    ahead: "{pct} % ispred",
+    behind: "{pct} % iza",
+    to_come: "Još dolazi",
+    tomorrow: "Sutra",
+    forecast_chip: "{x} / {y} prognoza",
+    savings: "Ušteda",
+    show_savings: "Ušteda (sopstvena potrošnja i predaja u mrežu)",
+    self_consumed: "Sopstvena potrošnja",
+    sold: "Prodato",
+    this_month: "Ovaj mesec",
+    today_value: "Danas {v}",
+    this_year: "Ove godine",
+    payback: "Isplata za ≈ {years} god.",
+    red_day: "Crveni dan: svaki sopstveno potrošen kWh štedi {price}",
+    tempo: "Senzor Tempo boje",
+    system_cost: "Cena sistema (za isplatu)",
   },
   it: {
     solar: "Solare",
@@ -806,6 +1022,26 @@ const STRINGS = {
     show_sources: "Produzione per fonte",
     show_strings: "Potenza di ogni ingresso dei pannelli",
     solar_sources: "Altre integrazioni solari (sommate alla produzione)",
+    forecast: "Previsione",
+    show_forecast: "Previsione (produzione rispetto alla previsione)",
+    forecast_of: "{x} di {y}",
+    expected_now: "atteso a quest'ora: {v}",
+    ahead: "{pct} % in anticipo",
+    behind: "{pct} % in ritardo",
+    to_come: "Ancora da produrre",
+    tomorrow: "Domani",
+    forecast_chip: "{x} / {y} previsti",
+    savings: "Risparmi",
+    show_savings: "Risparmi (autoconsumo e immissione)",
+    self_consumed: "Autoconsumato",
+    sold: "Venduto",
+    this_month: "Questo mese",
+    today_value: "Oggi {v}",
+    this_year: "Quest'anno",
+    payback: "Ammortizzato in ≈ {years} anni",
+    red_day: "Giorno rosso: ogni kWh autoconsumato fa risparmiare {price}",
+    tempo: "Sensore del colore Tempo",
+    system_cost: "Costo dell'impianto (per l'ammortamento)",
   },
   nl: {
     solar: "Zon",
@@ -877,6 +1113,26 @@ const STRINGS = {
     show_sources: "Productie per bron",
     show_strings: "Vermogen van elke paneelingang",
     solar_sources: "Andere zonne-integraties (opgeteld bij de productie)",
+    forecast: "Prognose",
+    show_forecast: "Prognose (opwek tegenover de prognose)",
+    forecast_of: "{x} van {y}",
+    expected_now: "tot nu verwacht: {v}",
+    ahead: "{pct} % voor",
+    behind: "{pct} % achter",
+    to_come: "Nog te verwachten",
+    tomorrow: "Morgen",
+    forecast_chip: "{x} / {y} prognose",
+    savings: "Besparing",
+    show_savings: "Besparing (eigen verbruik en teruglevering)",
+    self_consumed: "Zelf verbruikt",
+    sold: "Teruggeleverd",
+    this_month: "Deze maand",
+    today_value: "Vandaag {v}",
+    this_year: "Dit jaar",
+    payback: "Terugverdiend in ≈ {years} jaar",
+    red_day: "Rode dag: elke zelf verbruikte kWh bespaart {price}",
+    tempo: "Tempo-kleursensor",
+    system_cost: "Kosten van de installatie (voor de terugverdientijd)",
   },
   pt: {
     solar: "Solar",
@@ -948,6 +1204,26 @@ const STRINGS = {
     show_sources: "Produção por fonte",
     show_strings: "Potência de cada entrada de painéis",
     solar_sources: "Outras integrações solares (somadas à produção)",
+    forecast: "Previsão",
+    show_forecast: "Previsão (produção face à previsão)",
+    forecast_of: "{x} de {y}",
+    expected_now: "esperado até agora: {v}",
+    ahead: "{pct} % à frente",
+    behind: "{pct} % atrás",
+    to_come: "Ainda por vir",
+    tomorrow: "Amanhã",
+    forecast_chip: "{x} / {y} previstos",
+    savings: "Poupança",
+    show_savings: "Poupança (autoconsumo e venda)",
+    self_consumed: "Autoconsumido",
+    sold: "Vendido",
+    this_month: "Este mês",
+    today_value: "Hoje {v}",
+    this_year: "Este ano",
+    payback: "Amortizado em ≈ {years} anos",
+    red_day: "Dia vermelho: cada kWh autoconsumido poupa {price}",
+    tempo: "Sensor de cor Tempo",
+    system_cost: "Custo da instalação (para a amortização)",
   },
   pl: {
     solar: "Słońce",
@@ -1019,6 +1295,26 @@ const STRINGS = {
     show_sources: "Produkcja według źródła",
     show_strings: "Moc każdego wejścia paneli",
     solar_sources: "Inne integracje solarne (dodawane do produkcji)",
+    forecast: "Prognoza",
+    show_forecast: "Prognoza (produkcja względem prognozy)",
+    forecast_of: "{x} z {y}",
+    expected_now: "oczekiwano do teraz: {v}",
+    ahead: "{pct} % przed",
+    behind: "{pct} % za",
+    to_come: "Jeszcze przed nami",
+    tomorrow: "Jutro",
+    forecast_chip: "{x} / {y} prognozy",
+    savings: "Oszczędności",
+    show_savings: "Oszczędności (autokonsumpcja i oddawanie do sieci)",
+    self_consumed: "Zużyte na miejscu",
+    sold: "Sprzedane",
+    this_month: "Ten miesiąc",
+    today_value: "Dziś {v}",
+    this_year: "W tym roku",
+    payback: "Zwrot za ≈ {years} lat",
+    red_day: "Czerwony dzień: każda zużyta na miejscu kWh oszczędza {price}",
+    tempo: "Czujnik koloru Tempo",
+    system_cost: "Koszt instalacji (do zwrotu)",
   },
   ro: {
     solar: "Solar",
@@ -1090,6 +1386,26 @@ const STRINGS = {
     show_sources: "Producție pe sursă",
     show_strings: "Puterea fiecărei intrări de panouri",
     solar_sources: "Alte integrări solare (adăugate la producție)",
+    forecast: "Prognoză",
+    show_forecast: "Prognoză (producția față de prognoză)",
+    forecast_of: "{x} din {y}",
+    expected_now: "așteptat până acum: {v}",
+    ahead: "{pct} % înainte",
+    behind: "{pct} % în urmă",
+    to_come: "Încă de venit",
+    tomorrow: "Mâine",
+    forecast_chip: "{x} / {y} prognozat",
+    savings: "Economii",
+    show_savings: "Economii (autoconsum și vânzare)",
+    self_consumed: "Autoconsumat",
+    sold: "Vândut",
+    this_month: "Luna aceasta",
+    today_value: "Azi {v}",
+    this_year: "Anul acesta",
+    payback: "Amortizat în ≈ {years} ani",
+    red_day: "Zi roșie: fiecare kWh autoconsumat economisește {price}",
+    tempo: "Senzor de culoare Tempo",
+    system_cost: "Costul instalației (pentru amortizare)",
   },
   da: {
     solar: "Sol",
@@ -1161,6 +1477,26 @@ const STRINGS = {
     show_sources: "Produktion pr. kilde",
     show_strings: "Effekt for hver panelindgang",
     solar_sources: "Andre solcelleintegrationer (lagt til produktionen)",
+    forecast: "Prognose",
+    show_forecast: "Prognose (produktion mod prognosen)",
+    forecast_of: "{x} af {y}",
+    expected_now: "forventet indtil nu: {v}",
+    ahead: "{pct} % foran",
+    behind: "{pct} % bagud",
+    to_come: "Stadig på vej",
+    tomorrow: "I morgen",
+    forecast_chip: "{x} / {y} prognose",
+    savings: "Besparelse",
+    show_savings: "Besparelse (egetforbrug og salg)",
+    self_consumed: "Eget forbrug",
+    sold: "Solgt",
+    this_month: "Denne måned",
+    today_value: "I dag {v}",
+    this_year: "I år",
+    payback: "Tilbagebetalt om ≈ {years} år",
+    red_day: "Rød dag: hver kWh brugt selv sparer {price}",
+    tempo: "Tempo-farvesensor",
+    system_cost: "Anlæggets pris (til tilbagebetalingen)",
   },
   sv: {
     solar: "Sol",
@@ -1232,6 +1568,26 @@ const STRINGS = {
     show_sources: "Produktion per källa",
     show_strings: "Effekt för varje panelingång",
     solar_sources: "Andra solintegrationer (läggs till produktionen)",
+    forecast: "Prognos",
+    show_forecast: "Prognos (produktion mot prognosen)",
+    forecast_of: "{x} av {y}",
+    expected_now: "väntat hittills: {v}",
+    ahead: "{pct} % före",
+    behind: "{pct} % efter",
+    to_come: "Kvar att vänta",
+    tomorrow: "I morgon",
+    forecast_chip: "{x} / {y} prognos",
+    savings: "Besparing",
+    show_savings: "Besparing (egenförbrukning och försäljning)",
+    self_consumed: "Egenförbrukat",
+    sold: "Sålt",
+    this_month: "Denna månad",
+    today_value: "I dag {v}",
+    this_year: "I år",
+    payback: "Återbetald om ≈ {years} år",
+    red_day: "Röd dag: varje egenförbrukad kWh sparar {price}",
+    tempo: "Tempo-färgsensor",
+    system_cost: "Anläggningens kostnad (för återbetalningen)",
   },
   bg: {
     solar: "Слънце",
@@ -1303,6 +1659,26 @@ const STRINGS = {
     show_sources: "Производство по източник",
     show_strings: "Мощност на всеки вход на панели",
     solar_sources: "Други соларни интеграции (добавени към производството)",
+    forecast: "Прогноза",
+    show_forecast: "Прогноза (производство спрямо прогнозата)",
+    forecast_of: "{x} от {y}",
+    expected_now: "очаквано досега: {v}",
+    ahead: "{pct} % напред",
+    behind: "{pct} % назад",
+    to_come: "Предстои",
+    tomorrow: "Утре",
+    forecast_chip: "{x} / {y} прогноза",
+    savings: "Спестявания",
+    show_savings: "Спестявания (собствено потребление и продажба)",
+    self_consumed: "Собствено потребление",
+    sold: "Продадено",
+    this_month: "Този месец",
+    today_value: "Днес {v}",
+    this_year: "Тази година",
+    payback: "Изплащане за ≈ {years} г.",
+    red_day: "Червен ден: всеки собствено потребен kWh спестява {price}",
+    tempo: "Сензор за цвят Tempo",
+    system_cost: "Цена на системата (за изплащането)",
   },
   ru: {
     solar: "Солнце",
@@ -1374,6 +1750,26 @@ const STRINGS = {
     show_sources: "Выработка по источникам",
     show_strings: "Мощность каждого входа панелей",
     solar_sources: "Другие солнечные интеграции (добавляются к выработке)",
+    forecast: "Прогноз",
+    show_forecast: "Прогноз (выработка против прогноза)",
+    forecast_of: "{x} из {y}",
+    expected_now: "ожидалось к этому часу: {v}",
+    ahead: "{pct} % впереди",
+    behind: "{pct} % отставание",
+    to_come: "Ещё впереди",
+    tomorrow: "Завтра",
+    forecast_chip: "{x} / {y} по прогнозу",
+    savings: "Экономия",
+    show_savings: "Экономия (собственное потребление и продажа)",
+    self_consumed: "Собственное потребление",
+    sold: "Продано",
+    this_month: "Этот месяц",
+    today_value: "Сегодня {v}",
+    this_year: "В этом году",
+    payback: "Окупится за ≈ {years} лет",
+    red_day: "Красный день: каждый собственный кВт·ч экономит {price}",
+    tempo: "Датчик цвета Tempo",
+    system_cost: "Стоимость системы (для окупаемости)",
   },
   uk: {
     solar: "Сонце",
@@ -1445,6 +1841,26 @@ const STRINGS = {
     show_sources: "Виробіток за джерелами",
     show_strings: "Потужність кожного входу панелей",
     solar_sources: "Інші сонячні інтеграції (додаються до виробітку)",
+    forecast: "Прогноз",
+    show_forecast: "Прогноз (виробіток проти прогнозу)",
+    forecast_of: "{x} з {y}",
+    expected_now: "очікувалося до цієї години: {v}",
+    ahead: "{pct} % попереду",
+    behind: "{pct} % відставання",
+    to_come: "Ще попереду",
+    tomorrow: "Завтра",
+    forecast_chip: "{x} / {y} за прогнозом",
+    savings: "Заощадження",
+    show_savings: "Заощадження (власне споживання та продаж)",
+    self_consumed: "Власне споживання",
+    sold: "Продано",
+    this_month: "Цей місяць",
+    today_value: "Сьогодні {v}",
+    this_year: "Цього року",
+    payback: "Окупиться за ≈ {years} р.",
+    red_day: "Червоний день: кожна власна кВт·год заощаджує {price}",
+    tempo: "Датчик кольору Tempo",
+    system_cost: "Вартість системи (для окупності)",
   },
   hu: {
     solar: "Napelem",
@@ -1516,6 +1932,26 @@ const STRINGS = {
     show_sources: "Termelés forrásonként",
     show_strings: "Az egyes panelbemenetek teljesítménye",
     solar_sources: "Más napelemes integrációk (hozzáadva a termeléshez)",
+    forecast: "Előrejelzés",
+    show_forecast: "Előrejelzés (termelés az előrejelzéshez képest)",
+    forecast_of: "{x} / {y}",
+    expected_now: "eddig várt: {v}",
+    ahead: "{pct} % előnyben",
+    behind: "{pct} % lemaradás",
+    to_come: "Még várható",
+    tomorrow: "Holnap",
+    forecast_chip: "{x} / {y} előrejelzés",
+    savings: "Megtakarítás",
+    show_savings: "Megtakarítás (saját fogyasztás és betáplálás)",
+    self_consumed: "Saját fogyasztás",
+    sold: "Eladott",
+    this_month: "Ebben a hónapban",
+    today_value: "Ma {v}",
+    this_year: "Idén",
+    payback: "Megtérülés ≈ {years} év",
+    red_day: "Piros nap: minden saját fogyasztású kWh {price} megtakarítás",
+    tempo: "Tempo színérzékelő",
+    system_cost: "A rendszer ára (a megtérüléshez)",
   },
   sk: {
     solar: "Slnko",
@@ -1587,6 +2023,26 @@ const STRINGS = {
     show_sources: "Výroba podľa zdroja",
     show_strings: "Výkon každého vstupu panelov",
     solar_sources: "Ďalšie solárne integrácie (pripočítané k výrobe)",
+    forecast: "Predpoveď",
+    show_forecast: "Predpoveď (výroba oproti predpovedi)",
+    forecast_of: "{x} z {y}",
+    expected_now: "očakávané doteraz: {v}",
+    ahead: "{pct} % vpredu",
+    behind: "{pct} % vzadu",
+    to_come: "Ešte sa očakáva",
+    tomorrow: "Zajtra",
+    forecast_chip: "{x} / {y} predpoveď",
+    savings: "Úspory",
+    show_savings: "Úspory (vlastná spotreba a predaj)",
+    self_consumed: "Vlastná spotreba",
+    sold: "Predané",
+    this_month: "Tento mesiac",
+    today_value: "Dnes {v}",
+    this_year: "Tento rok",
+    payback: "Návratnosť ≈ {years} rokov",
+    red_day: "Červený deň: každá vlastne spotrebovaná kWh ušetrí {price}",
+    tempo: "Senzor farby Tempo",
+    system_cost: "Cena systému (pre návratnosť)",
   },
   cs: {
     solar: "Slunce",
@@ -1658,6 +2114,26 @@ const STRINGS = {
     show_sources: "Výroba podle zdroje",
     show_strings: "Výkon každého vstupu panelů",
     solar_sources: "Další solární integrace (přičtené k výrobě)",
+    forecast: "Předpověď",
+    show_forecast: "Předpověď (výroba oproti předpovědi)",
+    forecast_of: "{x} z {y}",
+    expected_now: "očekáváno dosud: {v}",
+    ahead: "{pct} % napřed",
+    behind: "{pct} % pozadu",
+    to_come: "Ještě se očekává",
+    tomorrow: "Zítra",
+    forecast_chip: "{x} / {y} předpověď",
+    savings: "Úspory",
+    show_savings: "Úspory (vlastní spotřeba a prodej)",
+    self_consumed: "Vlastní spotřeba",
+    sold: "Prodáno",
+    this_month: "Tento měsíc",
+    today_value: "Dnes {v}",
+    this_year: "Letos",
+    payback: "Návratnost ≈ {years} let",
+    red_day: "Červený den: každá vlastně spotřebovaná kWh ušetří {price}",
+    tempo: "Senzor barvy Tempo",
+    system_cost: "Cena systému (pro návratnost)",
   },
   sl: {
     solar: "Sonce",
@@ -1729,6 +2205,26 @@ const STRINGS = {
     show_sources: "Proizvodnja po virih",
     show_strings: "Moč vsakega vhoda panelov",
     solar_sources: "Druge sončne integracije (prištete proizvodnji)",
+    forecast: "Napoved",
+    show_forecast: "Napoved (proizvodnja glede na napoved)",
+    forecast_of: "{x} od {y}",
+    expected_now: "pričakovano do zdaj: {v}",
+    ahead: "{pct} % spredaj",
+    behind: "{pct} % zadaj",
+    to_come: "Še pričakovano",
+    tomorrow: "Jutri",
+    forecast_chip: "{x} / {y} napoved",
+    savings: "Prihranki",
+    show_savings: "Prihranki (lastna poraba in prodaja)",
+    self_consumed: "Lastna poraba",
+    sold: "Prodano",
+    this_month: "Ta mesec",
+    today_value: "Danes {v}",
+    this_year: "Letos",
+    payback: "Povrnitev v ≈ {years} letih",
+    red_day: "Rdeči dan: vsaka lastno porabljena kWh prihrani {price}",
+    tempo: "Senzor barve Tempo",
+    system_cost: "Cena sistema (za povrnitev)",
   },
   lv: {
     solar: "Saule",
@@ -1800,6 +2296,26 @@ const STRINGS = {
     show_sources: "Ražošana pa avotiem",
     show_strings: "Katras paneļu ieejas jauda",
     solar_sources: "Citas saules integrācijas (pieskaitītas ražošanai)",
+    forecast: "Prognoze",
+    show_forecast: "Prognoze (ražošana pret prognozi)",
+    forecast_of: "{x} no {y}",
+    expected_now: "līdz šim gaidīts: {v}",
+    ahead: "{pct} % priekšā",
+    behind: "{pct} % atpaliek",
+    to_come: "Vēl gaidāms",
+    tomorrow: "Rīt",
+    forecast_chip: "{x} / {y} prognoze",
+    savings: "Ietaupījums",
+    show_savings: "Ietaupījums (pašpatēriņš un pārdošana)",
+    self_consumed: "Pašpatēriņš",
+    sold: "Pārdots",
+    this_month: "Šomēnes",
+    today_value: "Šodien {v}",
+    this_year: "Šogad",
+    payback: "Atmaksāsies ≈ {years} gados",
+    red_day: "Sarkanā diena: katra pašpatērētā kWh ietaupa {price}",
+    tempo: "Tempo krāsas sensors",
+    system_cost: "Sistēmas izmaksas (atmaksai)",
   },
   el: {
     solar: "Ηλιακά",
@@ -1871,6 +2387,26 @@ const STRINGS = {
     show_sources: "Παραγωγή ανά πηγή",
     show_strings: "Ισχύς κάθε εισόδου πάνελ",
     solar_sources: "Άλλες ηλιακές ενσωματώσεις (προστίθενται στην παραγωγή)",
+    forecast: "Πρόβλεψη",
+    show_forecast: "Πρόβλεψη (παραγωγή έναντι πρόβλεψης)",
+    forecast_of: "{x} από {y}",
+    expected_now: "αναμενόμενο ως τώρα: {v}",
+    ahead: "{pct} % μπροστά",
+    behind: "{pct} % πίσω",
+    to_come: "Απομένει",
+    tomorrow: "Αύριο",
+    forecast_chip: "{x} / {y} πρόβλεψη",
+    savings: "Εξοικονόμηση",
+    show_savings: "Εξοικονόμηση (ιδιοκατανάλωση και πώληση)",
+    self_consumed: "Ιδιοκατανάλωση",
+    sold: "Πωλήθηκε",
+    this_month: "Αυτόν τον μήνα",
+    today_value: "Σήμερα {v}",
+    this_year: "Φέτος",
+    payback: "Απόσβεση σε ≈ {years} έτη",
+    red_day: "Κόκκινη ημέρα: κάθε ιδιοκαταναλωμένη kWh εξοικονομεί {price}",
+    tempo: "Αισθητήρας χρώματος Tempo",
+    system_cost: "Κόστος συστήματος (για την απόσβεση)",
   },
 };
 
@@ -2073,7 +2609,8 @@ const guessedRoles = (p, hass) => {
 // rather than micro-inverters that only report their production), the first by name between equals.
 const CAPABILITIES = [["solar"], ["home"], ["grid", "grid_import", "grid_export"], ["battery", "battery_charge", "battery_discharge", "soc"]];
 const primary = (m) => {
-  const score = (p) => CAPABILITIES.filter((roles) => roles.some((r) => p.roles[r])).length;
+  // On a tie, a roof system wins over a plug-and-play balcony kit, the smaller of the two in a home that has both.
+  const score = (p) => CAPABILITIES.filter((roles) => roles.some((r) => p.roles[r])).length * 2 + (BRANDS[p.brand]?.balcony ? 0 : 1);
   return m.systems.reduce((best, p) => (!best || score(p) > score(best) ? p : best), null);
 };
 
@@ -2134,6 +2671,80 @@ const findSystem = (hass, config) => {
       sign: { ...SIGNS[p?.platform] },
     },
   };
+};
+
+// ---------------------------------------------------------------------------
+// Forecast and savings
+// ---------------------------------------------------------------------------
+
+// Solar forecast integrations, and their sensors' roles matched on "<translation key> <entity id>" (the rest of
+// today before today itself: "energy_production_today_remaining" also ends with "today…").
+const FORECAST_PLATFORMS = ["forecast_solar", "solcast_solar", "open_meteo_solar_forecast"];
+const FORECAST_ROLES = [
+  ["remaining", /(today_remaining|remaining_today|get_remaining_today)\b/],
+  ["today", /(energy_production_today|forecast_today|total_kwh_forecast_today)\b/],
+  ["tomorrow", /(energy_production_tomorrow|forecast_tomorrow|total_kwh_forecast_tomorrow)\b/],
+];
+
+// The forecast's sensors { today, remaining, tomorrow }, each a list whose values add up: one sensor per device of the
+// forecast integration, so that the planes of Forecast.Solar (one entry, one device each) are all counted. `forecast`
+// sets them (any sensor of a device, or a list of them); without it, the first forecast integration of the home in
+// FORECAST_PLATFORMS order, never two of them (they would forecast the same panels twice), and none for a balcony kit
+// (the home's forecast is that of its roof). Null without today's forecast, or with `forecast: false`.
+const forecastOf = (hass, config, sys) => {
+  const f = config.forecast;
+  if (f === false || !hass?.entities) return null;
+  const reg = hass.entities;
+  const sensors = Object.keys(reg).filter((id) => id.startsWith("sensor."));
+  let pool;
+  if (typeof f === "string" || Array.isArray(f)) {
+    const set = (Array.isArray(f) ? f : [f]).filter((id) => typeof id === "string");
+    const devs = new Set(set.map((id) => reg[id]?.device_id).filter(Boolean));
+    pool = [...set, ...sensors.filter((id) => devs.has(reg[id].device_id))];
+  } else {
+    if (sys && BRANDS[sys.brand]?.balcony) return null;
+    const platform = FORECAST_PLATFORMS.find((pl) => sensors.some((id) => reg[id].platform === pl));
+    pool = platform ? sensors.filter((id) => reg[id].platform === platform) : [];
+  }
+  const out = { today: [], remaining: [], tomorrow: [] };
+  const seen = new Set();
+  for (const id of pool) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const key = `${reg[id]?.translation_key || ""} ${id}`;
+    const role = FORECAST_ROLES.find(([, re]) => re.test(key))?.[0];
+    const dev = reg[id]?.device_id || id;
+    // One sensor of each role per device.
+    if (role && !out[role].some((x) => (reg[x]?.device_id || x) === dev)) out[role].push(id);
+  }
+  return out.today.length ? out : null;
+};
+const forecastIds = (hass, config, sys) => Object.values(forecastOf(hass, config, sys) || {}).flat();
+
+// A price: a number, or the id of a sensor or input_number holding it.
+const isEntityId = (v) => typeof v === "string" && /^[a-z_]+\.\w+$/.test(v);
+const priceIds = (config) => [config.price_buy, config.price_sell, config.tempo].filter(isEntityId);
+const priceOf = (hass, v) => (typeof v === "number" ? v : isEntityId(v) ? num(hass.states[v]) : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : null);
+
+// Days of each EDF Tempo colour in a year, to average its prices over past days.
+const TEMPO_DAYS = [
+  ["blue", 300],
+  ["white", 43],
+  ["red", 22],
+];
+
+// The solar energy used at home (kWh): the production less the export, and never more than the home consumed when
+// it is known (without an export sensor, the production alone would count as self-consumed). Null without production.
+const selfConsumed = (produced, exported, consumed) => {
+  if (produced === null || produced === undefined) return null;
+  const s = Math.max(0, produced - (exported ?? 0));
+  return consumed === null || consumed === undefined ? s : Math.min(s, Math.max(0, consumed));
+};
+
+// The colour of an EDF Tempo day from a sensor's state (English or French, any case): blue, white, red, or null.
+const tempoColor = (st) => {
+  const v = String(st?.state ?? "").toLowerCase();
+  return /red|rouge/.test(v) ? "red" : /white|blanc/.test(v) ? "white" : /blue|bleu/.test(v) ? "blue" : null;
 };
 
 // Sum of the values of some sensors, null when none has one.
@@ -2205,7 +2816,9 @@ const powersOf = (hass, sys, config) => {
     const b = watts(s(minus));
     return a === null && b === null ? null : Math.abs(a ?? 0) - Math.abs(b ?? 0);
   };
-  const solarW = sumOf([watts(s("solar")), ...(sys.extra || []).map((x) => watts(hass.states[x.solar]))]);
+  // An integration with no total of its own (EcoFlow, Zendure): its solar is the sum of its panel inputs.
+  const own = r.solar ? watts(s("solar")) : sumOf((sys.strings || []).map((id) => watts(hass.states[id])));
+  const solarW = sumOf([own, ...(sys.extra || []).map((x) => watts(hass.states[x.solar]))]);
   const solar = solarW === null ? null : Math.max(0, solarW);
   let grid = signed("grid", "grid_dir", "export", config.invert_grid);
   if (grid === null) grid = pair("grid_import", "grid_export");
@@ -2285,8 +2898,9 @@ const ecIsNight = (hass, config) => {
 // One flow of the picture, drawn from where the power comes from to where it goes; `w` sets its speed.
 const ecFlow = (d, color, w) => `<path class="ec-flow" d="${d}" style="stroke:var(--ec-${color});animation-duration:${flowSpeed(w)}s"/>`;
 
-// The picture. `s`: { solar, flows, hasBattery, hasGrid, soc, batteryState, gridDown, error }; `uid` keeps the ids
-// of each card apart on a page with several cards.
+// The picture. `s`: { solar, flows, hasBattery, hasGrid, soc, batteryState, gridDown, error, balcony }; `uid` keeps
+// the ids of each card apart on a page with several cards. `balcony` (plug-and-play solar): the panels hang on the
+// balcony's rail instead of the roof.
 const ecSceneSvg = (uid, s) => {
   const f = s.flows;
   const producing = s.solar !== null && s.solar >= FLOW_MIN_W;
@@ -2294,7 +2908,7 @@ const ecSceneSvg = (uid, s) => {
   const panels = [0, 1, 2].map((i) => `<rect class="ec-pv" x="${i * 9}" y="-12" width="8" height="12"/>`).join("");
   const win = (x, lit) => `<rect class="ec-win${lit ? " lit" : ""}" x="${x}" y="12" width="10" height="9" rx=".6"/>`;
   const flows = [];
-  if (producing) flows.push(ecFlow("M36 22Q74 18 122 32", "solar", s.solar));
+  if (producing) flows.push(ecFlow(s.balcony ? "M36 22Q100 22 138 66" : "M36 22Q74 18 122 32", "solar", s.solar));
   const toBattery = (f.solarToBattery || 0) + (f.gridToBattery || 0);
   const fromBattery = (f.batteryToHome || 0) + (f.batteryToGrid || 0);
   if (s.hasBattery && toBattery >= FLOW_MIN_W) flows.push(ecFlow("M152 70H159", "charge", toBattery));
@@ -2323,8 +2937,14 @@ const ecSceneSvg = (uid, s) => {
     <path class="ec-hill" d="M0,80 C40,74 90,75 200,72 L200,80Z"/>
     <g class="ec-house" transform="translate(96 44)">
       <rect class="ec-wall" width="56" height="36"/><path class="ec-roof" d="M-6 1 L28 -22 L62 1Z"/>
-      <g class="ec-panels" transform="translate(30 -4) skewX(-34)">${panels}<rect class="ec-glint" x="0" y="-12" width="3" height="12"/></g>
+      ${s.balcony ? "" : `<g class="ec-panels" transform="translate(30 -4) skewX(-34)">${panels}<rect class="ec-glint" x="0" y="-12" width="3" height="12"/></g>`}
       ${win(8, s.night)}<rect class="ec-door" x="24" y="18" width="10" height="18"/>${win(40, false)}
+      ${
+        s.balcony
+          ? `<g class="ec-balcony"><rect class="ec-rail" x="36" y="22" width="18" height="1.2"/><rect class="ec-rail" x="36" y="22" width="1.2" height="12"/><rect class="ec-rail" x="52.8" y="22" width="1.2" height="12"/>
+        <g transform="translate(37.4 24) skewY(-8)"><rect class="ec-pv" width="7" height="10"/><rect class="ec-pv" x="8" width="7" height="10"/><rect class="ec-glint" width="2" height="10"/></g></g>`
+          : ""
+      }
     </g>
     ${battery}${pylon}${flows.join("")}${alert}
   </svg>`;
@@ -2371,6 +2991,7 @@ const EC_SCENE_STYLE = `
   .ec-door { fill: #8a5a3a; }
   .ec-win { fill: #86b9de; } .night .ec-win { fill: #3b4b5e; } .night .ec-win.lit { fill: #ffcf6e; filter: drop-shadow(0 0 1.4px #ffb347); }
   .ec-pv { fill: #1e3a6e; stroke: #9cc3ff; stroke-width: .5; }
+  .ec-rail { fill: #8a8f96; } .night .ec-rail { fill: #5d6672; }
   .ec-glint { fill: #fff; opacity: 0; }
   .producing .ec-glint { animation: ec-glint 3s ease-in-out infinite; }
   .ec-batt-body { fill: #e9edf1; stroke: #9aa3ae; stroke-width: .6; } .night .ec-batt-body { fill: #3d475c; stroke: #6b7587; }
@@ -2669,7 +3290,8 @@ class EnergyBase extends HTMLElement {
     const { sys } = findSystem(h, this._config);
     if (!sys) return null;
     const extra = sys.extra.flatMap((x) => [x.solar, x.solar_today, ...(this._config.show_strings ? x.strings : [])]);
-    const ids = [...Object.values(sys.roles), ...extra, ...(this._config.show_strings ? sys.strings : []), ...sys.switches, ...sys.selects];
+    const strings = this._config.show_strings || !sys.roles.solar ? sys.strings : [];
+    const ids = [...Object.values(sys.roles), ...extra, ...strings, ...sys.switches, ...sys.selects, ...forecastIds(h, this._config, sys), ...priceIds(this._config)];
     return [h.entities, h.devices, h.language, h.locale, h.themes?.darkMode, ...ids.map((id) => h.states[id])];
   }
 
@@ -3102,6 +3724,7 @@ class EnergyBase extends HTMLElement {
       gridDown: this._gridDown(),
       error: !!this._error(),
       night,
+      balcony: !!BRANDS[this._sys.brand].balcony,
     });
     return `
       <div class="banner${night ? " night" : ""}">
@@ -3245,6 +3868,7 @@ const FULL_STYLE = `
   .tile .k span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .tile .k .icon { width: 14px; height: 14px; color: var(--c, var(--secondary-text-color)); }
   .tile .v { font-size: 14px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+  .tile .s { font-size: 11px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
   .options { display: flex; flex-direction: column; gap: 4px; }
   .source { display: flex; flex-direction: column; gap: 4px; }
   .source .tags { padding-left: 22px; }
@@ -3261,6 +3885,17 @@ const FULL_STYLE = `
   .toggle-btn:focus-visible { outline: 2px solid var(--primary-color, var(--ec-accent)); outline-offset: 2px; }
   .alert-line { display: flex; align-items: center; gap: 6px; font-size: 13px; color: color-mix(in srgb, var(--ec-crit) 50%, var(--primary-text-color)); }
   .alert-line .icon { width: 16px; height: 16px; color: var(--ec-crit); }
+  /* Forecast: produced against today's forecast, the mark of what was expected by now, the gap. */
+  .fc { display: flex; flex-direction: column; gap: 8px; }
+  .fc-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .fc-big { font-size: 20px; font-weight: 600; } .fc-big small { font-size: 13px; font-weight: 400; color: var(--secondary-text-color); }
+  .fc-gap { margin-left: auto; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+            color: color-mix(in srgb, var(--c) 55%, var(--primary-text-color)); background: color-mix(in srgb, var(--c) 15%, transparent); }
+  .fc .bar { height: 8px; --c: var(--ec-solar); overflow: visible; }
+  .fc .bar .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--primary-text-color); border-radius: 1px; }
+  .fc-note { font-size: 12px; color: var(--secondary-text-color); }
+  /* Savings: the EDF Tempo red day banner, tinted. */
+  .alert-line.red-day { padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--ec-crit) 10%, transparent); }
   /* Narrow card: the diagram scales down with the card, so its figures grow in its own units and the labels go. */
   @container (max-width: 360px) {
     .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -3302,7 +3937,9 @@ class EnergyCard extends EnergyBase {
     if (c.show_flow !== false) parts.push(this._flow(p));
     if (c.show_sources !== false) parts.push(this._sourcesSection());
     if (c.show_battery !== false) parts.push(this._battery(p));
+    if (c.show_forecast !== false) parts.push(this._forecastSection());
     if (c.show_today !== false) parts.push(this._todaySection());
+    if (c.show_savings !== false) parts.push(this._savingsSection());
     if (c.show_week !== false) parts.push(this._weekSection());
     if (c.show_options !== false) parts.push(this._options());
     return `<style>${BASE_STYLE}${FULL_STYLE}${this._sceneStyle()}${this._accent()}</style>
@@ -3468,6 +4105,188 @@ class EnergyCard extends EnergyBase {
       return `<div class="source"><div class="option${id ? ` clickable" role="button" tabindex="0" data-entity="${esc(id)}` : ""}"><span class="lbl">${svgIcon(ICONS.solar)}${esc(x.name)}</span><span class="val">${esc(val)}</span></div>${tags ? `<div class="tags">${tags}</div>` : ""}</div>`;
     });
     return `<div>${title}<div class="options">${rows.join("")}</div></div>`;
+  }
+
+  // Sum of the energy (kWh) of some sensors, null when none has a value.
+  _kwhSum(ids) {
+    return sumOf((ids || []).map((id) => kwh(this._s(id))));
+  }
+
+  // Forecast: today's production against the forecast (Forecast.Solar, Solcast, Open-Meteo), with the mark of what the
+  // forecast expected by now (today's forecast less what is still to come) and the gap to it; the rest of today and
+  // tomorrow in two tiles.
+  _forecastSection() {
+    const fc = forecastOf(this._hass, this._config, this._sys);
+    if (!fc) return "";
+    const total = this._kwhSum(fc.today);
+    if (total === null) return "";
+    const L = this._locale();
+    const title = this._sectionTitle("forecast", ICONS.forecast, this._t("forecast"));
+    if (this._isCollapsed("forecast")) return `<div>${title}</div>`;
+    const produced = this._today().produced;
+    const remaining = this._kwhSum(fc.remaining);
+    const tomorrow = this._kwhSum(fc.tomorrow);
+    const expected = remaining === null ? null : Math.max(0, total - remaining);
+    const pct = (v) => clamp((v / Math.max(total, produced ?? 0, 0.001)) * 100, 0, 100);
+    let gap = "";
+    if (produced !== null && expected !== null && expected >= 0.2) {
+      const d = Math.round((produced / expected - 1) * 100);
+      const ahead = d >= 0;
+      gap = `<span class="fc-gap" style="--c:${ahead ? "var(--ec-ok)" : "var(--ec-warn)"}">${esc(this._t(ahead ? "ahead" : "behind", { pct: fmtNum(Math.abs(d), 0, L) }))}</span>`;
+    }
+    const big =
+      produced === null
+        ? `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today[0])}">${esc(fmtEnergy(total, L))}</span>`
+        : `<span class="fc-big clickable" role="button" tabindex="0" data-entity="${esc(fc.today[0])}">${esc(this._t("forecast_of", { x: fmtEnergy(produced, L).replace(/ kWh$/, ""), y: fmtEnergy(total, L) }))}</span>`;
+    const bar = `<div class="bar"><div style="width:${produced === null ? 0 : pct(produced)}%"></div>${expected === null ? "" : `<span class="mark" style="left:calc(${pct(expected)}% - 1px)" title="${esc(this._t("expected_now", { v: fmtEnergy(expected, L) }))}"></span>`}</div>`;
+    const note = expected === null ? "" : `<div class="fc-note">${esc(this._t("expected_now", { v: fmtEnergy(expected, L) }))}</div>`;
+    const tile = (id, icon, key, value) =>
+      value === null ? "" : `<div class="tile clickable" role="button" tabindex="0" data-entity="${esc(id)}" style="--c:var(--ec-solar)"><div class="k">${svgIcon(icon)}<span>${esc(this._t(key))}</span></div><div class="v">${esc(fmtEnergy(value, L))}</div></div>`;
+    const tiles = [tile(fc.remaining[0], ICONS.clock, "to_come", remaining), tile(fc.tomorrow[0], ICONS.calendar, "tomorrow", tomorrow)].join("");
+    return `<div>${title}<div class="fc"><div class="fc-top">${big}${gap}</div>${bar}${note}${tiles ? `<div class="tiles">${tiles}</div>` : ""}</div></div>`;
+  }
+
+  // The price of a kWh bought today: the EDF Tempo price of today's colour (`tempo` and `tempo_prices`), else
+  // `price_buy`.
+  _buyPrice() {
+    const c = this._config;
+    const color = c.tempo ? tempoColor(this._s(c.tempo)) : null;
+    const tp = c.tempo_prices && typeof c.tempo_prices === "object" ? priceOf(this._hass, c.tempo_prices[color]) : null;
+    return tp ?? priceOf(this._hass, c.price_buy);
+  }
+
+  // The price of a kWh bought over past days, for the month, the year and the payback: `price_buy`, else the Tempo
+  // prices weighted by the number of days of each colour in a year (300 blue, 43 white, 22 red); never the price of
+  // today's colour alone, which a red day would apply to the whole year.
+  _historyPrice() {
+    const c = this._config;
+    const base = priceOf(this._hass, c.price_buy);
+    if (base !== null || !c.tempo_prices || typeof c.tempo_prices !== "object") return base;
+    let sum = 0;
+    let days = 0;
+    for (const [color, n] of TEMPO_DAYS) {
+      const v = priceOf(this._hass, c.tempo_prices[color]);
+      if (v === null) continue;
+      sum += v * n;
+      days += n;
+    }
+    return days ? sum / days : null;
+  }
+
+  _money(v) {
+    const cur = this._hass.config?.currency || "EUR";
+    try {
+      return new Intl.NumberFormat(this._locale(), { style: "currency", currency: cur, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+    } catch (_err) {
+      return `${fmtNum(v, 2, this._locale())} ${cur}`;
+    }
+  }
+
+  // The production, export and home consumption of the last 12 months, from the monthly change of the "today" energy
+  // sensors in the recorder's statistics: one query, again every hour; rendered again when it comes.
+  _fetchYear() {
+    const r = this._sys.roles;
+    const ids = [r.solar_today, r.export_today, r.home_today].filter(Boolean);
+    const key = ids.join(",");
+    if (!r.solar_today || !this._hass.callWS || this._yearBusy) return;
+    if (this._yearKey === key && Date.now() - (this._yearAt || 0) < 3600000) return;
+    this._yearBusy = true;
+    this._yearKey = key;
+    this._yearAt = Date.now();
+    const tz = this._tz();
+    const now = wall(Date.now(), tz);
+    const start = midnightOf(tz, now.y, now.mo - 11, 1);
+    this._hass
+      .callWS({ type: "recorder/statistics_during_period", statistic_ids: ids, period: "month", types: ["change"], start_time: new Date(start).toISOString(), units: { energy: "kWh" } })
+      .then((x) => {
+        this._year = { tz, year: now.y, month: now.mo, rows: x || {} };
+      })
+      .catch(() => {
+        this._yearAt = Date.now() - 3600000 + 300000;
+      })
+      .finally(() => {
+        this._yearBusy = false;
+        this._html = null;
+        this._update();
+      });
+  }
+
+  // Produced, exported and consumed (kWh) this month, this calendar year and over the last 12 months, null where
+  // unknown; `since`: the start of the first month the production has statistics for.
+  _yearTotals() {
+    if (!this._year) return null;
+    const { rows, tz, year: thisYear, month: thisMonth } = this._year;
+    let since = null;
+    const of = (id, first) => {
+      const out = { month: null, year: null, rolling: null };
+      for (const r of rows[id] || []) {
+        const v = Number(r.change);
+        if (!Number.isFinite(v)) continue;
+        const t = typeof r.start === "number" ? r.start : Date.parse(r.start);
+        const w = wall(t + 43200000, tz);
+        const add = Math.max(0, v);
+        out.rolling = (out.rolling ?? 0) + add;
+        if (w.y === thisYear) out.year = (out.year ?? 0) + add;
+        if (w.y === thisYear && w.mo === thisMonth) out.month = (out.month ?? 0) + add;
+        if (first && (since === null || t < since)) since = t;
+      }
+      return out;
+    };
+    const r = this._sys.roles;
+    const none = { month: null, year: null, rolling: null };
+    return { produced: of(r.solar_today, true), exported: r.export_today ? of(r.export_today) : none, consumed: r.home_today ? of(r.home_today) : none, since };
+  }
+
+  // Savings: what the energy self-consumed saved (at the price of a kWh bought: Tempo's colour of the day for today,
+  // `price_buy` or the year's average Tempo price before) and what the exported energy earned (feed-in tariff), today,
+  // this month and this year, and the payback of the system over the last 12 months; on an EDF Tempo red day, a banner.
+  _savingsSection() {
+    const c = this._config;
+    const buy = this._buyPrice();
+    const sell = priceOf(this._hass, c.price_sell);
+    if (buy === null && sell === null) return "";
+    this._fetchYear();
+    const L = this._locale();
+    const title = this._sectionTitle("savings", ICONS.savings, this._t("savings"));
+    if (this._isCollapsed("savings")) return `<div>${title}</div>`;
+    const d = this._today();
+    const past = this._historyPrice() ?? buy;
+    const value = (produced, exported, consumed, price) => {
+      const s = selfConsumed(produced, exported, consumed);
+      return s === null ? null : s * (price ?? 0) + (exported ?? 0) * (sell ?? 0);
+    };
+    const selfToday = selfConsumed(d.produced, d.exported, d.consumed);
+    const tiles = [];
+    const tile = (role, icon, color, key, v, sub) => {
+      if (v === null) return false;
+      const id = role && this._sys.roles[role];
+      const attrs = id ? ` clickable" role="button" tabindex="0" data-entity="${esc(id)}` : "";
+      tiles.push(`<div class="tile${attrs}" style="--c:${color}"><div class="k">${svgIcon(icon)}<span>${esc(this._t(key))}</span></div><div class="v">${esc(this._money(v))}</div>${sub ? `<div class="s">${esc(sub)}</div>` : ""}</div>`);
+      return true;
+    };
+    const selfTile = buy !== null && tile("solar_today", ICONS.home, "var(--ec-solar)", "self_consumed", selfToday === null ? null : selfToday * buy, selfToday === null ? "" : `${fmtEnergy(selfToday, L)} × ${this._money(buy)}`);
+    const soldTile = sell !== null && tile("export_today", ICONS.up, "var(--ec-export)", "sold", d.exported === null ? null : d.exported * sell, d.exported === null ? "" : `${fmtEnergy(d.exported, L)} × ${this._money(sell)}`);
+    const y = this._yearTotals();
+    const at = (k) => (y ? value(y.produced[k], y.exported[k], y.consumed[k], past) : null);
+    tile(null, ICONS.calendar, "var(--ec-ok)", "this_month", at("month"));
+    tile(null, ICONS.calendar, "var(--ec-ok)", "this_year", at("year"));
+    const tags = [];
+    // Today's total, only when it is not one of the tiles already (self-consumed and sold both shown).
+    const today = value(d.produced, d.exported, d.consumed, buy);
+    if (today !== null && selfTile && soldTile) tags.push(this._t("today_value", { v: this._money(today) }));
+    const cost = priceOf(this._hass, c.system_cost);
+    const rolling = at("rolling");
+    if (cost && rolling && y.since !== null) {
+      // The last 12 months brought to a whole year pay the system back in… — once 90 days of data are in, so that a
+      // first winter (or summer) does not stand for the year.
+      const days = Math.min(365, (Date.now() - y.since) / 86400000);
+      const perYear = (rolling / days) * 365;
+      if (days >= 90 && perYear > 0) tags.push(this._t("payback", { years: fmtNum(cost / perYear, 1, L) }));
+    }
+    const red = c.tempo && tempoColor(this._s(c.tempo)) === "red" && buy !== null;
+    const banner = red ? `<div class="alert-line red-day clickable" role="button" tabindex="0" data-entity="${esc(c.tempo)}">${svgIcon(ICONS.alert)}<span>${esc(this._t("red_day", { price: this._money(buy) }))}</span></div>` : "";
+    if (!tiles.length && !tags.length && !banner) return "";
+    return `<div>${title}${banner}${tiles.length ? `<div class="tiles">${tiles.join("")}</div>` : ""}${tags.length ? `<div class="tags">${tags.map((x) => `<span class="tag"><span>${esc(x)}</span></span>`).join("")}</div>` : ""}</div>`;
   }
 
   // Today's energy: one tile per figure the integration gives, plus self-consumption and self-sufficiency.
@@ -3674,6 +4493,17 @@ class EnergyMiniCard extends EnergyCard {
     return { ...(this._zoomed ? super.getGridOptions() : { columns: 6, min_columns: 6 }), rows: "auto" };
   }
 
+  // The compact view's subtitle: today's production against the forecast ("12.4 / 18.6 kWh forecast").
+  _forecastChip() {
+    if (this._config.show_forecast === false) return "";
+    const fc = forecastOf(this._hass, this._config, this._sys);
+    const total = fc ? this._kwhSum(fc.today) : null;
+    if (total === null) return "";
+    const L = this._locale();
+    const produced = this._today().produced;
+    return this._t("forecast_chip", { x: produced === null ? "—" : fmtNum(produced, 1, L), y: fmtEnergy(total, L) });
+  }
+
   _zoomButton() {
     if (this._config.zoom === false) return "";
     const z = this._zoomed;
@@ -3724,7 +4554,7 @@ class EnergyMiniCard extends EnergyCard {
     }
     return `<style>${BASE_STYLE}${MINI_STYLE}${this._sceneStyle()}${this._accent()}</style>
       <ha-card>
-        ${this._header(this._status(p), "", p)}
+        ${this._header(this._status(p), this._forecastChip(), p)}
         <div class="content" style="--cols:${stats.length}">${stats.join("")}</div>
       </ha-card>`;
   }
@@ -3858,7 +4688,9 @@ class EnergyCardEditor extends EnergyEditorBase {
       ["show_sources", true],
       ["show_strings", false],
       ["show_battery", true],
+      ["show_forecast", true],
       ["show_today", true],
+      ["show_savings", true],
       ["show_week", true],
       ["show_options", true],
       ["show_controls", true],
@@ -3880,8 +4712,12 @@ class EnergyCardEditor extends EnergyEditorBase {
       },
       {
         name: "collapsed",
-        selector: { select: { multiple: true, mode: "list", options: ["sources", "battery", "today", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
+        selector: { select: { multiple: true, mode: "list", options: ["sources", "battery", "forecast", "today", "savings", "week", "options"].map((value) => ({ value, label: tr(value) })) } },
       },
+      { name: "forecast", selector: { entity: { domain: "sensor" } } },
+      // price_buy and price_sell stay YAML-only: a number or a sensor, which a number selector would turn to NaN.
+      { name: "tempo", selector: { entity: {} } },
+      { name: "system_cost", selector: { number: { min: 0, max: 1000000, step: 1, mode: "box" } } },
       {
         type: "expandable",
         name: "entities",

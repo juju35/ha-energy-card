@@ -95,6 +95,25 @@ async function openCard(browser, { file, type, config, theme, width, overrides }
       const callWS = async (msg) => {
         if (msg.type !== "recorder/statistics_during_period") return {};
         const start = Date.parse(msg.start_time);
+        // The savings section: the last 12 months of production, export and home consumption (kWh), by calendar
+        // month, the current month last (the production first, then the export and the home, by entity id).
+        if (msg.period === "month") {
+          const MONTHS = {
+            produced: [210, 320, 480, 590, 680, 712, 731, 655, 512, 380, 240, 96],
+            exported: [40, 90, 160, 230, 280, 300, 310, 260, 190, 110, 50, 12],
+            consumed: [620, 540, 480, 410, 380, 360, 350, 370, 400, 470, 560, 240],
+          };
+          const first = new Date(start);
+          const kind = (id, k) => (k === 0 ? "produced" : /export|injection/.test(id) ? "exported" : "consumed");
+          return Object.fromEntries(
+            msg.statistic_ids.map((id, k) => [
+              id,
+              Array.from({ length: 12 }, (_, i) => new Date(first.getFullYear(), first.getMonth() + i, 1))
+                .filter((d) => d.getTime() <= Date.now())
+                .map((d) => ({ start: d.getTime(), change: MONTHS[kind(id, k)][d.getMonth()] })),
+            ]),
+          );
+        }
         return Object.fromEntries(
           msg.statistic_ids.map((id, k) => [
             id,
