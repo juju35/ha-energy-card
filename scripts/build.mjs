@@ -1,16 +1,17 @@
-// Bundles src/energy-card.js into the Marketplace file dist/energy-card.js; the brand logos of the supported
+// Bundles the ES modules of src/ (entry src/index.js, assembled by scripts/bundle.mjs) into the Marketplace file dist/energy-card.js; the brand logos of the supported
 // integrations go to dist/energy-card.logo.<brand>.js next to it (loaded on demand, like the translations).
 // Usage: node scripts/build.mjs  (dist/ is not committed: CI and the release workflow build it)
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { splitDist } from "./i18n-split.mjs";
+import { bundle } from "./bundle.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(`${root}package.json`, "utf8"));
 const dataUri = (file) => `data:image/png;base64,${readFileSync(`${root}images/${file}`).toString("base64")}`;
 export const LOGOS = ["enphase", "solaredge", "fronius", "huawei", "sma", "tesla", "growatt", "apsystems", "solax", "goodwe", "foxess", "hoymiles", "ecoflow", "anker", "zendure", "marstek", "beem"];
 
-let out = readFileSync(`${root}src/energy-card.js`, "utf8").replace("__VERSION__", pkg.version);
+let out = bundle("src/index.js").replace("__VERSION__", pkg.version);
 mkdirSync(`${root}dist`, { recursive: true });
 // Each logo in its own file, fetched by the card only for the integration it shows.
 for (const brand of LOGOS) {
