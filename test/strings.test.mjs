@@ -1,8 +1,8 @@
 // Every language carries every key of the English strings, with the same placeholders.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { load } from "./load.mjs";
+import { source } from "./source.mjs";
 
 const { STRINGS, lang, intlLocale } = load();
 const LANGS = ["en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl", "ro", "da", "sv", "bg", "ru", "uk", "hu", "sk", "cs", "sl", "lv", "el"];
@@ -24,7 +24,7 @@ for (const l of LANGS) {
 }
 
 test("every key the card asks for exists in English", () => {
-  const src = readFileSync(new URL("../src/energy-card.js", import.meta.url), "utf8");
+  const src = source;
   const used = new Set([...src.matchAll(/(?:_t|\btr)\("([a-z_]+)"/g)].map((m) => m[1]));
   for (const k of used) assert.ok(k in STRINGS.en, k);
 });
