@@ -48,9 +48,9 @@ The cards work on top of the integrations you already use — [Enphase Envoy](ht
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-solaredge.png" alt="solaredge card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-fronius.png" alt="fronius card" width="400"> |
 
-| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="" width="20"> Fox ESS + <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="20"> APsystems (`solar_sources`, `show_strings`) |
-|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-foxess.png" alt="fox ess and apsystems card" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/foxess.png" alt="" width="20"> Fox ESS + <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/apsystems.png" alt="" width="20"> APsystems (`solar_sources`, `show_strings`) | Light |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-foxess.png" alt="fox ess and apsystems card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/screenshots/card-foxess-light.png" alt="fox ess and apsystems card, light theme" width="400"> |
 
 | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/anker.png" alt="" width="20"> Anker SOLIX (balcony kit) | <img src="https://raw.githubusercontent.com/juju35/ha-energy-card/main/images/ecoflow.png" alt="" width="20"> EcoFlow PowerStream |
 |---|---|
