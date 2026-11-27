@@ -12,7 +12,7 @@ export let _ecUid = 0;
 
 export const BASE_STYLE = `
   :host { --ec-accent: #a35f00; --ec-ok: var(--success-color, #43a047); --ec-warn: var(--warning-color, #ffa600);
-          --ec-crit: var(--error-color, #db4437); --ec-idle: var(--disabled-text-color, #9e9e9e); --ec-active: ${COLORS.solar};
+          --ec-crit: var(--error-color, #db4437); --ec-idle: var(--secondary-text-color, #9e9e9e); --ec-active: ${COLORS.solar};
           --ec-solar: ${COLORS.solar}; --ec-grid: ${COLORS.grid}; --ec-export: ${COLORS.export}; --ec-battery: ${COLORS.battery};
           --ec-charge: ${COLORS.charge}; --ec-home: ${COLORS.home};
           /* Text in a state or brand color is mixed with the text color so that it reads at 4.5:1 at least. */
