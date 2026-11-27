@@ -7,6 +7,7 @@ import { clamp, esc, fmtEnergy, fmtNum, fmtPower, intlLocale, kwh, levelClass, n
 import { findSystem } from "./registry-based-resolution.js";
 import { forecastIds, priceIds, sameDeps, sumOf } from "./forecast-savings.js";
 import { EC_SCENE_STYLE, ecIsNight, ecSceneSvg, flowsOf, powersOf, textWidth } from "./power-flow.js";
+import { rcMorph } from "./in-place-redraw.js";
 
 export let _ecUid = 0;
 
@@ -425,7 +426,8 @@ export class EnergyBase extends HTMLElement {
     const focused = this._confirm && this.shadowRoot.activeElement?.dataset?.action;
     const kept = this._confirm || this._byPointer ? null : this._focusedSpot();
     this._html = html;
-    this.shadowRoot.innerHTML = html;
+    // In place (see rcMorph): the nodes stay, so the card keeps its height, its animations and its focus.
+    rcMorph(this.shadowRoot, html);
     this._fitPill();
     this._placeImages();
     if (kept) this._restoreFocus(kept);
