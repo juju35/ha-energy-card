@@ -5,6 +5,7 @@ import "./core.js";
 import "./i18n/strings.js";
 import "./brands-integrations.js";
 import "./helpers.js";
+import "./in-place-redraw.js";
 import "./registry-based-resolution.js";
 import "./forecast-savings.js";
 import "./power-flow.js";
